@@ -5,8 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.persistence.*;
 import jakarta.servlet.annotation.WebServlet;
-
 import java.io.IOException;
+import java.time.LocalTime;
 
 @WebServlet(name = "restauranteCrear", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
@@ -30,27 +30,51 @@ public class SvRestaurante extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
         EntityManager em = emf.createEntityManager();
         String accion = req.getParameter("accion");
 
-        resp.getWriter().println("Entró a SvRestaurante");
         if ("guardar".equals(accion)) {
-            String nombre = req.getParameter("nombre");
-            String descripcion = req.getParameter("descripcion");
-            String horarioAtencion = req.getParameter("horarioAtencion");
-            Restaurante restaurante = new Restaurante(nombre, descripcion, horarioAtencion);
+            try {
+                // Obtener parámetros del formulario
+                String nombre = req.getParameter("nombre");
+                String tipoComida = req.getParameter("tipoCocina");
 
-            em.getTransaction().begin();
-            em.persist(restaurante);
-            em.getTransaction().commit();
+                // Convertir los horarios a LocalTime
+                LocalTime horaApertura = LocalTime.parse(req.getParameter("horaApertura"));
+                LocalTime horaCierre = LocalTime.parse(req.getParameter("horaCierre"));
 
-            em.close();
+                // Crear y persistir el restaurante
+                Restaurante restaurante = new Restaurante();
+                restaurante.setNombre(nombre);
+                restaurante.setTipoComida(tipoComida);
+                restaurante.setHoraApertura(horaApertura);
+                restaurante.setHoraCierre(horaCierre);
 
-            resp.getWriter().println("Restaurante guardado con éxito: " + restaurante.getNombre());
-            resp.sendRedirect(req.getContextPath() + "/index.jsp");
+                em.getTransaction().begin();
+                em.persist(restaurante);
+                em.getTransaction().commit();
+
+                resp.sendRedirect(req.getContextPath() + "/index.jsp?success=true");
+
+            } catch (Exception e) {
+                // Manejo de errores
+                em.getTransaction().rollback();
+                resp.sendRedirect(req.getContextPath() + "/index.jsp?error=" + e.getMessage());
+            } finally {
+                em.close();
+            }
         } else if ("actualizar".equals(accion)) {
             // lógica para actualizar
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (emf != null) {
+            emf.close();
         }
     }
 }

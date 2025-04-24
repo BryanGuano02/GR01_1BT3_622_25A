@@ -2,6 +2,8 @@ package entidades;
 
 import jakarta.persistence.*;
 
+import java.time.LocalTime;
+
 @Entity
 public class Restaurante {
 
@@ -10,16 +12,35 @@ public class Restaurante {
     private Long id;
 
     private String nombre;
-    private String descripcion;
-    private String horarioAtencion;
+    private String tipoComida;
+    private LocalTime horaApertura;
+    private LocalTime horaCierre;
 
     public Restaurante() {
     }
 
-    public Restaurante(String nombre, String descripcion, String horarioAtencion) {
-        this.horarioAtencion = horarioAtencion;
-        this.descripcion = descripcion;
+    public Restaurante(Long id, String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
+        this.id = id;
         this.nombre = nombre;
+        this.tipoComida = tipoComida;
+        this.horaApertura = horaApertura;
+        this.horaCierre = horaCierre;
+    }
+
+    public LocalTime getHoraApertura() {
+        return horaApertura;
+    }
+
+    public void setHoraApertura(LocalTime horaApertura) {
+        this.horaApertura = horaApertura;
+    }
+
+    public LocalTime getHoraCierre() {
+        return horaCierre;
+    }
+
+    public void setHoraCierre(LocalTime horaCierre) {
+        this.horaCierre = horaCierre;
     }
 
     public Long getId() {
@@ -38,20 +59,12 @@ public class Restaurante {
         this.nombre = nombre;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getTipoComida() {
+        return tipoComida;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setTipoComida(String descripcion) {
+        this.tipoComida = descripcion;
     }
 
-    public String getHorarioAtencion() {
-        return horarioAtencion;
-    }
-
-    public void setHorarioAtencion(String horarioAtencion) {
-        this.horarioAtencion = horarioAtencion;
-    }
 }
-//d
