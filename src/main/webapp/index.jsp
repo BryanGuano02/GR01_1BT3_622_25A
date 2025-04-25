@@ -29,7 +29,7 @@
         <input type="text" name="nombre" id="nombre" required style="width: 300px;"/>
     </div>
 
-    <!-- Tipo de Cocina -->
+    <!-- Tipo de Comida -->
     <div class="form-group">
         <label for="tipoComida">Tipo de Comida:</label>
         <select name="tipoComida" id="tipoComida" required style="width: 308px;">

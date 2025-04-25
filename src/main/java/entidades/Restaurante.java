@@ -19,8 +19,7 @@ public class Restaurante {
     public Restaurante() {
     }
 
-    public Restaurante(Long id, String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
-        this.id = id;
+    public Restaurante(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
         this.nombre = nombre;
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
@@ -63,8 +62,8 @@ public class Restaurante {
         return tipoComida;
     }
 
-    public void setTipoComida(String descripcion) {
-        this.tipoComida = descripcion;
+    public void setTipoComida(String tipoComida) {
+        this.tipoComida = tipoComida;
     }
 
 }
