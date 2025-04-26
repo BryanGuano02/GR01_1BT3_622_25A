@@ -3,9 +3,10 @@ package entidades;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
-public class Restaurante {
+public class Propietario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,11 +17,13 @@ public class Restaurante {
     private String tipoComida;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
+    @OneToMany(mappedBy = "propietario")
+    private List<Calificacion> calificaciones;
 
-    public Restaurante() {
+    public Propietario() {
     }
 
-    public Restaurante(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
+    public Propietario(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
         this.nombre = nombre;
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
