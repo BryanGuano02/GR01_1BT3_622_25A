@@ -40,7 +40,9 @@ public class SvRestaurante extends HttpServlet {
             try {
                 // Obtener parámetros del formulario
                 String nombre = req.getParameter("nombre");
+                String descripcion = req.getParameter("descripcion");
                 String tipoComida = req.getParameter("tipoComida");
+                System.out.println(descripcion);
 
                 // Convertir los horarios a LocalTime
                 LocalTime horaApertura = LocalTime.parse(req.getParameter("horaApertura"));
@@ -49,6 +51,7 @@ public class SvRestaurante extends HttpServlet {
                 // Crear y persistir el restaurante
                 Restaurante restaurante = new Restaurante();
                 restaurante.setNombre(nombre);
+                restaurante.setDescripcion(descripcion);
                 restaurante.setTipoComida(tipoComida);
                 restaurante.setHoraApertura(horaApertura);
                 restaurante.setHoraCierre(horaCierre);
