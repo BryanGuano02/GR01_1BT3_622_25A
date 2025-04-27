@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Entity
-public class Propietario {
+public class Restaurante {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,13 +17,11 @@ public class Propietario {
     private String tipoComida;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
-    @OneToMany(mappedBy = "propietario")
-    private List<Calificacion> calificaciones;
 
-    public Propietario() {
+    public Restaurante() {
     }
 
-    public Propietario(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
+    public Restaurante(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
         this.nombre = nombre;
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
@@ -78,4 +76,15 @@ public class Propietario {
         this.tipoComida = tipoComida;
     }
 
+    @Override
+    public String toString() {
+        return "Restaurante{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", tipoComida='" + tipoComida + '\'' +
+                ", horaApertura=" + horaApertura +
+                ", horaCierre=" + horaCierre +
+                '}';
+    }
 }

@@ -4,7 +4,7 @@
     <persistence-unit name="UFood_PU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <class>entidades.Propietario</class>
+        <class>entidades.Restaurante</class>
 
         <properties>
             <!-- Datos de conexión -->
