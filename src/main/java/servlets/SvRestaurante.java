@@ -59,12 +59,12 @@ public class SvRestaurante extends HttpServlet {
                 em.persist(restaurante);
                 em.getTransaction().commit();
 
-                resp.sendRedirect(req.getContextPath() + "/index.jsp?success=true");
+                resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?success=true");
 
             } catch (Exception e) {
                 // Manejo de errores
                 em.getTransaction().rollback();
-                resp.sendRedirect(req.getContextPath() + "/index.jsp?error=" + e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?error=" + e.getMessage());
             } finally {
                 em.close();
             }

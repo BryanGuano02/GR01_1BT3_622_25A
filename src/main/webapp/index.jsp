@@ -1,7 +1,16 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: alejo
+  Date: 27/4/2025
+  Time: 8:57
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ page import="entidades.Restaurante" %>
+<%@ page import="java.util.List" %>
 <head>
-    <title>U-Food | Panel Administrativo</title>
+    <title>U-Food | Dashboard Restaurantes</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -37,84 +46,120 @@
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .card-body {
-            padding: 30px;
+            padding: 20px;
         }
 
-        .btn-submit {
-            background-color: #28a745;
-            color: white;
-            width: 100%;
-            padding: 10px;
+        .restaurant-card {
+            transition: transform 0.2s;
+            cursor: pointer;
         }
 
-        .time-inputs {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .restaurant-img {
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            margin-right: 10px;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+        }
+
+        .restaurant-type {
+            font-size: 0.9rem;
+            color: #6c757d;
         }
     </style>
 </head>
 <body>
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Registrar Nuevo Restaurante</h2>
+        <h2 class="text-primary">Restaurantes Disponibles</h2>
         <div class="d-flex align-items-center">
-            <img src="https://ui-avatars.com/api/?name=Admin&background=ff6b6b&color=fff"
+            <img src="https://ui-avatars.com/api/?name=Usuario&background=ff6b6b&color=fff"
                  alt="Usuario" class="rounded-circle me-2" width="40">
-            <span class="fw-bold">Administrador</span>
+            <span class="fw-bold">Usuario</span>
         </div>
     </div>
 
+    <!-- Card de búsqueda -->
     <div class="card shadow">
         <div class="card-body">
-            <form action="${pageContext.request.contextPath}/restaurante" method="post">
-                <input type="hidden" name="accion" value="guardar">
-
-                <!-- Nombre -->
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre del Restaurante</label>
-                    <input type="text" class="form-control" name="nombre" id="nombre" required
-                           placeholder="Ej: La Cevichería">
-                </div>
-
-<%--                Descripcion--%>
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción</label>
-                    <input type="text" class="form-control" name="descripcion" id="descripcion" required
-                           placeholder="Ej: Almuerzos ricos">
-                </div>
-                <!-- Tipo de Comida -->
-                <div class="mb-3">
-                    <label for="tipoComida" class="form-label">Tipo de Comida</label>
-                    <select class="form-select" name="tipoComida" id="tipoComida" required>
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="COMIDA_RAPIDA">🍔 Comida Rápida</option>
-                        <option value="COMIDA_CASERA">🍲 Comida Casera</option>
-                        <option value="COMIDA_COSTEÑA">🐟 Comida Costeña</option>
-                        <option value="PLATOS_CARTA">🍽️ Platos a la Carta</option>
-                    </select>
-                </div>
-
-                <!-- Horario de Atención -->
-                <div class="mb-4">
-                    <label class="form-label">Horario de Atención</label>
-                    <div class="d-flex align-items-center">
-                        <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura" required>
-                        <span class="mx-2">a</span>
-                        <input type="time" class="form-control ms-2" style="width: 150px;" name="horaCierre" required>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Buscar restaurantes..."
+                               aria-label="Buscar restaurantes" aria-describedby="button-search">
+                        <button class="btn btn-primary" type="button" id="button-search">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary w-100 py-2">
-                    <i class="bi bi-save me-2"></i> Guardar Restaurante
-                </button>
-            </form>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-success">
+                        <i class="fas fa-heart me-2"></i>Guardar Preferencias
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Listado de restaurantes -->
+    <div class="row">
+        <%
+            // Estos serían los restaurantes que vienen del backend
+            String[] restaurantes = {"Bufcar", "Gurodov", "PreFeverness", "Lichtablos"};
+            String[] tipos = {"Comida Rápida", "Comida Casera", "Comida Internacional", "Comida Gourmet"};
+            int[] ratings = {4, 3, 5, 4};
+
+            for (int i = 0; i < restaurantes.length; i++) {
+        %>
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card restaurant-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><%= restaurantes[i] %>
+                    </h5>
+                    <p class="restaurant-type mb-2">
+                        <i class="fas fa-utensils me-1"></i> <%= tipos[i] %>
+                    </p>
+                    <div class="mb-2">
+                        <% for (int j = 0; j < 5; j++) { %>
+                        <i class="fas fa-star <%= j < ratings[i] ? "rating-stars" : "text-secondary" %>"></i>
+                        <% } %>
+                        <span class="ms-1">(<%= ratings[i] %>)</span>
+                    </div>
+                    <p class="card-text">Descripción breve del restaurante y sus especialidades.</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="calificar?idRestaurante=<%= i %>" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-star"></i> Calificar
+                    </a>
+                    <%--                    <button class="btn btn-sm btn-outline-success">--%>
+                    <%--                        <i class="fas fa-star"></i> Calificar--%>
+                    <%--                    </button>--%>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
 </div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
