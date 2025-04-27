@@ -1,6 +1,7 @@
 package entidades;
 
 import jakarta.persistence.*;
+
 @Entity
 public class Calificacion {
 
@@ -8,23 +9,36 @@ public class Calificacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double puntaje;
+    private int puntaje;
     private String comentario;
     @ManyToOne
     @JoinColumn(name = "idComensal")
     private Comensal comensal;
     @ManyToOne
-    @JoinColumn(name = "idPropietario")
-    private Propietario propietario;
+    @JoinColumn(name = "idRestaurante")
+    private Restaurante restaurante;
 
     public Calificacion() {
     }
 
-    public Calificacion(Double puntaje, String comentario, Comensal comensal, Propietario propietario) {
+    public Calificacion(int puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
         this.puntaje = puntaje;
         this.comentario = comentario;
         this.comensal = comensal;
-        this.propietario = propietario;
+        this.restaurante = restaurante;
+    }
+
+    public Boolean calificar(Comensal comensal, Restaurante restaurante) {
+        if (restaurante == null || comensal == null ) {
+            return false;
+        }
+        if (puntaje < 1.0 || puntaje > 5.0) {
+            return false;
+        }
+        this.restaurante = restaurante;
+        this.comensal = comensal;
+
+        return true;
     }
 
     public Long getId() {
@@ -35,11 +49,11 @@ public class Calificacion {
         this.id = id;
     }
 
-    public Double getPuntaje() {
+    public int getPuntaje() {
         return puntaje;
     }
 
-    public void setPuntaje(Double puntaje) {
+    public void setPuntaje(int puntaje) {
         this.puntaje = puntaje;
     }
 
@@ -59,11 +73,11 @@ public class Calificacion {
         this.comensal = comensal;
     }
 
-    public Propietario getPropietario() {
-        return propietario;
+    public Restaurante getRestaurante() {
+        return restaurante;
     }
 
-    public void setPropietario(Propietario propietario) {
-        this.propietario = propietario;
+    public void setRestaurante(Restaurante restaurante) {
+        this.restaurante = restaurante;
     }
 }
