@@ -1,6 +1,6 @@
 package servlets;
 
-import entidades.Restaurante;
+import entidades.Propietario;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.persistence.*;
@@ -49,15 +49,15 @@ public class SvRestaurante extends HttpServlet {
                 LocalTime horaCierre = LocalTime.parse(req.getParameter("horaCierre"));
 
                 // Crear y persistir el restaurante
-                Restaurante restaurante = new Restaurante();
-                restaurante.setNombre(nombre);
-                restaurante.setDescripcion(descripcion);
-                restaurante.setTipoComida(tipoComida);
-                restaurante.setHoraApertura(horaApertura);
-                restaurante.setHoraCierre(horaCierre);
+                Propietario propietario = new Propietario();
+                propietario.setNombre(nombre);
+                propietario.setDescripcion(descripcion);
+                propietario.setTipoComida(tipoComida);
+                propietario.setHoraApertura(horaApertura);
+                propietario.setHoraCierre(horaCierre);
 
                 em.getTransaction().begin();
-                em.persist(restaurante);
+                em.persist(propietario);
                 em.getTransaction().commit();
 
                 resp.sendRedirect(req.getContextPath() + "/index.jsp?success=true");

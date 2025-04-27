@@ -70,7 +70,7 @@
 
     <div class="card shadow">
         <div class="card-body">
-            <form action="${pageContext.request.contextPath}/restaurante" method="post">
+            <form action="${pageContext.request.contextPath}/propietario" method="post">
                 <input type="hidden" name="accion" value="guardar">
 
                 <!-- Nombre -->
