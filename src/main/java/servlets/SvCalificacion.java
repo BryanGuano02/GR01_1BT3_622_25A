@@ -77,11 +77,11 @@ public class SvCalificacion extends HttpServlet {
             } else {
                 em.getTransaction().rollback();
             }
-            resp.sendRedirect(req.getContextPath() + "/inicio.jsp?success=true");
+            resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
 
         } catch (Exception e) {
             em.getTransaction().rollback();
-            resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?error=" + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/inicio?error=" + e.getMessage());
         } finally {
             em.close();
         }

@@ -93,7 +93,7 @@
 <body>
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">sRestaurantes Disponibles</h2>
+        <h2 class="text-primary">Restaurantes Disponibles</h2>
         <div class="d-flex align-items-center">
             <img src="https://ui-avatars.com/api/?name=Usuario&background=ff6b6b&color=fff"
                  alt="Usuario" class="rounded-circle me-2" width="40">
