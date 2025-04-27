@@ -14,18 +14,15 @@ public class Comensal {
     @OneToMany
     @JoinColumn(name = "idComensal")
     private List<Preferencia> preferencias;
-    @OneToMany(mappedBy = "comensal")
-    private List<Calificacion> calificaciones;
 
     public Comensal() {
     }
 
-    public Comensal(Long id, String nombre, String correo, List<Preferencia> preferencias, List<Calificacion> calificaciones) {
+    public Comensal(Long id, String nombre, String correo, List<Preferencia> preferencias) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
         this.preferencias = preferencias;
-        this.calificaciones = calificaciones;
     }
 
     public Long getId() {
@@ -60,11 +57,4 @@ public class Comensal {
         this.preferencias = preferencias;
     }
 
-    public List<Calificacion> getCalificaciones() {
-        return calificaciones;
-    }
-
-    public void setCalificaciones(List<Calificacion> calificaciones) {
-        this.calificaciones = calificaciones;
-    }
 }
