@@ -1,10 +1,15 @@
 package servlets;
 
 import entidades.Restaurante;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
-import jakarta.persistence.*;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.time.LocalTime;
 
@@ -20,13 +25,15 @@ public class SvRestaurante extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String accion = req.getParameter("accion");
+//        String accion = req.getParameter("accion");
+//
+//        if ("listar".equals(accion)) {
+//            // lógica para listar
+//        } else if ("eliminar".equals(accion)) {
+//            // lógica para eliminar
+//        }
 
-        if ("listar".equals(accion)) {
-            // lógica para listar
-        } else if ("eliminar".equals(accion)) {
-            // lógica para eliminar
-        }
+        req.getRequestDispatcher("/crearRestaurante.jsp").forward(req, resp);
     }
 
     @Override

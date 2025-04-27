@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "calificar", value = "/calificar")
 public class SvCalificacion extends HttpServlet {
@@ -28,11 +27,21 @@ public class SvCalificacion extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         EntityManager em = emf.createEntityManager();
+        String idRestauranteString = req.getParameter("idRestaurante");
 
-        List<Restaurante> restaurantes = em.createQuery("SELECT r FROM Restaurante r").getResultList();
-
-        req.setAttribute("restaurantes", restaurantes);
-
+        if (idRestauranteString == null || idRestauranteString.isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parámetro idRestaurante requerido");
+            return;
+        }
+        int idRestaurante;
+        try {
+            idRestaurante = Integer.parseInt(idRestauranteString);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante debe ser un número entero");
+            return;
+        }
+        Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
+        req.setAttribute("restaurante", restaurante);
         req.getRequestDispatcher("calificarRestaurante.jsp").forward(req, resp);
     }
 
@@ -42,42 +51,40 @@ public class SvCalificacion extends HttpServlet {
 
         EntityManager em = emf.createEntityManager();
 
-            try {
-                // Obtener parámetros del formulario
-                int puntaje = Integer.parseInt(req.getParameter("puntaje"));
-                String comentario = req.getParameter("comentario");
-                Long idComensal = Long.parseLong(req.getParameter("idComensal"));
-                Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
+        try {
+            // Obtener parámetros del formulario
+            int puntaje = Integer.parseInt(req.getParameter("puntaje"));
+            String comentario = req.getParameter("comentario");
+            Long idComensal = Long.parseLong(req.getParameter("idComensal"));
+            Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
 
-                Calificacion nuevaCalificacion = new Calificacion();
-                em.getTransaction().begin();
-                Comensal comensal = em.find(Comensal.class, idComensal);
-                Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
+            Calificacion nuevaCalificacion = new Calificacion();
+            em.getTransaction().begin();
+            Comensal comensal = em.find(Comensal.class, idComensal);
+            Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
 
-                if (comensal == null || restaurante == null) {
-                    throw new IllegalArgumentException("Comensal o Restaurante no encontrado");
-                }
-
-                nuevaCalificacion.setPuntaje(puntaje);
-                nuevaCalificacion.setComentario(comentario);
-                boolean exito = nuevaCalificacion.calificar(comensal, restaurante);
-
-                if (exito) {
-                    em.persist(nuevaCalificacion);
-                    em.getTransaction().commit();
-                } else {
-                    em.getTransaction().rollback();
-                    // Manejar el caso de fallo en la calificación
-                }
-                resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?success=true");
-
-            } catch (Exception e) {
-                // Manejo de errores
-                em.getTransaction().rollback();
-                resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?error=" + e.getMessage());
-            } finally {
-                em.close();
+            if (comensal == null || restaurante == null) {
+                throw new IllegalArgumentException("Comensal o Restaurante no encontrado");
             }
+
+            nuevaCalificacion.setPuntaje(puntaje);
+            nuevaCalificacion.setComentario(comentario);
+            boolean exito = nuevaCalificacion.calificar(comensal, restaurante);
+
+            if (exito) {
+                em.persist(nuevaCalificacion);
+                em.getTransaction().commit();
+            } else {
+                em.getTransaction().rollback();
+            }
+            resp.sendRedirect(req.getContextPath() + "/inicio.jsp?success=true");
+
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp?error=" + e.getMessage());
+        } finally {
+            em.close();
+        }
     }
 
     @Override
