@@ -80,4 +80,15 @@ public class Calificacion {
     public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
     }
+
+    @Override
+    public String toString() {
+        return "Calificacion{" +
+                "id=" + id +
+                ", puntaje=" + puntaje +
+                ", comentario='" + comentario + '\'' +
+                ", comensal=" + comensal +
+                ", restaurante=" + restaurante +
+                '}';
+    }
 }
