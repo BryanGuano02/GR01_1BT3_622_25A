@@ -8,6 +8,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
+<%@ page import="entidades.Calificacion" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <head>
     <title>U-Food | Dashboard Restaurantes</title>
     <meta charset="UTF-8">
@@ -122,37 +125,83 @@
 
     <!-- Listado de restaurantes -->
     <div class="row">
-        <%
-            // Estos serían los restaurantes que vienen del backend
-            String[] restaurantes = {"Bufcar", "Gurodov", "PreFeverness", "Lichtablos"};
-            String[] tipos = {"Comida Rápida", "Comida Casera", "Comida Internacional", "Comida Gourmet"};
-            int[] ratings = {4, 3, 5, 4};
+<%--        <%--%>
+        <%--            List<Restaurante> restaurantes = (List<Restaurante>) request.getSession().getAttribute("restaurantes");--%>
 
-            for (int i = 0; i < restaurantes.length; i++) {
+        <%--            for (int i = 0; i < restaurantes.size(); i++) {--%>
+        <%--        %>--%>
+        <%--        <div class="col-md-6 col-lg-4 mb-4">--%>
+        <%--            <div class="card restaurant-card h-100">--%>
+        <%--                <div class="card-body">--%>
+        <%--                    <h5 class="card-title"><%= restaurantes[i] %>--%>
+        <%--                    </h5>--%>
+        <%--                    <p class="restaurant-type mb-2">--%>
+        <%--                        <i class="fas fa-utensils me-1"></i> <%= tipos[i] %>--%>
+        <%--                    </p>--%>
+        <%--                    <div class="mb-2">--%>
+        <%--                        <% for (int j = 0; j < 5; j++) { %>--%>
+        <%--                        <i class="fas fa-star <%= j < ratings[i] ? "rating-stars" : "text-secondary" %>"></i>--%>
+        <%--                        <% } %>--%>
+        <%--                        <span class="ms-1">(<%= ratings[i] %>)</span>--%>
+        <%--                    </div>--%>
+        <%--                    <p class="card-text">Descripción breve del restaurante y sus especialidades.</p>--%>
+        <%--                </div>--%>
+        <%--                <div class="card-footer bg-white">--%>
+        <%--                    <a href="calificar?idRestaurante=<%= i %>" class="btn btn-sm btn-outline-success">--%>
+        <%--                        <i class="fas fa-star"></i> Calificar--%>
+        <%--                    </a>--%>
+        <%--                    &lt;%&ndash;                    <button class="btn btn-sm btn-outline-success">&ndash;%&gt;--%>
+        <%--                    &lt;%&ndash;                        <i class="fas fa-star"></i> Calificar&ndash;%&gt;--%>
+        <%--                    &lt;%&ndash;                    </button>&ndash;%&gt;--%>
+        <%--                </div>--%>
+        <%--            </div>--%>
+        <%--        </div>--%>
+        <%--        <% } %>--%>
+        <%
+            // Obtener las listas de la sesión
+            List<Restaurante> restaurantes = (List<Restaurante>) request.getAttribute("restaurantes");
+            List<Calificacion> calificaciones = (List<Calificacion>) request.getAttribute("calificaciones");
+
+            // Crear un mapa rápido de calificaciones por restaurante (ID -> Calificacion)
+            Map<Long, Calificacion> calificacionMap = new HashMap<>();
+            if (calificaciones != null) {
+                for (Calificacion calif : calificaciones) {
+                    calificacionMap.put(calif.getRestaurante().getId(), calif);
+                }
+            }
+        %>
+
+        <% for (Restaurante restaurante : restaurantes) {
+            Calificacion calificacion = calificacionMap.get(restaurante.getId());
+            double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
         %>
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card restaurant-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><%= restaurantes[i] %>
+                    <h5 class="card-title"><%= restaurante.getNombre() %>
                     </h5>
                     <p class="restaurant-type mb-2">
-                        <i class="fas fa-utensils me-1"></i> <%= tipos[i] %>
+                        <i class="fas fa-utensils me-1"></i> <%= restaurante.getTipoComida() %>
                     </p>
                     <div class="mb-2">
+                        <% if (puntaje >= 0) {
+                            int rating = (int) Math.round(puntaje);
+                        %>
                         <% for (int j = 0; j < 5; j++) { %>
-                        <i class="fas fa-star <%= j < ratings[i] ? "rating-stars" : "text-secondary" %>"></i>
+                        <i class="fas fa-star <%= j < rating ? "rating-stars" : "text-secondary" %>"></i>
                         <% } %>
-                        <span class="ms-1">(<%= ratings[i] %>)</span>
+                        <span class="ms-1">(<%= String.format("%.1f", puntaje) %>)</span>
+                        <% } else { %>
+                        <span class="text-muted">-</span>
+                        <% } %>
                     </div>
-                    <p class="card-text">Descripción breve del restaurante y sus especialidades.</p>
+                    <p class="card-text"><%= restaurante.getDescripcion() %>
+                    </p>
                 </div>
                 <div class="card-footer bg-white">
-                    <a href="calificar?idRestaurante=<%= i %>" class="btn btn-sm btn-outline-success">
+                    <a href="calificar?idRestaurante=<%= restaurante.getId() %>" class="btn btn-sm btn-outline-success">
                         <i class="fas fa-star"></i> Calificar
                     </a>
-                    <%--                    <button class="btn btn-sm btn-outline-success">--%>
-                    <%--                        <i class="fas fa-star"></i> Calificar--%>
-                    <%--                    </button>--%>
                 </div>
             </div>
         </div>

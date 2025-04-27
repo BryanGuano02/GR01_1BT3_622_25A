@@ -91,10 +91,10 @@
                     <label for="tipoComida" class="form-label">Tipo de Comida</label>
                     <select class="form-select" name="tipoComida" id="tipoComida" required>
                         <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="COMIDA_RAPIDA">🍔 Comida Rápida</option>
-                        <option value="COMIDA_CASERA">🍲 Comida Casera</option>
-                        <option value="COMIDA_COSTEÑA">🐟 Comida Costeña</option>
-                        <option value="PLATOS_CARTA">🍽️ Platos a la Carta</option>
+                        <option value="Comida Rápida">🍔 Comida Rápida</option>
+                        <option value="Comida Casera">🍲 Comida Casera</option>
+                        <option value="Comida Costeña">🐟 Comida Costeña</option>
+                        <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
                     </select>
                 </div>
 
