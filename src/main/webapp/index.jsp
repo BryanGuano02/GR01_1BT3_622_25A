@@ -115,6 +115,9 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
+                    <a href="Comparar" class="btn btn-info me-2">
+                        <i class="fas fa-balance-scale me-2"></i>Comparar
+                    </a>
                     <button class="btn btn-success">
                         <i class="fas fa-heart me-2"></i>Guardar Preferencias
                     </button>
@@ -125,7 +128,7 @@
 
     <!-- Listado de restaurantes -->
     <div class="row">
-<%--        <%--%>
+        <%--        <%--%>
         <%--            List<Restaurante> restaurantes = (List<Restaurante>) request.getSession().getAttribute("restaurantes");--%>
 
         <%--            for (int i = 0; i < restaurantes.size(); i++) {--%>
