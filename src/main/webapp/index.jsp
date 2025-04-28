@@ -1,4 +1,4 @@
-<%--
+    <%--
   Created by IntelliJ IDEA.
   User: alejo
   Date: 27/4/2025
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="Comparar" class="btn btn-info me-2">
+                    <a href="SvComparar" class="btn btn-info me-2">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
                     <button class="btn btn-success">
