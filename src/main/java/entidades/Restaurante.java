@@ -15,6 +15,7 @@ public class Restaurante {
     private String nombre;
     private String descripcion;
     private String tipoComida;
+    private int distanciaUniversidad;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
 
@@ -75,6 +76,10 @@ public class Restaurante {
     public void setTipoComida(String tipoComida) {
         this.tipoComida = tipoComida;
     }
+
+    public int getDistanciaUniversidad(  ) { return distanciaUniversidad; }
+
+    public void setDistanciaUniversidad(int distanciaUniversidad) { this.distanciaUniversidad = distanciaUniversidad; }
 
     @Override
     public String toString() {
