@@ -4,6 +4,10 @@
     <persistence-unit name="UFood_PU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>entidades.Calificacion</class>
+        <class>entidades.Comensal</class>
+        <class>entidades.Preferencia</class>
+        <class>entidades.Historia</class>
         <class>entidades.Restaurante</class>
 
         <properties>

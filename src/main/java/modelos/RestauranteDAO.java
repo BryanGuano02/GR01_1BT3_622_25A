@@ -20,20 +20,42 @@ public class RestauranteDAO {
         List<Restaurante> restaurantes = new ArrayList<>();
 
         try {
-            // Crear la consulta JPQL para obtener todos los restaurantes
-            TypedQuery<Restaurante> query = em.createQuery("SELECT r FROM Restaurante r", Restaurante.class);
-
-            // Ejecutar la consulta y obtener los resultados
+            // JOIN FETCH para cargar historias junto con el restaurante
+            TypedQuery<Restaurante> query = em.createQuery(
+                    "SELECT DISTINCT r FROM Restaurante r " +
+                            "LEFT JOIN FETCH r.historias h " +
+                            "ORDER BY r.id", Restaurante.class);
             restaurantes = query.getResultList();
-
         } finally {
-            // Cerrar el EntityManager
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+            em.close();
         }
 
         return restaurantes;
+    }
+
+    public Restaurante buscarPorId(Long id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(Restaurante.class, id);
+        } finally {
+            em.close();
+        }
+    }
+
+    public void actualizar(Restaurante restaurante) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.merge(restaurante);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     // Otros métodos del DAO...

@@ -28,16 +28,15 @@ public class SvCalificacion extends HttpServlet {
             throws ServletException, IOException {
         EntityManager em = emf.createEntityManager();
         String idRestauranteString = req.getParameter("idRestaurante");
-
         if (idRestauranteString == null || idRestauranteString.isEmpty()) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parámetro idRestaurante requerido");
             return;
         }
-        int idRestaurante;
+        Long idRestaurante;
         try {
-            idRestaurante = Integer.parseInt(idRestauranteString);
+            idRestaurante = Long.parseLong(idRestauranteString);
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante debe ser un número entero");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante debe ser un número");
             return;
         }
         Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
@@ -52,7 +51,6 @@ public class SvCalificacion extends HttpServlet {
         EntityManager em = emf.createEntityManager();
 
         try {
-            // Obtener parámetros del formulario
             int puntaje = Integer.parseInt(req.getParameter("puntaje"));
             String comentario = req.getParameter("comentario");
             Long idComensal = Long.parseLong(req.getParameter("idComensal"));
@@ -80,17 +78,12 @@ public class SvCalificacion extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
 
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             resp.sendRedirect(req.getContextPath() + "/inicio?error=" + e.getMessage());
         } finally {
             em.close();
-        }
-    }
-
-    @Override
-    public void destroy() {
-        if (emf != null) {
-            emf.close();
         }
     }
 }
