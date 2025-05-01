@@ -17,24 +17,18 @@ public class RestauranteDAO {
 
     public List<Restaurante> obtenerTodosLosRestaurantes() {
         EntityManager em = emf.createEntityManager();
-        List<Restaurante> restaurantes = new ArrayList<>();
-
         try {
-            // Crear la consulta JPQL para obtener todos los restaurantes
-            TypedQuery<Restaurante> query = em.createQuery("SELECT r FROM Restaurante r", Restaurante.class);
-
-            // Ejecutar la consulta y obtener los resultados
-            restaurantes = query.getResultList();
-
+            TypedQuery<Restaurante> query = em.createQuery(
+                    "SELECT DISTINCT r FROM Restaurante r LEFT JOIN FETCH r.historias",
+                    Restaurante.class);
+            return query.getResultList();
         } finally {
-            // Cerrar el EntityManager
             if (em != null && em.isOpen()) {
                 em.close();
             }
         }
-
-        return restaurantes;
     }
+
 
     // Otros métodos del DAO...
 

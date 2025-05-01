@@ -3,6 +3,7 @@ package entidades;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,12 @@ public class Restaurante {
     private String tipoComida;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
+
+    // Nuevo atributo para las historias (menú del día)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "restaurante_historias", joinColumns = @JoinColumn(name = "restaurante_id"))
+    @Column(name = "historia", length = 1000)
+    private List<String> historias = new ArrayList<>();
 
     public Restaurante() {
     }
@@ -76,6 +83,21 @@ public class Restaurante {
         this.tipoComida = tipoComida;
     }
 
+    public List<String> getHistorias() {
+        if (this.historias == null) {
+            this.historias = new ArrayList<>();
+        }
+        return this.historias;
+    }
+
+    public void setHistorias(List<String> historias) {
+        this.historias = historias;
+    }
+
+    public void agregarHistoria(String historia) {
+        this.historias.add(historia);
+    }
+
     @Override
     public String toString() {
         return "Restaurante{" +
@@ -85,6 +107,7 @@ public class Restaurante {
                 ", tipoComida='" + tipoComida + '\'' +
                 ", horaApertura=" + horaApertura +
                 ", horaCierre=" + horaCierre +
+                ", historias=" + historias +
                 '}';
     }
 }
