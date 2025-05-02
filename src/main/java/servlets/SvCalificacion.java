@@ -1,5 +1,6 @@
 package servlets;
 
+import Servicios.CalificacionService;
 import entidades.Calificacion;
 import entidades.Comensal;
 import entidades.Restaurante;
@@ -49,15 +50,22 @@ public class SvCalificacion extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        int puntaje = Integer.parseInt(req.getParameter("puntaje"));
+        String comentario = req.getParameter("comentario");
+        Long idComensal = Long.parseLong(req.getParameter("idComensal"));
+        Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
+
+        CalificacionService calificacion = new CalificacionService(puntaje, comentario, idComensal, idRestaurante);
+        calificacion.calificar();
+
+        resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
+
+
+
         EntityManager em = emf.createEntityManager();
 
         try {
             // Obtener parámetros del formulario
-            int puntaje = Integer.parseInt(req.getParameter("puntaje"));
-            String comentario = req.getParameter("comentario");
-            Long idComensal = Long.parseLong(req.getParameter("idComensal"));
-            Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
-
             Calificacion nuevaCalificacion = new Calificacion();
             em.getTransaction().begin();
             Comensal comensal = em.find(Comensal.class, idComensal);

@@ -1,7 +1,6 @@
-package modelos;
+package DAO;
 
 import entidades.Calificacion;
-import entidades.Restaurante;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -12,7 +11,7 @@ import java.util.List;
 
 
 public class CalificacionDAO {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     public CalificacionDAO() {
         // Obtener la EntityManagerFactory (normalmente se hace una vez en la aplicación)
@@ -40,11 +39,27 @@ public class CalificacionDAO {
         return calificaciones;
     }
 
-    // Otros métodos del DAO...
+    public void crear(Calificacion nuevaCalificacion) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+            em.persist(nuevaCalificacion);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 
     public void cerrar() {
         if (emf != null && emf.isOpen()) {
             emf.close();
         }
     }
+
 }

@@ -1,4 +1,4 @@
-package modelos;
+package DAO;
 
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;

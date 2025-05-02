@@ -10,8 +10,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import modelos.CalificacionDAO;
-import modelos.RestauranteDAO;
+import DAO.CalificacionDAO;
+import DAO.RestauranteDAO;
 
 import java.io.IOException;
 import java.util.List;
