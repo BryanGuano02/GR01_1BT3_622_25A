@@ -211,11 +211,11 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <form action="${pageContext.request.contextPath}/restaurante" method="post">
-                                            <input type="hidden" name="accion" value="agregarMenu">
+                                            <input type="hidden" name="accion" value="agregarHistoria">
                                             <input type="hidden" name="restauranteId" value="<%= r.getId() %>">
                                             <div class="modal-body">
                                                 <div class="mb-3">
-                                                    <textarea class="form-control" name="menu"
+                                                    <textarea class="form-control" name="historia"
                                                               placeholder="Describa el menú del día..." required></textarea>
                                                 </div>
                                             </div>
