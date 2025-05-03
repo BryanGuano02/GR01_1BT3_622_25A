@@ -9,7 +9,7 @@ public class Calificacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int puntaje;
+    private Double puntaje;
     private String comentario;
     @ManyToOne
     @JoinColumn(name = "idComensal")
@@ -21,13 +21,12 @@ public class Calificacion {
     public Calificacion() {
     }
 
-    public Calificacion(int puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
+    public Calificacion(Double puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
         this.puntaje = puntaje;
         this.comentario = comentario;
         this.comensal = comensal;
         this.restaurante = restaurante;
     }
-
 
     public Long getId() {
         return id;
@@ -37,11 +36,11 @@ public class Calificacion {
         this.id = id;
     }
 
-    public int getPuntaje() {
+    public Double getPuntaje() {
         return puntaje;
     }
 
-    public void setPuntaje(int puntaje) {
+    public void setPuntaje(Double puntaje) {
         this.puntaje = puntaje;
     }
 

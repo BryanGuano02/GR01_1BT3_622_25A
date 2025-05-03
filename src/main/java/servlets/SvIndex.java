@@ -36,7 +36,6 @@ public class SvIndex extends HttpServlet {
         List<Restaurante> restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
         List<Calificacion> calificacions = calificacionesDAO.obtenerTodosLosCalificaciones();
 
-        System.out.println(calificacions);
         req.setAttribute("restaurantes", restaurantes);
         req.setAttribute("calificaciones", calificacions);
         req.getRequestDispatcher("/index.jsp").forward(req, resp);

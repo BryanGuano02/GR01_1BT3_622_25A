@@ -1,18 +1,29 @@
 package DAO;
 
 import entidades.Restaurante;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestauranteDAO {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     public RestauranteDAO() {
         // Obtener la EntityManagerFactory (normalmente se hace una vez en la aplicación)
         emf = Persistence.createEntityManagerFactory("UFood_PU");
+    }
+
+    public Restaurante obtenerRestaurantePorId(Long idRestaurante) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
+            return restaurante;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
     }
 
     public List<Restaurante> obtenerTodosLosRestaurantes() {
@@ -36,6 +47,44 @@ public class RestauranteDAO {
         return restaurantes;
     }
 
+    public void actualizar(Restaurante restaurante) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = null;
+
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            // Busca el restaurante existente o lanza excepción si no existe
+            Restaurante restauranteExistente = em.find(Restaurante.class, restaurante.getId());
+
+            if (restauranteExistente == null) {
+                throw new IllegalArgumentException("No se encontró el restaurante con ID: " + restaurante.getId());
+            }
+
+            // Actualiza todos los campos
+            restauranteExistente.setNombre(restaurante.getNombre());
+            restauranteExistente.setDescripcion(restaurante.getDescripcion());
+            restauranteExistente.setTipoComida(restaurante.getTipoComida());
+            restauranteExistente.setHoraApertura(restaurante.getHoraApertura());
+            restauranteExistente.setHoraCierre(restaurante.getHoraCierre());
+            restauranteExistente.setPuntajePromedio(restaurante.getPuntajePromedio());
+
+            // El merge no es estrictamente necesario aquí porque estamos trabajando con la entidad administrada
+            em.merge(restauranteExistente);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Error al actualizar el restaurante", e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
     // Otros métodos del DAO...
 
     public void cerrar() {

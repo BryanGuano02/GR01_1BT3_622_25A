@@ -17,6 +17,7 @@ public class Restaurante {
     private String tipoComida;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
+    private Double puntajePromedio;
 
     public Restaurante() {
     }
@@ -74,6 +75,14 @@ public class Restaurante {
 
     public void setTipoComida(String tipoComida) {
         this.tipoComida = tipoComida;
+    }
+
+    public Double getPuntajePromedio() {
+        return puntajePromedio;
+    }
+
+    public void setPuntajePromedio(Double puntajePromedio) {
+        this.puntajePromedio = puntajePromedio;
     }
 
     @Override

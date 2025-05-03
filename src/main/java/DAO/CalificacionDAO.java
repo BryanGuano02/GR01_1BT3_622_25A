@@ -14,8 +14,60 @@ public class CalificacionDAO {
     private final EntityManagerFactory emf;
 
     public CalificacionDAO() {
-        // Obtener la EntityManagerFactory (normalmente se hace una vez en la aplicación)
         emf = Persistence.createEntityManagerFactory("UFood_PU");
+    }
+
+    public Calificacion obtenerPorId(Long id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(Calificacion.class, id);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    public void actualizar(Calificacion calificacion) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            em.merge(calificacion);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    public List<Calificacion> obtenerTodosLosCalificaciones(Long idRestaurante) {
+        EntityManager em = emf.createEntityManager();
+        List<Calificacion> calificaciones = new ArrayList<>();
+
+        try {
+            TypedQuery<Calificacion> query = em.createQuery(
+                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+                    Calificacion.class);
+
+            query.setParameter("idRestaurante", idRestaurante);
+
+            calificaciones = query.getResultList();
+
+        } finally {
+            // Cerrar el EntityManager
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+
+        return calificaciones;
     }
 
     public List<Calificacion> obtenerTodosLosCalificaciones() {
@@ -23,14 +75,11 @@ public class CalificacionDAO {
         List<Calificacion> calificaciones = new ArrayList<>();
 
         try {
-            // Crear la consulta JPQL para obtener todos los restaurantes
             TypedQuery<Calificacion> query = em.createQuery("SELECT r FROM Calificacion r", Calificacion.class);
 
-            // Ejecutar la consulta y obtener los resultados
             calificaciones = query.getResultList();
 
         } finally {
-            // Cerrar el EntityManager
             if (em != null && em.isOpen()) {
                 em.close();
             }

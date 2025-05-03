@@ -1,50 +1,77 @@
 package Servicios;
 
 import DAO.CalificacionDAO;
+import DAO.ComensalDAO;
 import DAO.RestauranteDAO;
 import entidades.Calificacion;
+import entidades.Comensal;
 import entidades.Restaurante;
 
-public class CalificacionService {
-    private final int puntaje;
-    private final String comentario;
-    private final Long idComensal;
-    private final Long idRestaurante;
-    private CalificacionDAO calificacionDAO;
-    private RestauranteDAO restauranteDAO;
+import java.util.List;
+import java.util.Map;
 
-    public CalificacionService(int puntaje, String comentario, Long idComensal, Long idRestaurante, CalificacionDAO calificacionDAO, RestauranteDAO restauranteDAO) {
-        this.puntaje = puntaje;
-        this.comentario = comentario;
-        this.idComensal = idComensal;
-        this.idRestaurante = idRestaurante;
-        this.calificacionDAO = calificacionDAO;
-        this.restauranteDAO = restauranteDAO;
+public class CalificacionService {
+    private final CalificacionDAO calificacionDAO;
+    private final RestauranteDAO restauranteDAO;
+    private final ComensalDAO comensalDAO;
+
+    public CalificacionService() {
+        this.calificacionDAO = new CalificacionDAO();
+        this.restauranteDAO = new RestauranteDAO();
+        this.comensalDAO = new ComensalDAO();
     }
 
-    public Boolean calificar() {
-        if (idRestaurante == null || idComensal == null) return false;
-        if (puntaje < 1 || puntaje > 5) return false;
-        return !yaCalifico(idComensal, idRestaurante);
+    public Boolean calificar(Map<String, Object> parametrosCalificacion) {
+        Long idComensal = (Long) parametrosCalificacion.get("idComensal");
+        Long idRestaurante = (Long) parametrosCalificacion.get("idRestaurante");
+        Double puntaje = (Double) parametrosCalificacion.get("puntaje");
+        String comentario = (String) parametrosCalificacion.get("comentario");
 
-        Calificacion calificacion = new Calificacion(puntaje, comentario, idComensal, idRestaurante);
-        CalificacionDAO calificacionDAO = new CalificacionDAO();
+        if (esIDNull(idComensal, idRestaurante)) return false;
+        if (esPuntajeInvalido(puntaje)) return false;
+
+        Calificacion calificacion = construirCalificacion(puntaje, comentario, idComensal, idRestaurante);
         calificacionDAO.crear(calificacion);
-
         actualizarPromedioRestaurante(idRestaurante);
+
+        return true;
+    }
+
+    private Calificacion construirCalificacion(Double puntaje, String comentario, Long idComensal, Long idRestaurante) {
+        Comensal comensal = comensalDAO.obtenerComensalPorId(idComensal);
+        Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+        return new Calificacion(puntaje, comentario, comensal, restaurante);
+    }
+
+    private boolean esPuntajeInvalido(Double puntaje) {
+        return puntaje < 1 || puntaje > 5;
+    }
+
+    private boolean esIDNull(Long idComensal, Long idRestaurante) {
+        return idRestaurante == null || idComensal == null;
     }
 
     private void actualizarPromedioRestaurante(Long idRestaurante) {
-        Double promedio = calificacionDAO.calcularPromedioPorRestaurante(idRestaurante);
-        if (promedio != null) {
-            Restaurante restaurante = restauranteDAO.buscarPorId(idRestaurante);
-            restaurante.setPromedioCalificaciones(promedio);
-            restauranteDAO.actualizar(restaurante);
+        List<Calificacion> calificaciones = calificacionDAO.obtenerTodosLosCalificaciones(idRestaurante);
+        Restaurante restauranteAActualizar = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+        Double calificacionPromedio = calcularPromedioCalificaciones(calificaciones);
+
+        if (restauranteAActualizar.getPuntajePromedio() != calificacionPromedio) {
+            restauranteAActualizar.setPuntajePromedio(calificacionPromedio);
+            restauranteDAO.actualizar(restauranteAActualizar);
         }
     }
 
-    private Boolean yaCalifico(Long idComensal, Long idRestaurante) {
-        return calificacionDAO.existeCalificacionDeComensal(idComensal, idRestaurante);
-    }
+    public Double calcularPromedioCalificaciones(List<Calificacion> calificaciones) {
+        if (calificaciones == null || calificaciones.isEmpty()) {
+            return 0.0;
+        }
 
+        Double suma = 0.0;
+        for (Calificacion calificacion : calificaciones) {
+            suma += calificacion.getPuntaje();
+        }
+
+        return suma / calificaciones.size();
+    }
 }
