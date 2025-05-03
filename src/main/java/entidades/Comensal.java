@@ -4,33 +4,28 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+//@Entity
+//@Table(name = "comensal")
+//@PrimaryKeyJoinColumn(name = "usuario_id")
+//@DiscriminatorValue("COMENSAL")
 @Entity
-public class Comensal {
+@DiscriminatorValue("COMENSAL")
+public class Comensal extends Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String nombre;
-    private String correo;
-    @OneToMany
-    @JoinColumn(name = "idComensal")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "comensal_id")
     private List<Preferencia> preferencias;
 
     public Comensal() {
+        super();
     }
 
-    public Comensal(Long id, String nombre, String correo, List<Preferencia> preferencias) {
-        this.id = id;
+    public Comensal(String email, String password, String nombre, List<Preferencia> preferencias) {
+        super(email, password);
         this.nombre = nombre;
-        this.correo = correo;
         this.preferencias = preferencias;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNombre() {
@@ -39,14 +34,6 @@ public class Comensal {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
     }
 
     public List<Preferencia> getPreferencias() {

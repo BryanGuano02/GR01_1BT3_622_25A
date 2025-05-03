@@ -3,14 +3,14 @@ package entidades;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
-import java.util.List;
 
+//@Entity
+//@Table(name = "restaurante")
+//@PrimaryKeyJoinColumn(name = "usuario_id")
+//@DiscriminatorValue("RESTAURANTE")
 @Entity
-public class Restaurante {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@DiscriminatorValue("RESTAURANTE")
+public class Restaurante extends Usuario {
 
     private String nombre;
     private String descripcion;
@@ -19,9 +19,11 @@ public class Restaurante {
     private LocalTime horaCierre;
 
     public Restaurante() {
+        super();
     }
 
-    public Restaurante(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
+    public Restaurante(String email, String password, String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
+        super(email, password);
         this.nombre = nombre;
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
@@ -44,16 +46,12 @@ public class Restaurante {
         this.horaCierre = horaCierre;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNombre() {
         return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getDescripcion() {
@@ -62,10 +60,6 @@ public class Restaurante {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getTipoComida() {
@@ -79,7 +73,6 @@ public class Restaurante {
     @Override
     public String toString() {
         return "Restaurante{" +
-                "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", tipoComida='" + tipoComida + '\'' +

@@ -1,9 +1,9 @@
-    <%--
-  Created by IntelliJ IDEA.
-  User: alejo
-  Date: 27/4/2025
-  Time: 8:57
-  To change this template use File | Settings | File Templates.
+<%--
+Created by IntelliJ IDEA.
+User: alejo
+Date: 27/4/2025
+Time: 8:57
+To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entidades.Restaurante" %>
@@ -97,7 +97,11 @@
         <div class="d-flex align-items-center">
             <img src="https://ui-avatars.com/api/?name=Usuario&background=ff6b6b&color=fff"
                  alt="Usuario" class="rounded-circle me-2" width="40">
-            <span class="fw-bold">Usuario</span>
+            <form action="${pageContext.request.contextPath}/logout" method="get">
+                <button type="submit" class="logout-btn">
+                    <span class="icon">🚪</span> Salir
+                </button>
+            </form>
         </div>
     </div>
 

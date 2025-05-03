@@ -12,10 +12,10 @@ public class Calificacion {
     private int puntaje;
     private String comentario;
     @ManyToOne
-    @JoinColumn(name = "idComensal")
+    @JoinColumn(name = "comensal_id", referencedColumnName = "usuario_id")
     private Comensal comensal;
     @ManyToOne
-    @JoinColumn(name = "idRestaurante")
+    @JoinColumn(name = "restaurante_id", referencedColumnName = "usuario_id")
     private Restaurante restaurante;
 
     public Calificacion() {

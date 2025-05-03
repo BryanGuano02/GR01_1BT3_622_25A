@@ -64,7 +64,11 @@
         <div class="d-flex align-items-center">
             <img src="https://ui-avatars.com/api/?name=Admin&background=ff6b6b&color=fff"
                  alt="Usuario" class="rounded-circle me-2" width="40">
-            <span class="fw-bold">Administrador</span>
+            <form action="${pageContext.request.contextPath}/logout" method="get">
+                <button type="submit" class="logout-btn">
+                    <span class="icon">🚪</span> Salir
+                </button>
+            </form>
         </div>
     </div>
 
@@ -80,7 +84,7 @@
                            placeholder="Ej: La Cevichería">
                 </div>
 
-<%--                Descripcion--%>
+                <%--                Descripcion--%>
                 <div class="mb-3">
                     <label for="descripcion" class="form-label">Descripción</label>
                     <input type="text" class="form-control" name="descripcion" id="descripcion" required
