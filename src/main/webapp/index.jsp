@@ -1,9 +1,9 @@
-    <%--
-  Created by IntelliJ IDEA.
-  User: alejo
-  Date: 27/4/2025
-  Time: 8:57
-  To change this template use File | Settings | File Templates.
+<%--
+Created by IntelliJ IDEA.
+User: alejo
+Date: 27/4/2025
+Time: 8:57
+To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entidades.Restaurante" %>
@@ -199,6 +199,13 @@
                         <% } %>
                     </div>
                     <p class="card-text"><%= restaurante.getDescripcion() %>
+                    <p class="card-text">
+                        <i class="bi bi-star-fill text-warning"></i> <!-- Icono de estrella (Bootstrap Icons) -->
+                        Puntaje promedio:
+                        <%= restaurante.getPuntajePromedio() != null ?
+                                String.format("%.1f", restaurante.getPuntajePromedio()) :
+                                "-" %>
+                    </p>
                     </p>
                 </div>
                 <div class="card-footer bg-white">

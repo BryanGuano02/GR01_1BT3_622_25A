@@ -10,8 +10,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import modelos.CalificacionDAO;
-import modelos.RestauranteDAO;
+import DAO.CalificacionDAO;
+import DAO.RestauranteDAO;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,7 +36,6 @@ public class SvIndex extends HttpServlet {
         List<Restaurante> restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
         List<Calificacion> calificacions = calificacionesDAO.obtenerTodosLosCalificaciones();
 
-        System.out.println(calificacions);
         req.setAttribute("restaurantes", restaurantes);
         req.setAttribute("calificaciones", calificacions);
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
