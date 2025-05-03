@@ -1,9 +1,8 @@
 package servlets;
 
-import entidades.Calificacion;
-import entidades.Comensal;
+import servicios.CalificacionService;
+import servicios.RestauranteService;
 import entidades.Restaurante;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -13,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "calificar", value = "/calificar")
 public class SvCalificacion extends HttpServlet {
@@ -24,67 +25,46 @@ public class SvCalificacion extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        EntityManager em = emf.createEntityManager();
-        String idRestauranteString = req.getParameter("idRestaurante");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Long idRestaurante = obtenerIdRestaurante(req);
 
-        if (idRestauranteString == null || idRestauranteString.isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parámetro idRestaurante requerido");
-            return;
-        }
-        int idRestaurante;
-        try {
-            idRestaurante = Integer.parseInt(idRestauranteString);
-        } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante debe ser un número entero");
-            return;
-        }
-        Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
-        req.setAttribute("restaurante", restaurante);
+        RestauranteService restaurante = new RestauranteService();
+        Restaurante restauranteAPresentar = restaurante.obtenerRestaurantePorId(idRestaurante);
+
+        req.setAttribute("restaurante", restauranteAPresentar);
         req.getRequestDispatcher("calificarRestaurante.jsp").forward(req, resp);
     }
 
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Map<String, Object> parametrosCalificacion = extraerParametrosCalificacion(req);
 
-        EntityManager em = emf.createEntityManager();
+        CalificacionService calificacion = new CalificacionService();
+        calificacion.calificar(parametrosCalificacion);
 
-        try {
-            // Obtener parámetros del formulario
-            int puntaje = Integer.parseInt(req.getParameter("puntaje"));
-            String comentario = req.getParameter("comentario");
-            Long idComensal = Long.parseLong(req.getParameter("idComensal"));
-            Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
+        resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
+    }
 
-            Calificacion nuevaCalificacion = new Calificacion();
-            em.getTransaction().begin();
-            Comensal comensal = em.find(Comensal.class, idComensal);
-            Restaurante restaurante = em.find(Restaurante.class, idRestaurante);
-
-            if (comensal == null || restaurante == null) {
-                throw new IllegalArgumentException("Comensal o Restaurante no encontrado");
-            }
-
-            nuevaCalificacion.setPuntaje(puntaje);
-            nuevaCalificacion.setComentario(comentario);
-            boolean exito = nuevaCalificacion.calificar(comensal, restaurante);
-
-            if (exito) {
-                em.persist(nuevaCalificacion);
-                em.getTransaction().commit();
-            } else {
-                em.getTransaction().rollback();
-            }
-            resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
-
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            resp.sendRedirect(req.getContextPath() + "/inicio?error=" + e.getMessage());
-        } finally {
-            em.close();
+    private Long obtenerIdRestaurante(HttpServletRequest req) {
+        String idRestauranteString = req.getParameter("idRestaurante");
+        if (idRestauranteString == null || idRestauranteString.isEmpty()) {
+            return null;
         }
+        try {
+            return Long.parseLong(idRestauranteString);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Map<String, Object> extraerParametrosCalificacion(HttpServletRequest req) {
+        Map<String, Object> parametrosCalificacion = new HashMap<>();
+        parametrosCalificacion.put("puntaje", Double.parseDouble(req.getParameter("puntaje")));
+        parametrosCalificacion.put("comentario", req.getParameter("comentario"));
+        parametrosCalificacion.put("idComensal", Long.parseLong(req.getParameter("idComensal")));
+        parametrosCalificacion.put("idRestaurante", Long.parseLong(req.getParameter("idRestaurante")));
+        return parametrosCalificacion;
     }
 
     @Override
