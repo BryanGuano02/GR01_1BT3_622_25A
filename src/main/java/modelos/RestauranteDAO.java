@@ -29,6 +29,21 @@ public class RestauranteDAO {
         }
     }
 
+    public void guardarRestaurante(Restaurante restaurante) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(restaurante);
+            em.getTransaction().commit();
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+
+
 
     // Otros métodos del DAO...
 
