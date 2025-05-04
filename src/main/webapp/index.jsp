@@ -1,10 +1,4 @@
-<%--
-Created by IntelliJ IDEA.
-User: alejo
-Date: 27/4/2025
-Time: 8:57
-To change this template use File | Settings | File Templates.
---%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
@@ -22,6 +16,7 @@ To change this template use File | Settings | File Templates.
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ESTILOS EXISTENTES (SE MANTIENEN IGUAL) */
         body {
             background-color: #f8f9fa;
             padding: 20px;
@@ -88,6 +83,24 @@ To change this template use File | Settings | File Templates.
             font-size: 0.9rem;
             color: #6c757d;
         }
+
+        /* NUEVOS ESTILOS AGREGADOS */
+        .menu-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #0d6efd;
+        }
+
+        .menu-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .btn-menu {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -128,55 +141,21 @@ To change this template use File | Settings | File Templates.
 
     <!-- Listado de restaurantes -->
     <div class="row">
-        <%--        <%--%>
-        <%--            List<Restaurante> restaurantes = (List<Restaurante>) request.getSession().getAttribute("restaurantes");--%>
-
-        <%--            for (int i = 0; i < restaurantes.size(); i++) {--%>
-        <%--        %>--%>
-        <%--        <div class="col-md-6 col-lg-4 mb-4">--%>
-        <%--            <div class="card restaurant-card h-100">--%>
-        <%--                <div class="card-body">--%>
-        <%--                    <h5 class="card-title"><%= restaurantes[i] %>--%>
-        <%--                    </h5>--%>
-        <%--                    <p class="restaurant-type mb-2">--%>
-        <%--                        <i class="fas fa-utensils me-1"></i> <%= tipos[i] %>--%>
-        <%--                    </p>--%>
-        <%--                    <div class="mb-2">--%>
-        <%--                        <% for (int j = 0; j < 5; j++) { %>--%>
-        <%--                        <i class="fas fa-star <%= j < ratings[i] ? "rating-stars" : "text-secondary" %>"></i>--%>
-        <%--                        <% } %>--%>
-        <%--                        <span class="ms-1">(<%= ratings[i] %>)</span>--%>
-        <%--                    </div>--%>
-        <%--                    <p class="card-text">Descripción breve del restaurante y sus especialidades.</p>--%>
-        <%--                </div>--%>
-        <%--                <div class="card-footer bg-white">--%>
-        <%--                    <a href="calificar?idRestaurante=<%= i %>" class="btn btn-sm btn-outline-success">--%>
-        <%--                        <i class="fas fa-star"></i> Calificar--%>
-        <%--                    </a>--%>
-        <%--                    &lt;%&ndash;                    <button class="btn btn-sm btn-outline-success">&ndash;%&gt;--%>
-        <%--                    &lt;%&ndash;                        <i class="fas fa-star"></i> Calificar&ndash;%&gt;--%>
-        <%--                    &lt;%&ndash;                    </button>&ndash;%&gt;--%>
-        <%--                </div>--%>
-        <%--            </div>--%>
-        <%--        </div>--%>
-        <%--        <% } %>--%>
         <%
-            // Obtener las listas de la sesión
             List<Restaurante> restaurantes = (List<Restaurante>) request.getAttribute("restaurantes");
             List<Calificacion> calificaciones = (List<Calificacion>) request.getAttribute("calificaciones");
 
-            // Crear un mapa rápido de calificaciones por restaurante (ID -> Calificacion)
             Map<Long, Calificacion> calificacionMap = new HashMap<>();
             if (calificaciones != null) {
                 for (Calificacion calif : calificaciones) {
                     calificacionMap.put(calif.getRestaurante().getId(), calif);
                 }
             }
-        %>
 
-        <% for (Restaurante restaurante : restaurantes) {
-            Calificacion calificacion = calificacionMap.get(restaurante.getId());
-            double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
+            for (Restaurante restaurante : restaurantes) {
+                Calificacion calificacion = calificacionMap.get(restaurante.getId());
+                double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
+                boolean tieneMenu = restaurante.getHistorias() != null && !restaurante.getHistorias().isEmpty();
         %>
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card restaurant-card h-100">
@@ -212,9 +191,40 @@ To change this template use File | Settings | File Templates.
                     <a href="calificar?idRestaurante=<%= restaurante.getId() %>" class="btn btn-sm btn-outline-success">
                         <i class="fas fa-star"></i> Calificar
                     </a>
+
+                    <% if (tieneMenu) { %>
+                    <button class="btn btn-sm btn-outline-primary btn-menu" data-bs-toggle="modal"
+                            data-bs-target="#menuModal<%= restaurante.getId() %>">
+                        <i class="fas fa-utensils"></i> Ver Menú
+                    </button>
+                    <% } %>
                 </div>
             </div>
         </div>
+
+        <!-- Modal para el menú (se agrega solo si tiene menú) -->
+        <% if (tieneMenu) { %>
+        <div class="modal fade" id="menuModal<%= restaurante.getId() %>" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Menú de <%= restaurante.getNombre() %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body menu-container">
+                        <% for (String menu : restaurante.getHistorias()) { %>
+                        <div class="menu-item mb-2">
+                            <%= menu %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
         <% } %>
     </div>
 </div>

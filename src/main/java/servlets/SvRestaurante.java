@@ -75,8 +75,26 @@ public class SvRestaurante extends HttpServlet {
             } finally {
                 em.close();
             }
-        } else if ("actualizar".equals(accion)) {
-            // lógica para actualizar
+        } else if ("agregarHistoria".equals(accion)) {
+            try {
+                Long restauranteId = Long.parseLong(req.getParameter("restauranteId"));
+                String historia = req.getParameter("historia");
+
+                em.getTransaction().begin();
+                Restaurante restaurante = em.find(Restaurante.class, restauranteId);
+                if (restaurante != null) {
+                    restaurante.agregarHistoria(historia);
+                    em.merge(restaurante);
+                }
+                em.getTransaction().commit();
+
+                resp.sendRedirect(req.getContextPath() + "/restaurante?success=Historia agregada");
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + e.getMessage());
+            } finally {
+                em.close();
+            }
         }
     }
 
