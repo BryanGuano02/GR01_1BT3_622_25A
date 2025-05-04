@@ -1,7 +1,6 @@
 package servlets;
 
-import servicios.CalificacionService;
-import servicios.RestauranteService;
+import servicios.*;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -28,8 +27,8 @@ public class SvCalificacion extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long idRestaurante = obtenerIdRestaurante(req);
 
-        RestauranteService restaurante = new RestauranteService();
-        Restaurante restauranteAPresentar = restaurante.obtenerRestaurantePorId(idRestaurante);
+        RestauranteService restauranteService = new RestauranteService();
+        Restaurante restauranteAPresentar = restauranteService.obtenerRestaurantePorId(idRestaurante);
 
         req.setAttribute("restaurante", restauranteAPresentar);
         req.getRequestDispatcher("calificarRestaurante.jsp").forward(req, resp);

@@ -14,6 +14,19 @@ public class RestauranteDAO {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
     }
 
+    public void guardarRestaurante(Restaurante restaurante) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(restaurante);
+            em.getTransaction().commit();
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
     public Restaurante obtenerRestaurantePorId(Long idRestaurante) {
         EntityManager em = emf.createEntityManager();
         try {
