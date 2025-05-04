@@ -22,8 +22,12 @@ public class Restaurante {
 
     // Nuevo atributo para las historias (menú del día)
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "restaurante", joinColumns = @JoinColumn(name = "restaurante_id"))
-    @Column(name = "historia", length = 1000)
+    @CollectionTable(
+            name = "restaurante_historias",
+            joinColumns = @JoinColumn(name = "restaurante_id"),
+            foreignKey = @ForeignKey(name = "fk_restaurante_historias")
+    )
+    @Column(name = "historia", length = 1000, nullable = false)
     private List<String> historias = new ArrayList<>();
 
     public Restaurante() {
@@ -105,7 +109,6 @@ public class Restaurante {
 
     public void agregarHistoria(String historia) {
         this.historias.add(historia);
-
     }
 
     @Override

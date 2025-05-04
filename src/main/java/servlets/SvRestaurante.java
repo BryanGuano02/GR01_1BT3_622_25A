@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import modelos.RestauranteDAO;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -45,33 +46,18 @@ public class SvRestaurante extends HttpServlet {
 
         if ("guardar".equals(accion)) {
             try {
-                // Obtener parámetros del formulario
-                String nombre = req.getParameter("nombre");
-                String descripcion = req.getParameter("descripcion");
-                String tipoComida = req.getParameter("tipoComida");
-
-                // Convertir los horarios a LocalTime
-                LocalTime horaApertura = LocalTime.parse(req.getParameter("horaApertura"));
-                LocalTime horaCierre = LocalTime.parse(req.getParameter("horaCierre"));
-
-                // Crear y persistir el restaurante
-                Restaurante restaurante = new Restaurante();
-                restaurante.setNombre(nombre);
-                restaurante.setDescripcion(descripcion);
-                restaurante.setTipoComida(tipoComida);
-                restaurante.setHoraApertura(horaApertura);
-                restaurante.setHoraCierre(horaCierre);
-
-                em.getTransaction().begin();
-                em.persist(restaurante);
-                em.getTransaction().commit();
+                Restaurante restaurante = crearRestauranteDesdeRequest(req);
+                RestauranteDAO dao = new RestauranteDAO();
+                dao.guardarRestaurante(restaurante);
+                dao.cerrar();
 
                 resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
 
             } catch (Exception e) {
                 // Manejo de errores
                 em.getTransaction().rollback();
-                resp.sendRedirect(req.getContextPath() + "/inicio?error=" + e.getMessage());
+                req.getSession().setAttribute("error", "Error al guardar el restaurante");
+                resp.sendRedirect(req.getContextPath() + "/inicio");
             } finally {
                 em.close();
             }
@@ -96,6 +82,23 @@ public class SvRestaurante extends HttpServlet {
                 em.close();
             }
         }
+    }
+
+    private Restaurante crearRestauranteDesdeRequest(HttpServletRequest req) {
+        String nombre = req.getParameter("nombre");
+        String descripcion = req.getParameter("descripcion");
+        String tipoComida = req.getParameter("tipoComida");
+        LocalTime horaApertura = LocalTime.parse(req.getParameter("horaApertura"));
+        LocalTime horaCierre = LocalTime.parse(req.getParameter("horaCierre"));
+
+        Restaurante restaurante = new Restaurante();
+        restaurante.setNombre(nombre);
+        restaurante.setDescripcion(descripcion);
+        restaurante.setTipoComida(tipoComida);
+        restaurante.setHoraApertura(horaApertura);
+        restaurante.setHoraCierre(horaCierre);
+
+        return restaurante;
     }
 
     @Override
