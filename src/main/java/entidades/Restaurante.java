@@ -90,6 +90,7 @@ public class Restaurante {
 
     public void setPuntajePromedio(Double puntajePromedio) {
         this.puntajePromedio = puntajePromedio;
+    }
 
     public List<String> getHistorias() {
         if (this.historias == null) {
