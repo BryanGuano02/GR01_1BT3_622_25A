@@ -128,7 +128,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="SvComparar" class="btn btn-info me-2">
+                    <a href="comparar" class="btn btn-info me-2">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
                     <button class="btn btn-success">
