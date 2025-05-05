@@ -25,10 +25,6 @@ public class Comensal {
         this.preferencias = preferencias;
     }
 
-    public boolean guardarPreferencia(Preferencia preferencia) {
-        return this.preferencias.add(preferencia);
-    }
-
     public Long getId() {
         return id;
     }

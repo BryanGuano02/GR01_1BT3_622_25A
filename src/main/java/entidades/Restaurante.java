@@ -19,6 +19,7 @@ public class Restaurante {
     private LocalTime horaApertura;
     private LocalTime horaCierre;
     private Double puntajePromedio;
+    private Double distanciaUniversidad;
 
     // Nuevo atributo para las historias (menú del día)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -90,6 +91,14 @@ public class Restaurante {
 
     public void setPuntajePromedio(Double puntajePromedio) {
         this.puntajePromedio = puntajePromedio;
+    }
+
+    public Double getDistanciaUniversidad() {
+        return distanciaUniversidad;
+    }
+
+    public void setDistanciaUniversidad(Double distanciaUniversidad) {
+        this.distanciaUniversidad = distanciaUniversidad;
     }
 
     public List<String> getHistorias() {

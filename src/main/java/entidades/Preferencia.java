@@ -27,25 +27,7 @@ public class Preferencia {
         this.distanciaUniversidad = distanciaUniversidad;
     }
 
-    public List<Restaurante> aplicarPreferencia( List<Restaurante> restaurantes ){
 
-        List<Restaurante> restaurantesFiltrados = new ArrayList<>();
-
-        for (Restaurante restaurante : restaurantes) {
-
-            if (    restaurante.getTipoComida().equals( this.tipoComida ) &&
-                    restaurante.getHoraApertura().isBefore( this.horaApertura ) &&
-                    restaurante.getHoraCierre().isAfter( this.horaCierre ) &&
-                    restaurante.getDistanciaUniversidad() > this.distanciaUniversidad
-            ) {
-                restaurantesFiltrados.add(restaurante);
-            }
-
-        }
-
-        return restaurantesFiltrados;
-
-    }
 
     public Long getId() {
         return id;
