@@ -69,6 +69,10 @@ public class RestauranteDAO {
             restauranteExistente.setHoraApertura(restaurante.getHoraApertura());
             restauranteExistente.setHoraCierre(restaurante.getHoraCierre());
             restauranteExistente.setPuntajePromedio(restaurante.getPuntajePromedio());
+            restauranteExistente.setPrecio(restaurante.getPrecio());
+            restauranteExistente.setCalidad(restaurante.getCalidad());
+            restauranteExistente.setTiempoEspera(restaurante.getTiempoEspera());
+            restauranteExistente.setDistanciaUniversidad(restaurante.getDistanciaUniversidad());
 
             // El merge no es estrictamente necesario aquí porque estamos trabajando con la entidad administrada
             em.merge(restauranteExistente);

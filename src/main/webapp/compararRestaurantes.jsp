@@ -48,7 +48,7 @@
 
         <div class="card shadow">
             <div class="card-body">
-                <form action="SvComparar" method="get">
+                <form action="comparar" method="get">
                     <input type="hidden" name="accion" value="comparar">
 
                     <div class="mb-3">
