@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="modelos.RestauranteDAO, entidades.Restaurante, java.util.List" %>
+<%@ page import="DAO.RestauranteDAO, entidades.Restaurante, java.util.List" %>
 <html>
 <head>
     <title>U-Food | Panel Administrativo</title>
