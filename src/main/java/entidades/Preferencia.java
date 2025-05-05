@@ -2,6 +2,8 @@ package entidades;
 
 import jakarta.persistence.*;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Preferencia {
@@ -17,13 +19,15 @@ public class Preferencia {
     public Preferencia() {
     }
 
-    public Preferencia(Long id, String tipoComida, LocalTime horaApertura, LocalTime horaCierre, Double distanciaUniversidad) {
-        this.id = id;
+    public Preferencia(String tipoComida, LocalTime horaApertura, LocalTime horaCierre, Double distanciaUniversidad) {
+        //this.id = id;
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
         this.horaCierre = horaCierre;
         this.distanciaUniversidad = distanciaUniversidad;
     }
+
+
 
     public Long getId() {
         return id;

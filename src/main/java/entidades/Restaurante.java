@@ -24,6 +24,7 @@ public class Restaurante {
     private int calidad;
     private int tiempoEspera;
 
+
     // Nuevo atributo para las historias (menú del día)
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -100,6 +101,7 @@ public class Restaurante {
         this.puntajePromedio = puntajePromedio;
     }
 
+
     public int getPrecio() {
         return precio;
     }
@@ -107,6 +109,7 @@ public class Restaurante {
     public void setPrecio(int precio) {
         this.precio = precio;
     }
+
 
     public Double getDistanciaUniversidad() {
         return distanciaUniversidad;
