@@ -10,9 +10,13 @@ public class RestauranteDAO {
     private final EntityManagerFactory emf;
 
     public RestauranteDAO() {
-        // Obtener la EntityManagerFactory (normalmente se hace una vez en la aplicación)
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
+        this.emf = Persistence.createEntityManagerFactory("UFood_PU");
     }
+
+    public RestauranteDAO(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
 
     public void guardarRestaurante(Restaurante restaurante) {
         EntityManager em = emf.createEntityManager();
@@ -58,6 +62,17 @@ public class RestauranteDAO {
         }
 
         return restaurantes;
+    }
+    public List<Restaurante> buscarRestaurantes(String busqueda) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT r FROM Restaurante r WHERE LOWER(r.nombre) LIKE LOWER(:busqueda) OR LOWER(r.tipoComida) LIKE LOWER(:busqueda)";
+            return em.createQuery(jpql, Restaurante.class)
+                    .setParameter("busqueda", "%" + busqueda + "%")
+                    .getResultList();
+        } finally {
+            em.close();
+        }
     }
 
     public void actualizar(Restaurante restaurante) {

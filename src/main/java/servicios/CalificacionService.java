@@ -52,7 +52,8 @@ public class CalificacionService {
     }
 
     private void actualizarPromedioRestaurante(Long idRestaurante) {
-        List<Calificacion> calificaciones = calificacionDAO.obtenerTodosLosCalificaciones(idRestaurante);
+        // Cambio realizado aquí: usar obtenerCalificacionesPorRestaurante en lugar de obtenerTodosLosCalificaciones
+        List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
         Restaurante restauranteAActualizar = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
         Double calificacionPromedio = calcularPromedioCalificaciones(calificaciones);
 

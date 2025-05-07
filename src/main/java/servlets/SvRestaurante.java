@@ -84,7 +84,7 @@ public class SvRestaurante extends HttpServlet {
                     .getResultList();
 
             req.setAttribute("restaurantes", restaurantes);
-            req.getRequestDispatcher("/WEB-INF/restaurante/panelAdministrativo.jsp").forward(req, resp);
+            req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
         } finally {
             em.close();
         }

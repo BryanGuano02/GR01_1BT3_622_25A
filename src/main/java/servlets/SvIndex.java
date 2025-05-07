@@ -4,6 +4,7 @@ import DAO.CalificacionDAO;
 import DAO.RestauranteDAO;
 import entidades.Calificacion;
 import entidades.Restaurante;
+import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -11,9 +12,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "SvIndex", value = "/inicio")
 public class SvIndex extends HttpServlet {
@@ -24,47 +28,50 @@ public class SvIndex extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        restauranteDAO = new RestauranteDAO();
-        calificacionDAO = new CalificacionDAO();
+        restauranteDAO = new RestauranteDAO(emf);
+        calificacionDAO = new CalificacionDAO(emf);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Inicializar listas vacías por defecto
-        List<Restaurante> restaurantes = new ArrayList<>();
-        List<Calificacion> calificaciones = new ArrayList<>();
-
         try {
-            // Obtener datos de la base de datos
-            restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
-            calificaciones = calificacionDAO.obtenerTodosLosCalificaciones();
+            String busqueda = req.getParameter("busqueda");
+            boolean isAjax = "XMLHttpRequest".equals(req.getHeader("X-Requested-With"));
 
-            // Si por alguna razón son null, mantener las listas vacías
-            if (restaurantes == null) {
-                restaurantes = new ArrayList<>();
-            }
-            if (calificaciones == null) {
-                calificaciones = new ArrayList<>();
+            List<Restaurante> restaurantes;
+            if (busqueda != null && !busqueda.isEmpty()) {
+                restaurantes = restauranteDAO.buscarRestaurantes(busqueda);
+            } else {
+                restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
             }
 
+            // Calcular promedios
+            Map<Long, Double> promedios = new HashMap<>();
+            for (Restaurante r : restaurantes) {
+                Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
+                promedios.put(r.getId(), promedio);
+                r.setPuntajePromedio(promedio);
+            }
+
+            req.setAttribute("restaurantes", restaurantes);
+            req.setAttribute("promedios", promedios);
+
+            if (isAjax) {
+                req.getRequestDispatcher("/index.jsp").forward(req, resp);
+            } else {
+                req.getRequestDispatcher("/index.jsp").forward(req, resp);
+            }
         } catch (Exception e) {
-            // Loggear el error pero continuar con listas vacías
-            System.err.println("Error al obtener datos: " + e.getMessage());
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar restaurantes");
         }
-
-        // Establecer atributos con valores no nulos
-        req.setAttribute("restaurantes", restaurantes);
-        req.setAttribute("calificaciones", calificaciones);
-
-        req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
 
     @Override
     public void destroy() {
-        if (restauranteDAO != null) restauranteDAO.cerrar();
-        if (calificacionDAO != null) calificacionDAO.cerrar();
-        if (emf != null) emf.close();
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
     }
 }

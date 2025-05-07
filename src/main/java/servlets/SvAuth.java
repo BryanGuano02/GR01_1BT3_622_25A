@@ -40,7 +40,7 @@ public class SvAuth extends HttpServlet {
                 session.setAttribute("usuario", usuario);
 
                 if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
-                    response.sendRedirect(request.getContextPath() + "/restaurante");
+                    response.sendRedirect(request.getContextPath() + "/crearRestaurante.jsp");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/index.jsp");
                 }
