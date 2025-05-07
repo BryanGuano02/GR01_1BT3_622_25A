@@ -5,11 +5,17 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <class>entidades.Restaurante</class>
+        <class>entidades.Calificacion</class>
+        <class>entidades.Comensal</class>
+        <class>entidades.Usuario</class>
+        <class>entidades.UsuarioRestaurante</class>
+        <class>entidades.Preferencia</class>
+
 
         <properties>
             <!-- Datos de conexión -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/tarea1"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/webapp"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value="root"/>
 

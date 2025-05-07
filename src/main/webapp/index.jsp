@@ -1,10 +1,11 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
 <%@ page import="entidades.Calificacion" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
+<!DOCTYPE html>
+<html>
 <head>
     <title>U-Food | Dashboard Restaurantes</title>
     <meta charset="UTF-8">
@@ -16,75 +17,60 @@
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ESTILOS EXISTENTES (SE MANTIENEN IGUAL) */
         body {
             background-color: #f8f9fa;
             padding: 20px;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
         }
-
         .user-info {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
         .user-info img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
         }
-
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-
         .card-body {
             padding: 20px;
         }
-
         .restaurant-card {
             transition: transform 0.2s;
             cursor: pointer;
         }
-
         .restaurant-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-
         .restaurant-img {
             height: 120px;
             object-fit: cover;
             border-radius: 8px 8px 0 0;
         }
-
         .search-container {
             margin-bottom: 20px;
         }
-
         .btn-action {
             margin-right: 10px;
         }
-
         .rating-stars {
             color: #ffc107;
         }
-
         .restaurant-type {
             font-size: 0.9rem;
             color: #6c757d;
         }
-
-        /* NUEVOS ESTILOS AGREGADOS */
         .menu-item {
             padding: 8px;
             margin-bottom: 5px;
@@ -92,14 +78,17 @@
             border-radius: 5px;
             border-left: 3px solid #0d6efd;
         }
-
         .menu-container {
             max-height: 300px;
             overflow-y: auto;
         }
-
         .btn-menu {
             margin-left: 5px;
+        }
+        .no-restaurants {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -142,28 +131,52 @@
     <!-- Listado de restaurantes -->
     <div class="row">
         <%
+            // Obtener listas con validación de null
             List<Restaurante> restaurantes = (List<Restaurante>) request.getAttribute("restaurantes");
             List<Calificacion> calificaciones = (List<Calificacion>) request.getAttribute("calificaciones");
 
+            // Inicializar si son nulas
+            if (restaurantes == null) {
+                restaurantes = new java.util.ArrayList<Restaurante>();
+            }
+            if (calificaciones == null) {
+                calificaciones = new java.util.ArrayList<Calificacion>();
+            }
+
+            // Crear mapa de calificaciones con validación
             Map<Long, Calificacion> calificacionMap = new HashMap<>();
             if (calificaciones != null) {
                 for (Calificacion calif : calificaciones) {
-                    calificacionMap.put(calif.getRestaurante().getId(), calif);
+                    if (calif != null && calif.getRestaurante() != null) {
+                        calificacionMap.put(calif.getRestaurante().getId(), calif);
+                    }
                 }
             }
 
+            if (restaurantes.isEmpty()) {
+        %>
+        <div class="col-12">
+            <div class="card no-restaurants">
+                <i class="fas fa-utensils fa-4x mb-3"></i>
+                <h3>No hay restaurantes disponibles</h3>
+                <p class="text-muted">Actualmente no hay restaurantes registrados en el sistema.</p>
+            </div>
+        </div>
+        <%
+        } else {
             for (Restaurante restaurante : restaurantes) {
-                Calificacion calificacion = calificacionMap.get(restaurante.getId());
-                double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
-                boolean tieneMenu = restaurante.getHistorias() != null && !restaurante.getHistorias().isEmpty();
+                if (restaurante != null) { // Validación adicional
+                    Calificacion calificacion = calificacionMap.get(restaurante.getId());
+                    double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
+                    boolean tieneMenu = restaurante.getHistorias() != null && !restaurante.getHistorias().isEmpty();
         %>
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card restaurant-card h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><%= restaurante.getNombre() %>
-                    </h5>
+                    <h5 class="card-title"><%= restaurante.getNombre() != null ? restaurante.getNombre() : "Sin nombre" %></h5>
                     <p class="restaurant-type mb-2">
-                        <i class="fas fa-utensils me-1"></i> <%= restaurante.getTipoComida() %>
+                        <i class="fas fa-utensils me-1"></i>
+                        <%= restaurante.getTipoComida() != null ? restaurante.getTipoComida() : "No especificado" %>
                     </p>
                     <div class="mb-2">
                         <% if (puntaje >= 0) {
@@ -174,17 +187,17 @@
                         <% } %>
                         <span class="ms-1">(<%= String.format("%.1f", puntaje) %>)</span>
                         <% } else { %>
-                        <span class="text-muted">-</span>
+                        <span class="text-muted">Sin calificaciones</span>
                         <% } %>
                     </div>
-                    <p class="card-text"><%= restaurante.getDescripcion() %>
                     <p class="card-text">
-                        <i class="bi bi-star-fill text-warning"></i> <!-- Icono de estrella (Bootstrap Icons) -->
+                        <%= restaurante.getDescripcion() != null ? restaurante.getDescripcion() : "Sin descripción" %>
+                    </p>
+                    <p class="card-text">
+                        <i class="fas fa-star text-warning"></i>
                         Puntaje promedio:
                         <%= restaurante.getPuntajePromedio() != null ?
-                                String.format("%.1f", restaurante.getPuntajePromedio()) :
-                                "-" %>
-                    </p>
+                                String.format("%.1f", restaurante.getPuntajePromedio()) : "-" %>
                     </p>
                 </div>
                 <div class="card-footer bg-white">
@@ -202,7 +215,7 @@
             </div>
         </div>
 
-        <!-- Modal para el menú (se agrega solo si tiene menú) -->
+        <!-- Modal para el menú -->
         <% if (tieneMenu) { %>
         <div class="modal fade" id="menuModal<%= restaurante.getId() %>" tabindex="-1">
             <div class="modal-dialog">
@@ -213,9 +226,11 @@
                     </div>
                     <div class="modal-body menu-container">
                         <% for (String menu : restaurante.getHistorias()) { %>
+                        <% if (menu != null && !menu.trim().isEmpty()) { %>
                         <div class="menu-item mb-2">
                             <%= menu %>
                         </div>
+                        <% } %>
                         <% } %>
                     </div>
                     <div class="modal-footer">
@@ -225,7 +240,9 @@
             </div>
         </div>
         <% } %>
-        <% } %>
+        <% } // fin if restaurante != null %>
+        <% } // fin for restaurantes %>
+        <% } // fin else restaurantes vacíos %>
     </div>
 </div>
 

@@ -1,52 +1,30 @@
 package entidades;
 
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
-public class Comensal {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String nombre;
-    private String correo;
-    @OneToMany
-    @JoinColumn(name = "idComensal")
+@Table(name = "comensales")
+@PrimaryKeyJoinColumn(name = "usuario_id")
+public class Comensal extends Usuario {
+
+    @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Preferencia> preferencias;
 
     public Comensal() {
     }
 
-    public Comensal(Long id, String nombre, String correo, List<Preferencia> preferencias) {
-        this.id = id;
-        this.nombre = nombre;
-        this.correo = correo;
+    public Comensal(String nombreUsuario, String contrasena, String email, List<Preferencia> preferencias) {
+        this.setNombreUsuario(nombreUsuario);
+        this.setContrasena(contrasena);
+        this.setEmail(email);
+        this.setTipoUsuario("COMENSAL");
         this.preferencias = preferencias;
-    }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
+        // Establece la relación bidireccional
+        if (preferencias != null) {
+            preferencias.forEach(p -> p.setComensal(this));
+        }
     }
 
     public List<Preferencia> getPreferencias() {
@@ -55,6 +33,21 @@ public class Comensal {
 
     public void setPreferencias(List<Preferencia> preferencias) {
         this.preferencias = preferencias;
+
+        // Establece la relación bidireccional
+        if (preferencias != null) {
+            preferencias.forEach(p -> p.setComensal(this));
+        }
     }
 
+    // Método de conveniencia para manejar la relación
+    public void agregarPreferencia(Preferencia preferencia) {
+        preferencias.add(preferencia);
+        preferencia.setComensal(this);
+    }
+
+    public void removerPreferencia(Preferencia preferencia) {
+        preferencias.remove(preferencia);
+        preferencia.setComensal(null);
+    }
 }

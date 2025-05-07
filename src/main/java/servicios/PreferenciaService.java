@@ -53,18 +53,13 @@ public class PreferenciaService {
 
     }
 
-    public void crearPreferencia( String tipoComida, LocalTime horaApertura, LocalTime horaCierre, Double distanciaUniversidad, Long idComensal ) {
-
-
+    public void crearPreferencia(String tipoComida, LocalTime horaApertura, LocalTime horaCierre,
+                                 Double distanciaUniversidad, Long idComensal) {
         Comensal comensal = comensalDAO.obtenerComensalPorId(idComensal);
-        Preferencia preferencia = new Preferencia( tipoComida,horaApertura, horaCierre, distanciaUniversidad );
-        comensal.getPreferencias().add(preferencia);
-
-
+        if (comensal != null) {
+            Preferencia preferencia = new Preferencia(tipoComida, horaApertura, horaCierre,
+                    distanciaUniversidad, comensal);
+            comensal.getPreferencias().add(preferencia);
+        }
     }
-
-
-
-
-
 }

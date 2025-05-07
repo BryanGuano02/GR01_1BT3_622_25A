@@ -150,6 +150,13 @@ public class Restaurante {
         this.historias.add(historia);
     }
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_restaurante_id")
+    private UsuarioRestaurante usuarioRestaurante;
+
+    public UsuarioRestaurante getUsuarioRestaurante() { return usuarioRestaurante; }
+    public void setUsuarioRestaurante(UsuarioRestaurante usuarioRestaurante) { this.usuarioRestaurante = usuarioRestaurante; }
+
     @Override
     public String toString() {
         return "Restaurante{" +

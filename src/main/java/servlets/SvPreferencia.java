@@ -40,9 +40,6 @@ public class SvPreferencia extends HttpServlet {
         List<Restaurante> restaurantesFiltrados = preferenciaService.aplicarPreferencia(parametrosPreferencia);
         req.setAttribute("restaurantesFiltrados", restaurantesFiltrados);
         req.getRequestDispatcher("restaurantesFiltrados.jsp").forward(req, resp);
-
-
-
     }
 
     @Override
