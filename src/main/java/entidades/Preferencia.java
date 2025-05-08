@@ -15,20 +15,18 @@ public class Preferencia {
     private LocalTime horaCierre;
     private Double distanciaUniversidad;
 
-    // Añade esta relación
     @ManyToOne
-    @JoinColumn(name = "comensal_id") // Nombre de la columna FK en la tabla preferencias
+    @JoinColumn(name = "comensal_id")
     private Comensal comensal;
 
-    public Preferencia() {
-    }
+    public Preferencia() {}
 
-    public Preferencia(String tipoComida, LocalTime horaApertura, LocalTime horaCierre,
-                       Double distanciaUniversidad, Comensal comensal) {
+    public Preferencia(String tipoComida, LocalTime horaApertura,
+                       LocalTime horaCierre, Double distancia, Comensal comensal) {
         this.tipoComida = tipoComida;
         this.horaApertura = horaApertura;
         this.horaCierre = horaCierre;
-        this.distanciaUniversidad = distanciaUniversidad;
+        this.distanciaUniversidad = distancia;
         this.comensal = comensal;
     }
 

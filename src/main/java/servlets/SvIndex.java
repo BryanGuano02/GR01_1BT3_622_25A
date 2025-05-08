@@ -1,10 +1,9 @@
 package servlets;
 
 import DAO.CalificacionDAO;
-import DAO.RestauranteDAO;
-import entidades.Calificacion;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
-import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -12,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,13 +20,13 @@ import java.util.Map;
 @WebServlet(name = "SvIndex", value = "/inicio")
 public class SvIndex extends HttpServlet {
     private EntityManagerFactory emf;
-    private RestauranteDAO restauranteDAO;
+    private UsuarioDAO usuarioDAO;
     private CalificacionDAO calificacionDAO;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        restauranteDAO = new RestauranteDAO(emf);
+        usuarioDAO = new UsuarioDAOImpl(emf);
         calificacionDAO = new CalificacionDAO(emf);
     }
 
@@ -42,9 +40,9 @@ public class SvIndex extends HttpServlet {
 
             List<Restaurante> restaurantes;
             if (busqueda != null && !busqueda.isEmpty()) {
-                restaurantes = restauranteDAO.buscarRestaurantes(busqueda);
+                restaurantes = usuarioDAO.buscarRestaurantes(busqueda);
             } else {
-                restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
+                restaurantes = usuarioDAO.obtenerTodosRestaurantes();
             }
 
             // Calcular promedios
@@ -58,11 +56,8 @@ public class SvIndex extends HttpServlet {
             req.setAttribute("restaurantes", restaurantes);
             req.setAttribute("promedios", promedios);
 
-            if (isAjax) {
-                req.getRequestDispatcher("/index.jsp").forward(req, resp);
-            } else {
-                req.getRequestDispatcher("/index.jsp").forward(req, resp);
-            }
+            req.getRequestDispatcher("/index.jsp").forward(req, resp);
+
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar restaurantes");
         }

@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "usuarios")
-public class Usuario {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +21,7 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
-    private String tipoUsuario; // "RESTAURANTE" o "COMENSAL"
+    private String tipoUsuario;
 
     // Getters y Setters
     public Long getId() { return id; }

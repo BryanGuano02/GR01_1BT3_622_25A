@@ -1,33 +1,46 @@
 package servlets;
 
 import DAO.UsuarioDAOImpl;
-import entidades.Usuario;
+import entidades.Comensal;
+import entidades.Restaurante;
+import entidades.Usuario;  // Importación añadida
 import exceptions.ServiceException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 import servicios.AuthServiceImpl;
 
 import java.io.IOException;
 
-@WebServlet(name = "SvAuth", urlPatterns = {"/login", "/registro"})
+@WebServlet(name = "SvAuth", urlPatterns = {"/login", "/registro-restaurante", "/registro-comensal"})
 public class SvAuth extends HttpServlet {
     private AuthServiceImpl authService;
+    private static EntityManagerFactory emf;
 
     @Override
     public void init() throws ServletException {
-        super.init();
-        this.authService = new AuthServiceImpl(new UsuarioDAOImpl());
+        try {
+            if (emf == null) {
+                emf = Persistence.createEntityManagerFactory("UFood_PU");
+            }
+            this.authService = new AuthServiceImpl(new UsuarioDAOImpl(emf));
+        } catch (Exception e) {
+            throw new ServletException("Error al inicializar JPA", e);
+        }
     }
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String path = request.getServletPath();
 
         if ("/login".equals(path)) {
@@ -40,33 +53,41 @@ public class SvAuth extends HttpServlet {
                 session.setAttribute("usuario", usuario);
 
                 if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
-                    response.sendRedirect(request.getContextPath() + "/crearRestaurante.jsp");
+                    response.sendRedirect("crearRestaurante.jsp");
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/index.jsp");
+                    response.sendRedirect("index.jsp");
                 }
             } catch (ServiceException e) {
                 request.setAttribute("error", e.getMessage());
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
-        } else if ("/registro".equals(path)) {
-            String tipoUsuario = request.getParameter("tipoUsuario");
-            String nombreUsuario = request.getParameter("nombreUsuario");
-            String contrasena = request.getParameter("contrasena");
-            String email = request.getParameter("email");
-
-            Usuario usuario = new Usuario();
-            usuario.setNombreUsuario(nombreUsuario);
-            usuario.setContrasena(contrasena);
-            usuario.setEmail(email);
+        }
+        else if ("/registro-restaurante".equals(path)) {
+            Restaurante restaurante = new Restaurante(
+                    request.getParameter("nombreUsuario"),
+                    request.getParameter("contrasena"),
+                    request.getParameter("email"),
+                    request.getParameter("nombreComercial"),
+                    request.getParameter("tipoComida")
+            );
 
             try {
-                if ("RESTAURANTE".equals(tipoUsuario)) {
-                    authService.registrarUsuarioRestaurante(usuario);
-                } else {
-                    authService.registrarComensal(usuario);
-                }
+                authService.registrarUsuarioRestaurante(restaurante);  // Método actualizado
+                response.sendRedirect("login.jsp?registroExitoso=true");
+            } catch (ServiceException e) {
+                request.setAttribute("error", e.getMessage());
+                request.getRequestDispatcher("/registro-restaurante.jsp").forward(request, response);
+            }
+        }
+        else if ("/registro-comensal".equals(path)) {
+            try {
+                Comensal comensal = new Comensal();
+                comensal.setNombreUsuario(request.getParameter("nombreUsuario"));
+                comensal.setContrasena(request.getParameter("contrasena"));
+                comensal.setEmail(request.getParameter("email"));
 
-                response.sendRedirect(request.getContextPath() + "/login.jsp?registroExitoso=true");
+                authService.registrarComensal(comensal);
+                response.sendRedirect("login.jsp?registroExitoso=true");
             } catch (ServiceException e) {
                 request.setAttribute("error", e.getMessage());
                 request.getRequestDispatcher("/registro.jsp").forward(request, response);

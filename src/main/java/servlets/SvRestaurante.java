@@ -1,19 +1,14 @@
 package servlets;
 
-import DAO.RestauranteDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
 import entidades.Usuario;
-import entidades.UsuarioRestaurante;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,12 +16,12 @@ import java.util.List;
 @WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
-    private RestauranteDAO restauranteDAO;
+    private UsuarioDAO usuarioDAO;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        restauranteDAO = new RestauranteDAO();
+        usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
     @Override
@@ -44,7 +39,7 @@ public class SvRestaurante extends HttpServlet {
 
         // Redirigir según tipo de usuario
         if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
-            mostrarPanelRestaurante(req, resp, (UsuarioRestaurante) usuario);
+            mostrarPanelRestaurante(req, resp, (Restaurante) usuario);
         } else {
             resp.sendRedirect(req.getContextPath() + "/inicio");
         }
@@ -61,58 +56,51 @@ public class SvRestaurante extends HttpServlet {
             return;
         }
 
-        UsuarioRestaurante usuarioRestaurante = (UsuarioRestaurante) session.getAttribute("usuario");
+        Restaurante restauranteUsuario = (Restaurante) session.getAttribute("usuario");
         String accion = req.getParameter("accion");
 
         if ("guardar".equals(accion)) {
-            procesarGuardarRestaurante(req, resp, usuarioRestaurante);
+            procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
-            procesarAgregarMenu(req, resp, usuarioRestaurante);
+            procesarAgregarMenu(req, resp, restauranteUsuario);
         }
     }
 
     private void mostrarPanelRestaurante(HttpServletRequest req, HttpServletResponse resp,
-                                         UsuarioRestaurante usuarioRestaurante) throws ServletException, IOException {
-
-        EntityManager em = emf.createEntityManager();
+                                         Restaurante restauranteUsuario) throws ServletException, IOException {
         try {
-            // Obtener solo los restaurantes del usuario actual
-            List<Restaurante> restaurantes = em.createQuery(
-                            "SELECT r FROM Restaurante r WHERE r.usuarioRestaurante.id = :userId",
-                            Restaurante.class)
-                    .setParameter("userId", usuarioRestaurante.getId())
-                    .getResultList();
+            // Obtener el restaurante del usuario actual
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
 
-            req.setAttribute("restaurantes", restaurantes);
+            req.setAttribute("restaurante", restaurante);
             req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
-        } finally {
-            em.close();
+        } catch (Exception e) {
+            req.setAttribute("error", "Error al cargar datos del restaurante: " + e.getMessage());
+            req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
         }
     }
 
     private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
-                                            UsuarioRestaurante usuarioRestaurante) throws IOException {
+                                            Restaurante restauranteUsuario) throws IOException {
         try {
-            Restaurante restaurante = new Restaurante();
-            restaurante.setNombre(req.getParameter("nombre"));
-            restaurante.setDescripcion(req.getParameter("descripcion"));
-            restaurante.setTipoComida(req.getParameter("tipoComida"));
-            restaurante.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
-            restaurante.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
-            restaurante.setUsuarioRestaurante(usuarioRestaurante);
+            // Actualizar los datos del restaurante (que es el usuario)
+            restauranteUsuario.setNombre(req.getParameter("nombre"));
+            restauranteUsuario.setDescripcion(req.getParameter("descripcion"));
+            restauranteUsuario.setTipoComida(req.getParameter("tipoComida"));
+            restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
+            restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
 
-            restauranteDAO.guardarRestaurante(restaurante);
-            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante creado exitosamente");
+            usuarioDAO.save(restauranteUsuario);
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante actualizado exitosamente");
         } catch (Exception e) {
             resp.sendRedirect(req.getContextPath() + "/restaurante?error=Error al guardar: " + e.getMessage());
         }
     }
 
+
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
-                                     UsuarioRestaurante usuarioRestaurante) throws IOException {
-        EntityManager em = emf.createEntityManager();
+                                     Restaurante restauranteUsuario) throws IOException {
         try {
-            Long restauranteId = Long.parseLong(req.getParameter("restauranteId"));
             String menu = req.getParameter("historia");
 
             if (menu == null || menu.trim().isEmpty()) {
@@ -120,32 +108,20 @@ public class SvRestaurante extends HttpServlet {
                 return;
             }
 
-            em.getTransaction().begin();
-            Restaurante restaurante = em.find(Restaurante.class, restauranteId);
+            // Obtener el restaurante actualizado
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
+            restaurante.agregarHistoria(menu);
 
-            // Verificar propiedad del restaurante
-            if (restaurante != null && restaurante.getUsuarioRestaurante().getId().equals(usuarioRestaurante.getId())) {
-                restaurante.agregarHistoria(menu);
-                em.merge(restaurante);
-                em.getTransaction().commit();
-                resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú agregado");
-            } else {
-                em.getTransaction().rollback();
-                resp.sendRedirect(req.getContextPath() + "/restaurante?error=No autorizado");
-            }
+            usuarioDAO.save(restaurante);
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú agregado");
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
             resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + e.getMessage());
-        } finally {
-            em.close();
         }
     }
 
     @Override
     public void destroy() {
-        if (restauranteDAO != null) restauranteDAO.cerrar();
+        if (usuarioDAO != null) usuarioDAO.close();
         if (emf != null) emf.close();
     }
 }

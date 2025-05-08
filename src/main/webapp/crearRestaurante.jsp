@@ -1,5 +1,9 @@
+<%@ page import="DAO.UsuarioDAOImpl" %>
+<%@ page import="jakarta.persistence.EntityManagerFactory" %>
+<%@ page import="jakarta.persistence.Persistence" %>
+<%@ page import="entidades.Restaurante" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="DAO.RestauranteDAO, entidades.Restaurante, java.util.List" %>
 <html>
 <head>
     <title>U-Food | Panel Administrativo</title>
@@ -14,7 +18,7 @@
 <div class="container mt-5">
     <%
         request.setAttribute("titulo", "Registrar nuevo restaurante");
-        request.setAttribute("botonAtras", true);
+        request.setAttribute("botonAtras", false);
     %>
     <%@ include file="layout/header.jsp" %>
     <div class="card shadow">
@@ -83,11 +87,13 @@
                     </thead>
                     <tbody>
                     <%
-                        RestauranteDAO dao = new RestauranteDAO();
-                        List<Restaurante> restaurantes = dao.obtenerTodosLosRestaurantes();
-                        dao.cerrar();
+                        EntityManagerFactory emf = null;
+                        try {
+                            emf = Persistence.createEntityManagerFactory("UFood_PU");
+                            UsuarioDAOImpl dao = new UsuarioDAOImpl(emf);
+                            List<Restaurante> restaurantes = dao.obtenerTodosRestaurantes();
 
-                        for (Restaurante r : restaurantes) {
+                            for (Restaurante r : restaurantes) {
                     %>
                     <tr>
                         <td><%= r.getId() %></td>
@@ -139,7 +145,16 @@
                             </div>
                         </td>
                     </tr>
-                    <% } %>
+                    <%
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (emf != null) {
+                                emf.close();
+                            }
+                        }
+                    %>
                     </tbody>
                 </table>
             </div>
