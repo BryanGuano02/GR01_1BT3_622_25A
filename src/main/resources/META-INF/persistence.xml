@@ -8,7 +8,6 @@
         <class>entidades.Calificacion</class>
         <class>entidades.Comensal</class>
         <class>entidades.Usuario</class>
-        <class>entidades.UsuarioRestaurante</class>
         <class>entidades.Preferencia</class>
 
 

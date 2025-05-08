@@ -8,10 +8,11 @@ import java.util.List;
 @PrimaryKeyJoinColumn(name = "usuario_id")
 public class Comensal extends Usuario {
 
-    @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL)
     private List<Preferencia> preferencias;
 
     public Comensal() {
+        this.setTipoUsuario("COMENSAL");
     }
 
     public Comensal(String nombreUsuario, String contrasena, String email, List<Preferencia> preferencias) {

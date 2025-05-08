@@ -9,18 +9,32 @@
 <html>
 <head>
   <title>Registro - UFood</title>
+  <script>
+    function enviarFormulario() {
+      const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked').value;
+      const form = document.getElementById('formRegistro');
+
+      if(tipoUsuario === "COMENSAL") {
+        form.action = "${pageContext.request.contextPath}/registro-comensal";
+      } else {
+        form.action = "${pageContext.request.contextPath}/registro-restaurante";
+      }
+      form.submit();
+      return false;
+    }
+  </script>
 </head>
 <body>
 <h1>Registro de Usuario</h1>
 <% if (request.getAttribute("error") != null) { %>
 <p style="color: red;">${error}</p>
 <% } %>
-<form action="${pageContext.request.contextPath}/registro" method="post">
+<form id="formRegistro" method="post" onsubmit="return enviarFormulario()">
   <div>
     <label>Tipo de usuario:</label>
-    <input type="radio" id="restaurante" name="tipoUsuario" value="RESTAURANTE" checked>
+    <input type="radio" id="restaurante" name="tipoUsuario" value="RESTAURANTE">
     <label for="restaurante">Restaurante</label>
-    <input type="radio" id="comensal" name="tipoUsuario" value="COMENSAL">
+    <input type="radio" id="comensal" name="tipoUsuario" value="COMENSAL" checked>
     <label for="comensal">Comensal</label>
   </div>
   <div>
