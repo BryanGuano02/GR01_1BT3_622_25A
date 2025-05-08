@@ -16,7 +16,7 @@
 <body>
 <div class="container mt-5">
     <%
-        request.setAttribute("titulo", "Listad de Restaurantes "); // Ejemplo: para resaltar menú
+        request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
         request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
     %>
     <%@ include file="layout/header.jsp" %>
