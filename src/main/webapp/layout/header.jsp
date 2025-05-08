@@ -21,7 +21,6 @@
         <h2 class="text-primary"><%=titulo%>
         </h2>
         <c:if test="${botonAtras}">
-            <%--        <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary me-3">--%>
             <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary me-3 d-flex align-items-center">
                 <i class="fas fa-arrow-left"></i> Atrás
             </a>
