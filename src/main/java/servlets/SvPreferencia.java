@@ -1,10 +1,7 @@
 package servlets;
 
-import entidades.Calificacion;
-import entidades.Comensal;
-import entidades.Preferencia;
+import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -23,14 +20,14 @@ import java.util.Map;
 @WebServlet(name = "SvPreferencia", value = "/SvPreferencia")
 public class SvPreferencia extends HttpServlet {
     private EntityManagerFactory emf;
+    private PreferenciaService preferenciaService;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
+        UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+        preferenciaService = new PreferenciaService(usuarioDAO);
     }
-    PreferenciaService preferenciaService = new PreferenciaService();
-
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -40,9 +37,6 @@ public class SvPreferencia extends HttpServlet {
         List<Restaurante> restaurantesFiltrados = preferenciaService.aplicarPreferencia(parametrosPreferencia);
         req.setAttribute("restaurantesFiltrados", restaurantesFiltrados);
         req.getRequestDispatcher("restaurantesFiltrados.jsp").forward(req, resp);
-
-
-
     }
 
     @Override
@@ -50,14 +44,14 @@ public class SvPreferencia extends HttpServlet {
             throws ServletException, IOException {
 
         Map<String, Object> parametrosPreferencia = extraerParametrosPreferencia(req);
-        Long idComensal = (Long) parametrosPreferencia.get("idComensal");
+        Long idComensal = (Long) req.getSession().getAttribute("idComensal"); // Obtener ID de la sesión
         String tipoComida = (String) parametrosPreferencia.get("tipoComida");
         LocalTime horaApertura = (LocalTime) parametrosPreferencia.get("horaApertura");
         LocalTime horaCierre = (LocalTime) parametrosPreferencia.get("horaCierre");
         Double distancia = (Double) parametrosPreferencia.get("distancia");
 
-        preferenciaService.crearPreferencia( tipoComida, horaApertura, horaCierre, distancia, idComensal );
-
+        preferenciaService.crearPreferencia(tipoComida, horaApertura, horaCierre, distancia, idComensal);
+        resp.sendRedirect("preferenciasGuardadas.jsp");
     }
 
     private Map<String, Object> extraerParametrosPreferencia(HttpServletRequest req) {
@@ -67,23 +61,24 @@ public class SvPreferencia extends HttpServlet {
         String horaCierreStr = req.getParameter("horaCierre");
         String distanciaStr = req.getParameter("distancia");
 
-        LocalTime horaApertura = (horaAperturaStr != null && !horaAperturaStr.isEmpty()) ? LocalTime.parse(horaAperturaStr) : null;
-        LocalTime horaCierre = (horaCierreStr != null && !horaCierreStr.isEmpty()) ? LocalTime.parse(horaCierreStr) : null;
-        Double distanciaMax = (distanciaStr != null && !distanciaStr.isEmpty()) ? Double.parseDouble(distanciaStr) : null;
+        LocalTime horaApertura = (horaAperturaStr != null && !horaAperturaStr.isEmpty()) ?
+                LocalTime.parse(horaAperturaStr) : null;
+        LocalTime horaCierre = (horaCierreStr != null && !horaCierreStr.isEmpty()) ?
+                LocalTime.parse(horaCierreStr) : null;
+        Double distanciaMax = (distanciaStr != null && !distanciaStr.isEmpty()) ?
+                Double.parseDouble(distanciaStr) : null;
 
         parametrosPreferencia.put("tipoComida", req.getParameter("tipoComida"));
-        parametrosPreferencia.put("horaApertura", horaApertura );
-        parametrosPreferencia.put("horaCierre", horaCierre );
-        parametrosPreferencia.put("distancia", distanciaMax );
+        parametrosPreferencia.put("horaApertura", horaApertura);
+        parametrosPreferencia.put("horaCierre", horaCierre);
+        parametrosPreferencia.put("distancia", distanciaMax);
 
         return parametrosPreferencia;
-
     }
-
 
     @Override
     public void destroy() {
-        if (emf != null) {
+        if (emf != null && emf.isOpen()) {
             emf.close();
         }
     }

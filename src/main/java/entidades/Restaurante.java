@@ -1,18 +1,16 @@
 package entidades;
 
 import jakarta.persistence.*;
-
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Restaurante {
+@Table(name = "restaurantes")
+@PrimaryKeyJoinColumn(name = "usuario_id")
+public class Restaurante extends Usuario {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    // Atributos específicos del restaurante
     private String nombre;
     private String descripcion;
     private String tipoComida;
@@ -24,25 +22,31 @@ public class Restaurante {
     private int calidad;
     private int tiempoEspera;
 
-
-    // Nuevo atributo para las historias (menú del día)
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "restaurante_historias",
             joinColumns = @JoinColumn(name = "restaurante_id"),
             foreignKey = @ForeignKey(name = "fk_restaurante_historias")
     )
-    @Column(name = "historia", length = 1000, nullable = false)
+    @Column(name = "historia", length = 1000)
     private List<String> historias = new ArrayList<>();
 
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
+    private List<Calificacion> calificaciones;
+
     public Restaurante() {
+        this.setTipoUsuario("RESTAURANTE");
     }
 
-    public Restaurante(String nombre, String tipoComida, LocalTime horaApertura, LocalTime horaCierre) {
-        this.nombre = nombre;
+    // Constructores
+    public Restaurante(String nombreUsuario, String contrasena, String email,
+                       String nombreComercial, String tipoComida) {
+        this.setNombreUsuario(nombreUsuario);
+        this.setContrasena(contrasena);
+        this.setEmail(email);
+        this.nombre = nombreComercial;
         this.tipoComida = tipoComida;
-        this.horaApertura = horaApertura;
-        this.horaCierre = horaCierre;
+        this.setTipoUsuario("RESTAURANTE");
     }
 
     public LocalTime getHoraApertura() {
@@ -61,13 +65,8 @@ public class Restaurante {
         this.horaCierre = horaCierre;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // Métodos getId() y setId() heredados de Usuario - No es necesario redefinirlos
+    // Se accede a ellos mediante super.getId() y super.setId() si es necesario
 
     public String getNombre() {
         return nombre;
@@ -101,7 +100,6 @@ public class Restaurante {
         this.puntajePromedio = puntajePromedio;
     }
 
-
     public int getPrecio() {
         return precio;
     }
@@ -109,7 +107,6 @@ public class Restaurante {
     public void setPrecio(int precio) {
         this.precio = precio;
     }
-
 
     public Double getDistanciaUniversidad() {
         return distanciaUniversidad;
@@ -153,7 +150,7 @@ public class Restaurante {
     @Override
     public String toString() {
         return "Restaurante{" +
-                "id=" + id +
+                "id=" + getId() + // Acceso correcto al id heredado
                 ", nombre='" + nombre + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", tipoComida='" + tipoComida + '\'' +

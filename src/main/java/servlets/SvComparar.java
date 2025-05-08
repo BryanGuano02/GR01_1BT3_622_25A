@@ -1,7 +1,10 @@
 package servlets;
 
-import DAO.RestauranteDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,21 +16,23 @@ import java.util.List;
 
 @WebServlet(name = "comparar", urlPatterns = {"/comparar"})
 public class SvComparar extends HttpServlet {
-    private RestauranteDAO restauranteDAO;
+    private UsuarioDAO usuarioDAO;
+    private EntityManagerFactory emf;
 
     @Override
     public void init() {
-        restauranteDAO = new RestauranteDAO();
+        emf = Persistence.createEntityManagerFactory("UFood_PU");
+        usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
-   @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String accion = request.getParameter("accion");
 
         try {
             if (accion == null || accion.equals("listar")) {
-                List<Restaurante> restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
+                List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
                 request.setAttribute("restaurantes", restaurantes);
                 request.getRequestDispatcher("/compararRestaurantes.jsp")
                         .forward(request, response);
@@ -43,8 +48,8 @@ public class SvComparar extends HttpServlet {
                 }
 
                 // Obtener restaurantes usando el DAO
-                Restaurante rest1 = restauranteDAO.obtenerRestaurantePorId(id1);
-                Restaurante rest2 = restauranteDAO.obtenerRestaurantePorId(id2);
+                Restaurante rest1 = (Restaurante) usuarioDAO.findById(id1);
+                Restaurante rest2 = (Restaurante) usuarioDAO.findById(id2);
 
                 if (rest1 == null || rest2 == null) {
                     request.setAttribute("error", "Uno o ambos restaurantes no fueron encontrados");
@@ -54,12 +59,12 @@ public class SvComparar extends HttpServlet {
 
                 request.getSession().setAttribute("restaurante1", rest1);
                 request.getSession().setAttribute("restaurante2", rest2);
-                
+
                 response.sendRedirect(request.getContextPath() + "/resultadoComparacion.jsp");
             }
         } catch (Exception e) {
             request.setAttribute("error", "Ha ocurrido un error en el proceso");
-            List<Restaurante> restaurantes = restauranteDAO.obtenerTodosLosRestaurantes();
+            List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
             request.setAttribute("restaurantes", restaurantes);
             request.getRequestDispatcher("/compararRestaurantes.jsp")
                     .forward(request, response);
@@ -74,8 +79,8 @@ public class SvComparar extends HttpServlet {
 
     @Override
     public void destroy() {
-        if (restauranteDAO != null) {
-            restauranteDAO.cerrar();
+        if (emf != null && emf.isOpen()) {
+            emf.close();
         }
     }
 }

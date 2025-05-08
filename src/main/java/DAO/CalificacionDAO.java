@@ -7,19 +7,27 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CalificacionDAO {
+    private static final Logger LOGGER = Logger.getLogger(CalificacionDAO.class.getName());
     private final EntityManagerFactory emf;
 
+    public CalificacionDAO(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
     public CalificacionDAO() {
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
+        this.emf = Persistence.createEntityManagerFactory("UFood_PU");
     }
 
     public Calificacion obtenerPorId(Long id) {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = null;
         try {
+            em = emf.createEntityManager();
             return em.find(Calificacion.class, id);
         } finally {
             if (em != null && em.isOpen()) {
@@ -28,18 +36,20 @@ public class CalificacionDAO {
         }
     }
 
-    public void actualizar(Calificacion calificacion) {
-        EntityManager em = emf.createEntityManager();
+    public boolean actualizar(Calificacion calificacion) {
+        EntityManager em = null;
         try {
+            em = emf.createEntityManager();
             em.getTransaction().begin();
-
             em.merge(calificacion);
             em.getTransaction().commit();
+            return true;
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
+            LOGGER.log(Level.SEVERE, "Error al actualizar calificación", e);
+            if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            return false;
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
@@ -47,61 +57,81 @@ public class CalificacionDAO {
         }
     }
 
-    public List<Calificacion> obtenerTodosLosCalificaciones(Long idRestaurante) {
-        EntityManager em = emf.createEntityManager();
-        List<Calificacion> calificaciones = new ArrayList<>();
-
+    public List<Calificacion> obtenerCalificacionesPorRestaurante(Long idRestaurante) {
+        EntityManager em = null;
         try {
+            em = emf.createEntityManager();
             TypedQuery<Calificacion> query = em.createQuery(
-                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante ORDER BY c.id DESC",
                     Calificacion.class);
-
             query.setParameter("idRestaurante", idRestaurante);
-
-            calificaciones = query.getResultList();
-
-        } finally {
-            // Cerrar el EntityManager
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
-        }
-
-        return calificaciones;
-    }
-
-    public List<Calificacion> obtenerTodosLosCalificaciones() {
-        EntityManager em = emf.createEntityManager();
-        List<Calificacion> calificaciones = new ArrayList<>();
-
-        try {
-            TypedQuery<Calificacion> query = em.createQuery("SELECT r FROM Calificacion r", Calificacion.class);
-
-            calificaciones = query.getResultList();
-
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones por restaurante", e);
+            return new ArrayList<>();
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
             }
         }
-
-        return calificaciones;
     }
 
-    public void crear(Calificacion nuevaCalificacion) {
-        EntityManager em = emf.createEntityManager();
-
+    public List<Calificacion> obtenerTodasLasCalificaciones() {
+        EntityManager em = null;
         try {
+            em = emf.createEntityManager();
+            TypedQuery<Calificacion> query = em.createQuery(
+                    "SELECT c FROM Calificacion c ORDER BY c.id DESC",
+                    Calificacion.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener todas las calificaciones", e);
+            return new ArrayList<>(); // Cambiado a new ArrayList<>()
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    public boolean crear(Calificacion nuevaCalificacion) {
+        EntityManager em = null;
+        try {
+            em = emf.createEntityManager();
             em.getTransaction().begin();
             em.persist(nuevaCalificacion);
             em.getTransaction().commit();
+            return true;
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
+            LOGGER.log(Level.SEVERE, "Error al crear calificación", e);
+            if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            return false;
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    public Double calcularPromedioCalificaciones(Long idRestaurante) {
+        EntityManager em = null;
+        try {
+            em = emf.createEntityManager();
+            TypedQuery<Double> query = em.createQuery(
+                    "SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+                    Double.class);
+            query.setParameter("idRestaurante", idRestaurante);
+            Double promedio = query.getSingleResult();
+            return promedio != null ? promedio : 0.0;
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error al calcular promedio de calificaciones", e);
+            return 0.0;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 
@@ -110,5 +140,4 @@ public class CalificacionDAO {
             emf.close();
         }
     }
-
 }

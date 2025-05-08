@@ -1,235 +1,269 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="entidades.Restaurante" %>
-<%@ page import="java.util.List" %>
-<%@ page import="entidades.Calificacion" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html>
 <head>
-    <title>U-Food | Dashboard Restaurantes</title>
+    <title>U-Food | Inicio</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ESTILOS EXISTENTES (SE MANTIENEN IGUAL) */
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .restaurant-card {
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .restaurant-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .restaurant-img {
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .search-container {
-            margin-bottom: 20px;
-        }
-
-        .btn-action {
-            margin-right: 10px;
-        }
-
-        .rating-stars {
-            color: #ffc107;
-        }
-
-        .restaurant-type {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        /* NUEVOS ESTILOS AGREGADOS */
-        .menu-item {
-            padding: 8px;
-            margin-bottom: 5px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 3px solid #0d6efd;
-        }
-
-        .menu-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .btn-menu {
-            margin-left: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Restaurantes Disponibles</h2>
-        <div class="d-flex align-items-center">
-            <img src="https://ui-avatars.com/api/?name=Usuario&background=ff6b6b&color=fff"
-                 alt="Usuario" class="rounded-circle me-2" width="40">
-            <span class="fw-bold">Usuario</span>
-        </div>
-    </div>
+    <%
+        request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
+        request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
+    %>
+    <%@ include file="layout/header.jsp" %>
 
-    <!-- Card de búsqueda -->
-    <div class="card shadow">
+    <!-- Barra de búsqueda y acciones -->
+    <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Buscar restaurantes..."
-                               aria-label="Buscar restaurantes" aria-describedby="button-search">
-                        <button class="btn btn-primary" type="button" id="button-search">
-                            <i class="fas fa-search me-2"></i>Buscar
-                        </button>
-                    </div>
+                    <form id="searchForm" onsubmit="buscarRestaurantes(event)">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchInput" name="busqueda"
+                                   placeholder="Buscar restaurantes..."
+                                   value="${param.busqueda}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="comparar" class="btn btn-info me-2">
+                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                        <a href="${pageContext.request.contextPath}/SvPreferencia" class="btn btn-info me-2">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </a>
+                    </c:if>
+                    <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
-                    <button class="btn btn-success">
-                        <i class="fas fa-heart me-2"></i>Guardar Preferencias
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Listado de restaurantes -->
-    <div class="row">
-        <%
-            List<Restaurante> restaurantes = (List<Restaurante>) request.getAttribute("restaurantes");
-            List<Calificacion> calificaciones = (List<Calificacion>) request.getAttribute("calificaciones");
-
-            Map<Long, Calificacion> calificacionMap = new HashMap<>();
-            if (calificaciones != null) {
-                for (Calificacion calif : calificaciones) {
-                    calificacionMap.put(calif.getRestaurante().getId(), calif);
-                }
-            }
-
-            for (Restaurante restaurante : restaurantes) {
-                Calificacion calificacion = calificacionMap.get(restaurante.getId());
-                double puntaje = calificacion != null ? calificacion.getPuntaje() : -1;
-                boolean tieneMenu = restaurante.getHistorias() != null && !restaurante.getHistorias().isEmpty();
-        %>
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card restaurant-card h-100">
-                <div class="card-body">
-                    <h5 class="card-title"><%= restaurante.getNombre() %>
-                    </h5>
-                    <p class="restaurant-type mb-2">
-                        <i class="fas fa-utensils me-1"></i> <%= restaurante.getTipoComida() %>
-                    </p>
-                    <div class="mb-2">
-                        <% if (puntaje >= 0) {
-                            int rating = (int) Math.round(puntaje);
-                        %>
-                        <% for (int j = 0; j < 5; j++) { %>
-                        <i class="fas fa-star <%= j < rating ? "rating-stars" : "text-secondary" %>"></i>
-                        <% } %>
-                        <span class="ms-1">(<%= String.format("%.1f", puntaje) %>)</span>
-                        <% } else { %>
-                        <span class="text-muted">-</span>
-                        <% } %>
+    <div class="row" id="restaurantes-container">
+        <c:choose>
+            <c:when test="${empty restaurantes}">
+                <div class="col-12">
+                    <div class="card no-restaurants">
+                        <i class="fas fa-utensils fa-4x mb-3"></i>
+                        <h3>No hay restaurantes disponibles</h3>
+                        <p class="text-muted">No se encontraron restaurantes que coincidan con tu búsqueda.</p>
                     </div>
-                    <p class="card-text"><%= restaurante.getDescripcion() %>
-                    <p class="card-text">
-                        <i class="bi bi-star-fill text-warning"></i> <!-- Icono de estrella (Bootstrap Icons) -->
-                        Puntaje promedio:
-                        <%= restaurante.getPuntajePromedio() != null ?
-                                String.format("%.1f", restaurante.getPuntajePromedio()) :
-                                "-" %>
-                    </p>
-                    </p>
                 </div>
-                <div class="card-footer bg-white">
-                    <a href="calificar?idRestaurante=<%= restaurante.getId() %>" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-star"></i> Calificar
-                    </a>
+            </c:when>
+            <c:otherwise>
+                <c:forEach items="${restaurantes}" var="restaurante">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card restaurant-card h-100">
+                            <div class="restaurant-img-placeholder">
+                                <i class="fas fa-utensils fa-3x"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                </h5>
+                                <p class="restaurant-type mb-2">
+                                    <i class="fas fa-utensils me-1"></i>
+                                    <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                </p>
 
-                    <% if (tieneMenu) { %>
-                    <button class="btn btn-sm btn-outline-primary btn-menu" data-bs-toggle="modal"
-                            data-bs-target="#menuModal<%= restaurante.getId() %>">
-                        <i class="fas fa-utensils"></i> Ver Menú
-                    </button>
-                    <% } %>
-                </div>
-            </div>
-        </div>
+                                <div class="mb-2">
+                                    <c:choose>
+                                        <c:when test="${restaurante.puntajePromedio > 0}">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
+                                            </c:forEach>
+                                            <span class="ms-1">(<fmt:formatNumber value="${restaurante.puntajePromedio}"
+                                                                                  pattern="#.##"/>)</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">Sin calificaciones</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
 
-        <!-- Modal para el menú (se agrega solo si tiene menú) -->
-        <% if (tieneMenu) { %>
-        <div class="modal fade" id="menuModal<%= restaurante.getId() %>" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Menú de <%= restaurante.getNombre() %></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body menu-container">
-                        <% for (String menu : restaurante.getHistorias()) { %>
-                        <div class="menu-item mb-2">
-                            <%= menu %>
+                                <p class="card-text">
+                                    <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                </p>
+
+                                <div class="restaurant-actions">
+                                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                                        <a href="${pageContext.request.contextPath}/calificar?idRestaurante=${restaurante.id}"
+                                           class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-star"></i> Calificar
+                                        </a>
+                                    </c:if>
+
+                                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#menuModal${restaurante.id}">
+                                            <i class="fas fa-utensils"></i> Ver Menú
+                                        </button>
+                                    </c:if>
+                                </div>
+                            </div>
                         </div>
-                        <% } %>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <% } %>
-        <% } %>
+
+                    <!-- Modal para el menú -->
+                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
+                        <div class="modal fade" id="menuModal${restaurante.id}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Menú de ${restaurante.nombre}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body menu-container">
+                                        <c:forEach items="${restaurante.historias}" var="menu">
+                                            <c:if test="${not empty menu}">
+                                                <div class="menu-item mb-2">
+                                                        ${menu}
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:if>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Manejar el formulario de búsqueda
+        const searchForm = document.getElementById('searchForm');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                buscarRestaurantes(searchTerm);
+            });
+        }
+
+        // Verificar si ya hay restaurantes cargados
+        const hasRestaurants = document.querySelectorAll('.restaurant-card').length > 0;
+        const hasSearchParam = new URL(window.location.href).searchParams.get('busqueda');
+
+        if (!hasRestaurants && !hasSearchParam) {
+            cargarRestaurantes();
+        }
+    });
+
+    function cargarRestaurantes() {
+        const container = document.getElementById('restaurantes-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="col-12 loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>`;
+
+        fetch('${pageContext.request.contextPath}/inicio')
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la respuesta del servidor');
+                return response.text();
+            })
+            .then(html => {
+                // Parsear el HTML para extraer solo los restaurantes
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const restaurantesHTML = tempDiv.querySelector('#restaurantes-container').innerHTML;
+                container.innerHTML = restaurantesHTML;
+                inicializarModales();
+            })
+            .catch(error => {
+                console.error('Error al cargar restaurantes:', error);
+                container.innerHTML = `
+                    <div class="col-12 error-message">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <h4>Error al cargar los restaurantes</h4>
+                        <p>Por favor intenta recargar la página</p>
+                        <button onclick="location.reload()" class="btn btn-primary mt-2">
+                            <i class="fas fa-sync-alt me-2"></i>Recargar
+                        </button>
+                    </div>`;
+            });
+    }
+
+    function buscarRestaurantes(searchTerm) {
+        const container = document.getElementById('restaurantes-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="col-12 loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Buscando...</span>
+                </div>
+            </div>`;
+
+        const url = '${pageContext.request.contextPath}/inicio?busqueda=' + encodeURIComponent(searchTerm);
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la búsqueda');
+                return response.text();
+            })
+            .then(html => {
+                // Parsear el HTML para extraer solo los restaurantes
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const restaurantesHTML = tempDiv.querySelector('#restaurantes-container').innerHTML;
+                container.innerHTML = restaurantesHTML;
+                inicializarModales();
+
+                // Actualizar URL sin recargar la página
+                window.history.pushState({}, '', url);
+            })
+            .catch(error => {
+                console.error('Error en la búsqueda:', error);
+                container.innerHTML = `
+                <div class="col-12 error-message">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4>Error en la búsqueda</h4>
+                    <p>${error.message}</p>
+                    <button onclick="buscarRestaurantes('${searchTerm}')" class="btn btn-primary mt-2">
+                        <i class="fas fa-sync-alt me-2"></i>Reintentar
+                    </button>
+                </div>`;
+            });
+    }
+
+    function inicializarModales() {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            document.querySelectorAll('.modal').forEach(modalEl => {
+                new bootstrap.Modal(modalEl);
+            });
+        }
+    }
+</script>
 </body>
 </html>
