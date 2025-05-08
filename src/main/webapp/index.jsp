@@ -11,117 +11,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .restaurant-card {
-            transition: transform 0.2s;
-            cursor: pointer;
-            height: 100%;
-        }
-        .restaurant-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        .search-container {
-            margin-bottom: 20px;
-        }
-        .rating-stars {
-            color: #ffc107;
-        }
-        .restaurant-type {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .menu-item {
-            padding: 8px;
-            margin-bottom: 5px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 3px solid #0d6efd;
-        }
-        .menu-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .no-restaurants {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        .restaurant-img-placeholder {
-            height: 120px;
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            border-radius: 8px 8px 0 0;
-        }
-        .restaurant-actions {
-            margin-top: 15px;
-        }
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-        }
-        .error-message {
-            text-align: center;
-            padding: 20px;
-            color: #dc3545;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Restaurantes Disponibles</h2>
-        <div class="d-flex align-items-center">
-            <c:choose>
-                <c:when test="${not empty sessionScope.usuario}">
-                    <img src="https://ui-avatars.com/api/?name=${sessionScope.usuario.nombreUsuario}&background=ff6b6b&color=fff"
-                         alt="Usuario" class="rounded-circle me-2" width="40">
-                    <span class="fw-bold">${sessionScope.usuario.nombreUsuario}</span>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-outline-danger ms-3">
-                        <i class="fas fa-sign-out-alt"></i> Salir
-                    </a>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login.jsp" class="btn btn-sm btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-                    </a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
+    <%
+        request.setAttribute("titulo", "Listad de Restaurantes "); // Ejemplo: para resaltar menú
+        request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
+    %>
+    <%@ include file="layout/header.jsp" %>
 
     <!-- Barra de búsqueda y acciones -->
     <div class="card shadow mb-4">
@@ -130,7 +28,8 @@
                 <div class="col-md-8">
                     <form id="searchForm" onsubmit="buscarRestaurantes(event)">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="searchInput" name="busqueda" placeholder="Buscar restaurantes..."
+                            <input type="text" class="form-control" id="searchInput" name="busqueda"
+                                   placeholder="Buscar restaurantes..."
                                    value="${param.busqueda}">
                             <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-search me-2"></i>Buscar
@@ -186,7 +85,8 @@
                                             <c:forEach begin="1" end="5" var="i">
                                                 <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
                                             </c:forEach>
-                                            <span class="ms-1">(<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)</span>
+                                            <span class="ms-1">(<fmt:formatNumber value="${restaurante.puntajePromedio}"
+                                                                                  pattern="#.##"/>)</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted">Sin calificaciones</span>
@@ -236,7 +136,8 @@
                                         </c:forEach>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -251,11 +152,11 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Manejar el formulario de búsqueda
         const searchForm = document.getElementById('searchForm');
-        if(searchForm) {
-            searchForm.addEventListener('submit', function(e) {
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const searchTerm = document.getElementById('searchInput').value.trim();
                 buscarRestaurantes(searchTerm);
@@ -266,14 +167,14 @@
         const hasRestaurants = document.querySelectorAll('.restaurant-card').length > 0;
         const hasSearchParam = new URL(window.location.href).searchParams.get('busqueda');
 
-        if(!hasRestaurants && !hasSearchParam) {
+        if (!hasRestaurants && !hasSearchParam) {
             cargarRestaurantes();
         }
     });
 
     function cargarRestaurantes() {
         const container = document.getElementById('restaurantes-container');
-        if(!container) return;
+        if (!container) return;
 
         container.innerHTML = `
             <div class="col-12 loading-spinner">
@@ -311,7 +212,7 @@
 
     function buscarRestaurantes(searchTerm) {
         const container = document.getElementById('restaurantes-container');
-        if(!container) return;
+        if (!container) return;
 
         container.innerHTML = `
             <div class="col-12 loading-spinner">

@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -47,97 +49,100 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <%
-    Restaurante restaurante1 = (Restaurante) session.getAttribute("restaurante1");
-    Restaurante restaurante2 = (Restaurante) session.getAttribute("restaurante2");
-    
-    request.setAttribute("restaurante1", restaurante1);
-    request.setAttribute("restaurante2", restaurante2);
 
-    if (restaurante1 != null && restaurante2 != null) {
-        Comparacion comparacion = new Comparacion(restaurante1, restaurante2);
-        comparacion.realizarComparacion();
-        request.setAttribute("comparaciones", comparacion.getComparaciones());
-        request.setAttribute("resultadoFinal", comparacion.getResultadoFinal());
-    }
-%>
+<div class="container mt-5">
+    <%
+        request.setAttribute("titulo", "Resultado de Comparación");
+        request.setAttribute("botonAtras", true);
+        Restaurante restaurante1 = (Restaurante) session.getAttribute("restaurante1");
+        Restaurante restaurante2 = (Restaurante) session.getAttribute("restaurante2");
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-primary">Resultado de Comparación</h2>
-        </div>
+        request.setAttribute("restaurante1", restaurante1);
+        request.setAttribute("restaurante2", restaurante2);
 
-        <c:if test="${restaurante1 != null && restaurante2 != null}">
-            <!-- El resto de tu código de la tabla permanece igual -->
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>Características</th>
-                                <th>${restaurante1.nombre}</th>
-                                <th>${restaurante2.nombre}</th>
-                            </tr>
-                            <tr>
-                                <td>Tipo de Comida</td>
-                                <td>${restaurante1.tipoComida}</td>
-                                <td>${restaurante2.tipoComida}</td>
-                            </tr>
-                            <tr>
-                                <td>Descripción</td>
-                                <td>${restaurante1.descripcion}</td>
-                                <td>${restaurante2.descripcion}</td>
-                            </tr>
-                            <tr>
-                                <td>Horario</td>
-                                <td>${restaurante1.horaApertura} - ${restaurante1.horaCierre}</td>
-                                <td>${restaurante2.horaApertura} - ${restaurante2.horaCierre}</td>
-                            </tr>
-                            <tr>
-                                <td>Puntaje Promedio </td>
-                                <td>${restaurante1.puntajePromedio} ★</td>
-                                <td>${restaurante2.puntajePromedio} ★</td>
-                            </tr>
-                            <tr>
-                                <td>Tiempo de Espera </td>
-                                <td>${restaurante1.tiempoEspera} minutos</td>
-                                <td>${restaurante2.tiempoEspera} minutos</td>
-                            </tr>
-                            <tr>
-                                <td>Distancia Universidad </td>
-                                <td>${restaurante1.distanciaUniversidad} km</td>
-                                <td>${restaurante2.distanciaUniversidad} km</td>
-                            </tr>
-                            <tr>
-                                <td>Calidad </td>
-                                <td>${restaurante1.calidad}🍴</td>
-                                <td>${restaurante2.calidad}🍴</td>
-                            </tr>
-                            <tr>
-                                <td>Precio </td>
-                                <td>${restaurante1.precio}$</td>
-                                <td>${restaurante2.precio}$</td>
-                            </tr>
-                        </table>
+        if (restaurante1 != null && restaurante2 != null) {
+            Comparacion comparacion = new Comparacion(restaurante1, restaurante2);
+            comparacion.realizarComparacion();
+            request.setAttribute("comparaciones", comparacion.getComparaciones());
+            request.setAttribute("resultadoFinal", comparacion.getResultadoFinal());
+        }
+    %>
 
-        <div class="card mt-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Análisis Comparativo</h4>
-                <div class="mb-3">
-                    ${comparaciones}
+    <%@ include file="layout/header.jsp" %>
+</div>
+<div class="container">
+    <c:if test="${restaurante1 != null && restaurante2 != null}">
+    <!-- El resto de tu código de la tabla permanece igual -->
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Características</th>
+                        <th>${restaurante1.nombre}</th>
+                        <th>${restaurante2.nombre}</th>
+                    </tr>
+                    <tr>
+                        <td>Tipo de Comida</td>
+                        <td>${restaurante1.tipoComida}</td>
+                        <td>${restaurante2.tipoComida}</td>
+                    </tr>
+                    <tr>
+                        <td>Descripción</td>
+                        <td>${restaurante1.descripcion}</td>
+                        <td>${restaurante2.descripcion}</td>
+                    </tr>
+                    <tr>
+                        <td>Horario</td>
+                        <td>${restaurante1.horaApertura} - ${restaurante1.horaCierre}</td>
+                        <td>${restaurante2.horaApertura} - ${restaurante2.horaCierre}</td>
+                    </tr>
+                    <tr>
+                        <td>Puntaje Promedio</td>
+                        <td>${restaurante1.puntajePromedio} ★</td>
+                        <td>${restaurante2.puntajePromedio} ★</td>
+                    </tr>
+                    <tr>
+                        <td>Tiempo de Espera</td>
+                        <td>${restaurante1.tiempoEspera} minutos</td>
+                        <td>${restaurante2.tiempoEspera} minutos</td>
+                    </tr>
+                    <tr>
+                        <td>Distancia Universidad</td>
+                        <td>${restaurante1.distanciaUniversidad} km</td>
+                        <td>${restaurante2.distanciaUniversidad} km</td>
+                    </tr>
+                    <tr>
+                        <td>Calidad</td>
+                        <td>${restaurante1.calidad}🍴</td>
+                        <td>${restaurante2.calidad}🍴</td>
+                    </tr>
+                    <tr>
+                        <td>Precio</td>
+                        <td>${restaurante1.precio}$</td>
+                        <td>${restaurante2.precio}$</td>
+                    </tr>
+                </table>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">Análisis Comparativo</h4>
+                        <div class="mb-3">
+                                ${comparaciones}
+                        </div>
+                        <div class="alert alert-primary">
+                                ${resultadoFinal}
+                        </div>
+                    </div>
                 </div>
-                <div class="alert alert-primary">
-                    ${resultadoFinal}
-                </div>
+
+                <a href="comparar" class="btn btn-primary w-100 py-2 mt-3">
+                    <i class="fas fa-redo me-2"></i> Realizar otra comparación
+                </a>
             </div>
         </div>
-
-        <a href="comparar" class="btn btn-primary w-100 py-2 mt-3">
-            <i class="fas fa-redo me-2"></i> Realizar otra comparación
-        </a>
+        </c:if>
     </div>
-</div>
-</c:if>
 </div>
 </body>
 </html>
