@@ -1,112 +1,26 @@
+<%@ page import="DAO.UsuarioDAOImpl" %>
+<%@ page import="jakarta.persistence.EntityManagerFactory" %>
+<%@ page import="jakarta.persistence.Persistence" %>
+<%@ page import="entidades.Restaurante" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="DAO.RestauranteDAO, entidades.Restaurante, java.util.List" %>
 <html>
 <head>
     <title>U-Food | Panel Administrativo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .card-body {
-            padding: 30px;
-        }
-
-        .btn-submit {
-            background-color: #28a745;
-            color: white;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .time-inputs {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .table-responsive {
-            margin-top: 20px;
-        }
-
-        .table th {
-            background-color: #f8f9fa;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-        }
-
-        .badge-comida {
-            background-color: #6c757d;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85em;
-        }
-
-        .historia-item {
-            padding: 8px;
-            margin-bottom: 5px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 3px solid #0d6efd;
-        }
-
-        .historia-fecha {
-            font-size: 0.8em;
-            color: #6c757d;
-        }
-
-        .modal-historia textarea {
-            min-height: 150px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Registrar Nuevo Restaurante</h2>
-        <div class="d-flex align-items-center">
-            <img src="https://ui-avatars.com/api/?name=Admin&background=ff6b6b&color=fff"
-                 alt="Usuario" class="rounded-circle me-2" width="40">
-            <span class="fw-bold">Administrador</span>
-        </div>
-    </div>
-
+    <%
+        request.setAttribute("titulo", "Registrar nuevo restaurante");
+        request.setAttribute("botonAtras", false);
+    %>
+    <%@ include file="layout/header.jsp" %>
     <div class="card shadow">
         <div class="card-body">
             <form action="${pageContext.request.contextPath}/restaurante" method="post">
@@ -173,11 +87,13 @@
                     </thead>
                     <tbody>
                     <%
-                        RestauranteDAO dao = new RestauranteDAO();
-                        List<Restaurante> restaurantes = dao.obtenerTodosLosRestaurantes();
-                        dao.cerrar();
+                        EntityManagerFactory emf = null;
+                        try {
+                            emf = Persistence.createEntityManagerFactory("UFood_PU");
+                            UsuarioDAOImpl dao = new UsuarioDAOImpl(emf);
+                            List<Restaurante> restaurantes = dao.obtenerTodosRestaurantes();
 
-                        for (Restaurante r : restaurantes) {
+                            for (Restaurante r : restaurantes) {
                     %>
                     <tr>
                         <td><%= r.getId() %></td>
@@ -229,7 +145,16 @@
                             </div>
                         </td>
                     </tr>
-                    <% } %>
+                    <%
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (emf != null) {
+                                emf.close();
+                            }
+                        }
+                    %>
                     </tbody>
                 </table>
             </div>

@@ -1,110 +1,127 @@
 package servlets;
 
-import DAO.RestauranteDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
-import jakarta.persistence.EntityManager;
+import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.List;
 
-@WebServlet(name = "restauranteCrear", value = "/restaurante")
+@WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
+    private UsuarioDAO usuarioDAO;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
+        usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-//        String accion = req.getParameter("accion");
-//
-//        if ("listar".equals(accion)) {
-//            // lógica para listar
-//        } else if ("eliminar".equals(accion)) {
-//            // lógica para eliminar
-//        }
+        HttpSession session = req.getSession(false);
 
-        req.getRequestDispatcher("/crearRestaurante.jsp").forward(req, resp);
+        // Validar sesión
+        if (session == null || session.getAttribute("usuario") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        // Redirigir según tipo de usuario
+        if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
+            mostrarPanelRestaurante(req, resp, (Restaurante) usuario);
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/inicio");
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
 
-        EntityManager em = emf.createEntityManager();
+        if (session == null || session.getAttribute("usuario") == null ||
+                !"RESTAURANTE".equals(((Usuario)session.getAttribute("usuario")).getTipoUsuario())) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        Restaurante restauranteUsuario = (Restaurante) session.getAttribute("usuario");
         String accion = req.getParameter("accion");
 
         if ("guardar".equals(accion)) {
-            try {
-                Restaurante restaurante = crearRestauranteDesdeRequest(req);
-                RestauranteDAO dao = new RestauranteDAO();
-                dao.guardarRestaurante(restaurante);
-                dao.cerrar();
-
-                resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
-
-            } catch (Exception e) {
-                // Manejo de errores
-                em.getTransaction().rollback();
-                req.getSession().setAttribute("error", "Error al guardar el restaurante");
-                resp.sendRedirect(req.getContextPath() + "/inicio");
-            } finally {
-                em.close();
-            }
+            procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
-            try {
-                Long restauranteId = Long.parseLong(req.getParameter("restauranteId"));
-                String historia = req.getParameter("historia");
-
-                em.getTransaction().begin();
-                Restaurante restaurante = em.find(Restaurante.class, restauranteId);
-                if (restaurante != null) {
-                    restaurante.agregarHistoria(historia);
-                    em.merge(restaurante);
-                }
-                em.getTransaction().commit();
-
-                resp.sendRedirect(req.getContextPath() + "/restaurante?success=Historia agregada");
-            } catch (Exception e) {
-                em.getTransaction().rollback();
-                resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + e.getMessage());
-            } finally {
-                em.close();
-            }
+            procesarAgregarMenu(req, resp, restauranteUsuario);
         }
     }
 
-    private Restaurante crearRestauranteDesdeRequest(HttpServletRequest req) {
-        String nombre = req.getParameter("nombre");
-        String descripcion = req.getParameter("descripcion");
-        String tipoComida = req.getParameter("tipoComida");
-        LocalTime horaApertura = LocalTime.parse(req.getParameter("horaApertura"));
-        LocalTime horaCierre = LocalTime.parse(req.getParameter("horaCierre"));
+    private void mostrarPanelRestaurante(HttpServletRequest req, HttpServletResponse resp,
+                                         Restaurante restauranteUsuario) throws ServletException, IOException {
+        try {
+            // Obtener el restaurante del usuario actual
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
 
-        Restaurante restaurante = new Restaurante();
-        restaurante.setNombre(nombre);
-        restaurante.setDescripcion(descripcion);
-        restaurante.setTipoComida(tipoComida);
-        restaurante.setHoraApertura(horaApertura);
-        restaurante.setHoraCierre(horaCierre);
+            req.setAttribute("restaurante", restaurante);
+            req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
+        } catch (Exception e) {
+            req.setAttribute("error", "Error al cargar datos del restaurante: " + e.getMessage());
+            req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
+        }
+    }
 
-        return restaurante;
+    private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+                                            Restaurante restauranteUsuario) throws IOException {
+        try {
+            // Actualizar los datos del restaurante (que es el usuario)
+            restauranteUsuario.setNombre(req.getParameter("nombre"));
+            restauranteUsuario.setDescripcion(req.getParameter("descripcion"));
+            restauranteUsuario.setTipoComida(req.getParameter("tipoComida"));
+            restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
+            restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
+
+            usuarioDAO.save(restauranteUsuario);
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante actualizado exitosamente");
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/restaurante?error=Error al guardar: " + e.getMessage());
+        }
+    }
+
+
+    private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
+                                     Restaurante restauranteUsuario) throws IOException {
+        try {
+            String menu = req.getParameter("historia");
+
+            if (menu == null || menu.trim().isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/restaurante?error=El menú no puede estar vacío");
+                return;
+            }
+
+            // Obtener el restaurante actualizado
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
+            restaurante.agregarHistoria(menu);
+
+            usuarioDAO.save(restaurante);
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú agregado");
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + e.getMessage());
+        }
     }
 
     @Override
     public void destroy() {
-        if (emf != null) {
-            emf.close();
-        }
+        if (usuarioDAO != null) usuarioDAO.close();
+        if (emf != null) emf.close();
     }
 }
