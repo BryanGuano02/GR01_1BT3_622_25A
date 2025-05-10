@@ -1,6 +1,7 @@
 package entidades;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -8,6 +9,8 @@ import java.util.List;
 @PrimaryKeyJoinColumn(name = "usuario_id")
 public class Comensal extends Usuario {
 
+    @ManyToMany(mappedBy = "comensales")
+    private List<Planificacion> planificaciones;
     @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL)
     private List<Preferencia> preferencias;
 
@@ -21,6 +24,7 @@ public class Comensal extends Usuario {
         this.setEmail(email);
         this.setTipoUsuario("COMENSAL");
         this.preferencias = preferencias;
+        this.planificaciones = null;
 
         // Establece la relación bidireccional
         if (preferencias != null) {
@@ -50,5 +54,14 @@ public class Comensal extends Usuario {
     public void removerPreferencia(Preferencia preferencia) {
         preferencias.remove(preferencia);
         preferencia.setComensal(null);
+    }
+
+
+    public List<Planificacion> getPlanificaciones() {
+        return planificaciones;
+    }
+
+    public void setPlanificaciones(List<Planificacion> planificaciones) {
+        this.planificaciones = planificaciones;
     }
 }
