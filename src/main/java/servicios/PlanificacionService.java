@@ -5,6 +5,7 @@ import DAO.PlanificacionDAO;
 import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Planificacion;
+import entidades.Restaurante;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -76,6 +77,23 @@ public class PlanificacionService {
                 planificacion.addComensal(comensal);
             }
         }
+    }
+
+    public Boolean recomendarRestaurante(Restaurante restaurante){
+        final Double PUNTAJE_MINIMO = 3.5;
+        final Double DISTANCIA_MAXIMA = 5.0;
+        final int TIEMPO_MAXIMO_ESPERA = 30;
+
+        if (restaurante == null) {
+            throw new IllegalArgumentException("El restaurante no puede ser nulo");
+        }
+        if (restaurante.getPuntajePromedio() == null || restaurante.getDistanciaUniversidad() == null || restaurante.getTiempoEspera() == 0) {
+            throw new IllegalArgumentException("Los atributos del restaurante no pueden ser nulos");
+        }
+
+        return restaurante.getPuntajePromedio() >= PUNTAJE_MINIMO
+                && restaurante.getDistanciaUniversidad() <= DISTANCIA_MAXIMA
+                && restaurante.getTiempoEspera() <= TIEMPO_MAXIMO_ESPERA;
     }
 }
 
