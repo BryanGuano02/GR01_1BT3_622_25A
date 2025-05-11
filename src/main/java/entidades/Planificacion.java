@@ -19,7 +19,6 @@ public class Planificacion {
             joinColumns = @JoinColumn(name = "planificacion_id"),
             inverseJoinColumns = @JoinColumn(name = "comensal_id")
     )
-
     private List<Comensal> comensales = new ArrayList<>();
 
     @ManyToOne
