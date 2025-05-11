@@ -90,11 +90,4 @@ public class Planificacion {
         this.comensales.add(comensal);
     }
 
-    public Planificacion crearPlanificacion(String nombre, String hora) {
-        if (nombre == null || nombre.trim().isEmpty() || hora == null || hora.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nombre y hora son requeridos");
-        }
-        return new Planificacion(nombre, hora);
-    }
-
 }

@@ -23,10 +23,21 @@ public class PlanificacionService {
     }
 
     public Planificacion crearPlanificacion(String nombre, String hora) {
+        validarParametrosCreacion(nombre, hora);
         Planificacion planificacion = new Planificacion(nombre, hora);
         planificacionDAO.crear(planificacion);
         return planificacion;
     }
+
+    private void validarParametrosCreacion(String nombre, String hora) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre es requerido");
+        }
+        if (hora == null || hora.trim().isEmpty()) {
+            throw new IllegalArgumentException("La hora es requerida");
+        }
+    }
+
 
     public Boolean agregarComensales(Long planificacionId, List<Long> comensalIds) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
