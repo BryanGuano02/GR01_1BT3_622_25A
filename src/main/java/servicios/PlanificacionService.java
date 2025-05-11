@@ -32,15 +32,11 @@ public class PlanificacionService {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-
         try {
             tx.begin();
 
-            Planificacion planificacion = em.find(Planificacion.class, planificacionId);
-            for (Long comensalId : comensalIds) {
-                Comensal comensal = em.find(Comensal.class, comensalId);
-                planificacion.addComensal(comensal);
-            }
+            Planificacion planificacion = findPlanificacion(em, planificacionId);
+            agregarComensalesALaPlanificacion(em, planificacion, comensalIds);
 
             tx.commit();
             return true;
@@ -51,6 +47,23 @@ public class PlanificacionService {
         } finally {
             em.close();
             emf.close();
+        }
+    }
+
+    private Planificacion findPlanificacion(EntityManager em, Long planificacionId) {
+        Planificacion planificacion = em.find(Planificacion.class, planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+        return planificacion;
+    }
+
+    private void agregarComensalesALaPlanificacion(EntityManager em, Planificacion planificacion, List<Long> comensalIds) {
+        for (Long comensalId : comensalIds) {
+            Comensal comensal = em.find(Comensal.class, comensalId);
+            if (comensal != null) {
+                planificacion.addComensal(comensal);
+            }
         }
     }
 }
