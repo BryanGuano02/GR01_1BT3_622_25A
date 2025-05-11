@@ -51,7 +51,7 @@ public class SvPreferencia extends HttpServlet {
         Double distancia = (Double) parametrosPreferencia.get("distancia");
 
         preferenciaService.crearPreferencia(tipoComida, horaApertura, horaCierre, distancia, idComensal);
-        resp.sendRedirect("preferenciasGuardadas.jsp");
+        resp.sendRedirect("confirmacionPreferencia.jsp");
     }
 
     private Map<String, Object> extraerParametrosPreferencia(HttpServletRequest req) {
@@ -60,6 +60,7 @@ public class SvPreferencia extends HttpServlet {
         String horaAperturaStr = req.getParameter("horaApertura");
         String horaCierreStr = req.getParameter("horaCierre");
         String distanciaStr = req.getParameter("distancia");
+
 
         LocalTime horaApertura = (horaAperturaStr != null && !horaAperturaStr.isEmpty()) ?
                 LocalTime.parse(horaAperturaStr) : null;

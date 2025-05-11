@@ -82,26 +82,32 @@
       opacity: 0.9;
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="header">
-  <h1>Filtrar Restaurantes</h1>
-  <div class="user-info">
-    <div class="user-circle">US</div>
-    <span>Usuario</span>
+  <div class="container mt-5">
+    <%
+      request.setAttribute("titulo", "Filtrar Restaurantes"); // Ejemplo: para resaltar menú
+      request.setAttribute("botonAtras", true); // Ejemplo: para resaltar menú
+    %>
+    <%@ include file="layout/header.jsp" %>
   </div>
-</div>
+
 
 <div class="container">
   <form id="filtroForm" action="${pageContext.request.contextPath}/SvPreferencia" method="get">
     <label for="tipoComida">Tipo de Comida</label>
     <select id="tipoComida" name="tipoComida" required>
       <option value="">Seleccione una opción</option>
-      <option value="COMIDA_RAPIDA">Comida Rápida</option>
-      <option value="COMIDA_COSTEÑA">Comida Costeña</option>
-      <option value="COMIDA_CASERA">Comida Casera</option>
-      <option value="PLATOS_CARTA">Platos a la Carta</option>
+      <option value="COMIDA RAPIDA">Comida Rápida</option>
+      <option value="COMIDA COSTEÑA">Comida Costeña</option>
+      <option value="COMIDA CASERA">Comida Casera</option>
+      <option value="PLATOS A LA CARTA">Platos a la Carta</option>
     </select>
 
     <label for="horaApertura">Hora de Apertura (mínima)</label>
