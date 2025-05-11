@@ -1,6 +1,7 @@
 package servicios;
 
 import entidades.Planificacion;
+import entidades.Restaurante;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,5 +31,36 @@ public class PlanificacionServiceTest {
         Boolean exito = planificacionService.agregarComensales(planificacionId, comensalIds);
 
         assertTrue(exito);
+    }
+
+    @Test
+    public void resolverEmpate_entreDosRestaurantes_devuelveUno() {
+        // Given
+        Restaurante restaurante1 = new Restaurante();
+        restaurante1.setNombre("Restaurante 1");
+        Restaurante restaurante2 = new Restaurante();
+        restaurante2.setNombre("Restaurante 2");
+        List<Restaurante> restaurantesEmpatados = Arrays.asList(restaurante1, restaurante2);
+
+        // When
+        PlanificacionService planificacionService = new PlanificacionService();
+        Restaurante restauranteSeleccionado = planificacionService.resolverEmpateRestaurantes(restaurantesEmpatados);
+
+        // Then
+        assertNotNull(restauranteSeleccionado);
+        assertTrue(restaurantesEmpatados.contains(restauranteSeleccionado));
+    }
+
+    @Test
+    public void cancelarGrupoSiNadieVoto() {
+        // Given
+        Long planificacionId = 1L;
+        PlanificacionService planificacionService = new PlanificacionService();
+
+        // When
+        boolean resultadoCancelacion = planificacionService.cancelarPlanificacionSinVotos(planificacionId);
+
+        // Then
+        assertTrue(resultadoCancelacion);
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 public class Planificacion {
     public String nombre;
     public String hora;
+    public String estado;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,5 +64,6 @@ public class Planificacion {
     public void addComensal(Comensal comensal) {
         this.comensales.add(comensal);
     }
-
+    public void setEstado(String estado) {}
+    public String getEstado() { return estado; }
 }
