@@ -34,33 +34,29 @@ public class PlanificacionServiceTest {
     }
 
     @Test
-    public void resolverEmpate_entreDosRestaurantes_devuelveUno() {
-        // Given
+    public void give_two_restaurants_when_resolve_empate_then_return_restaurant_randomly () {
+
         Restaurante restaurante1 = new Restaurante();
         restaurante1.setNombre("Restaurante 1");
         Restaurante restaurante2 = new Restaurante();
         restaurante2.setNombre("Restaurante 2");
         List<Restaurante> restaurantesEmpatados = Arrays.asList(restaurante1, restaurante2);
 
-        // When
         PlanificacionService planificacionService = new PlanificacionService();
         Restaurante restauranteSeleccionado = planificacionService.resolverEmpateRestaurantes(restaurantesEmpatados);
 
-        // Then
         assertNotNull(restauranteSeleccionado);
         assertTrue(restaurantesEmpatados.contains(restauranteSeleccionado));
     }
 
     @Test
-    public void cancelarGrupoSiNadieVoto() {
-        // Given
+    public void given_planificacion_when_cancel_planificacion_then_ok () {
+
         Long planificacionId = 1L;
         PlanificacionService planificacionService = new PlanificacionService();
 
-        // When
         boolean resultadoCancelacion = planificacionService.cancelarPlanificacionSinVotos(planificacionId);
 
-        // Then
         assertTrue(resultadoCancelacion);
     }
 }
