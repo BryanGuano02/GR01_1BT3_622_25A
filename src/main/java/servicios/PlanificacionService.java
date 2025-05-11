@@ -5,6 +5,7 @@ import DAO.PlanificacionDAO;
 import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Planificacion;
+import entidades.Restaurante;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -23,24 +24,31 @@ public class PlanificacionService {
     }
 
     public Planificacion crearPlanificacion(String nombre, String hora) {
+        validarParametrosCreacion(nombre, hora);
         Planificacion planificacion = new Planificacion(nombre, hora);
         planificacionDAO.crear(planificacion);
         return planificacion;
     }
 
+    private void validarParametrosCreacion(String nombre, String hora) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre es requerido");
+        }
+        if (hora == null || hora.trim().isEmpty()) {
+            throw new IllegalArgumentException("La hora es requerida");
+        }
+    }
+
+
     public Boolean agregarComensales(Long planificacionId, List<Long> comensalIds) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-
         try {
             tx.begin();
 
-            Planificacion planificacion = em.find(Planificacion.class, planificacionId);
-            for (Long comensalId : comensalIds) {
-                Comensal comensal = em.find(Comensal.class, comensalId);
-                planificacion.addComensal(comensal);
-            }
+            Planificacion planificacion = findPlanificacion(em, planificacionId);
+            agregarComensalesALaPlanificacion(em, planificacion, comensalIds);
 
             tx.commit();
             return true;
@@ -52,6 +60,40 @@ public class PlanificacionService {
             em.close();
             emf.close();
         }
+    }
+
+    private Planificacion findPlanificacion(EntityManager em, Long planificacionId) {
+        Planificacion planificacion = em.find(Planificacion.class, planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+        return planificacion;
+    }
+
+    private void agregarComensalesALaPlanificacion(EntityManager em, Planificacion planificacion, List<Long> comensalIds) {
+        for (Long comensalId : comensalIds) {
+            Comensal comensal = em.find(Comensal.class, comensalId);
+            if (comensal != null) {
+                planificacion.addComensal(comensal);
+            }
+        }
+    }
+
+    public Boolean recomendarRestaurante(Restaurante restaurante){
+        final Double PUNTAJE_MINIMO = 3.5;
+        final Double DISTANCIA_MAXIMA = 5.0;
+        final int TIEMPO_MAXIMO_ESPERA = 30;
+
+        if (restaurante == null) {
+            throw new IllegalArgumentException("El restaurante no puede ser nulo");
+        }
+        if (restaurante.getPuntajePromedio() == null || restaurante.getDistanciaUniversidad() == null || restaurante.getTiempoEspera() == 0) {
+            throw new IllegalArgumentException("Los atributos del restaurante no pueden ser nulos");
+        }
+
+        return restaurante.getPuntajePromedio() >= PUNTAJE_MINIMO
+                && restaurante.getDistanciaUniversidad() <= DISTANCIA_MAXIMA
+                && restaurante.getTiempoEspera() <= TIEMPO_MAXIMO_ESPERA;
     }
 }
 
