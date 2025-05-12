@@ -22,6 +22,10 @@ public class Planificacion {
     )
     private List<Comensal> comensales = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "restaurante_id")
+    private Restaurante restaurante;
+
     public Planificacion() {
     }
 
@@ -58,10 +62,31 @@ public class Planificacion {
         return comensales;
     }
 
+    public Restaurante getRestaurante() {
+        return restaurante;
+    }
+
+    public void setRestaurante(Restaurante restaurante) {
+        if (restaurante == null || restaurante.getNombre() == null || restaurante.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("Restaurante no válido");
+        }
+        this.restaurante = restaurante;
+    }
+
     public void setComensales(List<Comensal> comensales) {
         this.comensales = comensales;
     }
+
     public void addComensal(Comensal comensal) {
+        if (this.comensales == null) {
+            this.comensales = new ArrayList<>();
+        }
+
+        // Verifica si el comensal ya existe
+        if (this.comensales.stream().anyMatch(c -> c.getId().equals(comensal.getId()))) {
+            throw new IllegalArgumentException("El comensal ya está en esta planificación");
+        }
+
         this.comensales.add(comensal);
     }
     public void setEstado(String estado) {}

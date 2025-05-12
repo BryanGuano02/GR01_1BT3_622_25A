@@ -14,35 +14,42 @@ import java.util.List;
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
     private final CalificacionDAO calificacionDAO;
-    private final EntityManagerFactory emf;
     private final UsuarioDAOImpl usuarioDAO;
 
     public PlanificacionService() {
         this.planificacionDAO = new PlanificacionDAO();
         this.calificacionDAO = new CalificacionDAO();
-        this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         this.usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
     public Planificacion crearPlanificacion(String nombre, String hora) {
+        validarParametrosCreacion(nombre, hora);
         Planificacion planificacion = new Planificacion(nombre, hora);
         planificacionDAO.crear(planificacion);
         return planificacion;
     }
 
+    private void validarParametrosCreacion(String nombre, String hora) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre es requerido");
+        }
+        if (hora == null || hora.trim().isEmpty()) {
+            throw new IllegalArgumentException("La hora es requerida");
+        }
+    }
+
+
     public Boolean agregarComensales(Long planificacionId, List<Long> comensalIds) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-
         try {
             tx.begin();
 
-            Planificacion planificacion = em.find(Planificacion.class, planificacionId);
-            for (Long comensalId : comensalIds) {
-                Comensal comensal = em.find(Comensal.class, comensalId);
-                planificacion.addComensal(comensal);
-            }
+            Planificacion planificacion = findPlanificacion(em, planificacionId);
+            agregarComensalesALaPlanificacion(em, planificacion, comensalIds);
 
             tx.commit();
             return true;
@@ -56,6 +63,40 @@ public class PlanificacionService {
         }
     }
 
+    private Planificacion findPlanificacion(EntityManager em, Long planificacionId) {
+        Planificacion planificacion = em.find(Planificacion.class, planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+        return planificacion;
+    }
+
+    private void agregarComensalesALaPlanificacion(EntityManager em, Planificacion planificacion, List<Long> comensalIds) {
+        for (Long comensalId : comensalIds) {
+            Comensal comensal = em.find(Comensal.class, comensalId);
+            if (comensal != null) {
+                planificacion.addComensal(comensal);
+            }
+        }
+    }
+
+    public Boolean recomendarRestaurante(Restaurante restaurante){
+        final Double PUNTAJE_MINIMO = 3.5;
+        final Double DISTANCIA_MAXIMA = 5.0;
+        final int TIEMPO_MAXIMO_ESPERA = 30;
+
+        if (restaurante == null) {
+            throw new IllegalArgumentException("El restaurante no puede ser nulo");
+        }
+        if (restaurante.getPuntajePromedio() == null || restaurante.getDistanciaUniversidad() == null || restaurante.getTiempoEspera() == 0) {
+            throw new IllegalArgumentException("Los atributos del restaurante no pueden ser nulos");
+        }
+
+        return restaurante.getPuntajePromedio() >= PUNTAJE_MINIMO
+                && restaurante.getDistanciaUniversidad() <= DISTANCIA_MAXIMA
+                && restaurante.getTiempoEspera() <= TIEMPO_MAXIMO_ESPERA;
+    }
+
 public boolean registrarVoto(Long planificacionId, Long restauranteId, Long comensalId, double puntaje) {
     EntityManager em = emf.createEntityManager();
     try {
@@ -64,7 +105,7 @@ public boolean registrarVoto(Long planificacionId, Long restauranteId, Long come
         Comensal comensal = em.find(Comensal.class, comensalId);
         Restaurante restaurante = em.find(Restaurante.class, restauranteId);
 
-        if (plan == null || comensal == null || restaurante == null || 
+        if (plan == null || comensal == null || restaurante == null ||
             !plan.getComensales().contains(comensal)) {
             return false;
         }
@@ -135,7 +176,7 @@ public boolean cancelarPlanificacion(Long planificacionId) {
         em.close();
     }
 }
-        
+
 public Restaurante resolverEmpateRestaurantes(List<Restaurante> restaurantesEmpatados) {
     if (restaurantesEmpatados == null || restaurantesEmpatados.isEmpty()) {
         return null;
@@ -150,7 +191,7 @@ public boolean cancelarPlanificacionSinVotos(Long planificacionId) {
     try {
         em.getTransaction().begin();
         Planificacion plan = em.find(Planificacion.class, planificacionId);
-        
+
         if (plan == null || "CONFIRMADA".equalsIgnoreCase(plan.getEstado())) {
             return false;
         }
@@ -159,7 +200,7 @@ public boolean cancelarPlanificacionSinVotos(Long planificacionId) {
         String queryStr = "SELECT COUNT(c) FROM Calificacion c " +
                          "WHERE c.comensal IN (SELECT com FROM Planificacion p JOIN p.comensales com " +
                          "WHERE p.id = :planId)";
-        
+
         Long cantidadVotos = em.createQuery(queryStr, Long.class)
                               .setParameter("planId", planificacionId)
                               .getSingleResult();
@@ -182,5 +223,5 @@ public boolean cancelarPlanificacionSinVotos(Long planificacionId) {
         em.close();
     }
 }
-    
+
 }

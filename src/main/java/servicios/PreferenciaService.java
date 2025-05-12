@@ -26,7 +26,6 @@ public class PreferenciaService {
 
         // Obtener todos los restaurantes (ahora son Usuarios de tipo RESTAURANTE)
         List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
-
         return restaurantes.stream()
                 .filter(r -> r.getTipoComida().equalsIgnoreCase(tipoComida))
                 .filter(r -> r.getHoraApertura().isBefore(horaApertura))
@@ -43,11 +42,11 @@ public class PreferenciaService {
 
     public void crearPreferencia(String tipoComida, LocalTime horaApertura, LocalTime horaCierre,
                                  Double distanciaUniversidad, Long idComensal) {
-        Comensal comensal = (Comensal) usuarioDAO.findById(idComensal);
+        Comensal comensal = (Comensal) usuarioDAO.obtenerComensalPorId(idComensal);
         if (comensal != null) {
             Preferencia preferencia = new Preferencia(tipoComida, horaApertura, horaCierre,
                     distanciaUniversidad, comensal);
-            comensal.getPreferencias().add(preferencia);
+            comensal.agregarPreferencia(preferencia);
             usuarioDAO.save(comensal); // Actualiza el comensal con su nueva preferencia
         }
     }

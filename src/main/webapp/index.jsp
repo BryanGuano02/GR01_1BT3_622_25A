@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-md-4 text-end">
                     <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                        <a href="${pageContext.request.contextPath}/SvPreferencia" class="btn btn-info me-2">
+                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info me-2">
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
                     </c:if>
