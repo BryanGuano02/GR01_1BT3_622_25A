@@ -8,7 +8,10 @@ import entidades.Planificacion;
 import entidades.Restaurante;
 import jakarta.persistence.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
@@ -94,6 +97,32 @@ public class PlanificacionService {
         return restaurante.getPuntajePromedio() >= PUNTAJE_MINIMO
                 && restaurante.getDistanciaUniversidad() <= DISTANCIA_MAXIMA
                 && restaurante.getTiempoEspera() <= TIEMPO_MAXIMO_ESPERA;
+    }
+
+    public int calcularMinutosRestantesParaVotacion(LocalDateTime ahora, LocalDateTime horaLimite ) {
+
+
+        return (int) Duration.between(ahora, horaLimite).toMinutes();
+    }
+
+    public Restaurante obtenerRestauranteMasVotado(Map<Restaurante, Integer> votos) {
+
+        return votos.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+    }
+
+    public void confirmarRestauranteDelGrupo(Planificacion planificacion, String restauranteConfirmado) {
+        List<Comensal> comensales = planificacion.getComensales();
+        for (Comensal comensal : comensales) {
+            notificar(comensal, "Se ha confirmado: " + restauranteConfirmado);
+        }
+    }
+
+    public void notificar(Comensal comensal, String restauranteConfirmado) {
+
     }
 }
 

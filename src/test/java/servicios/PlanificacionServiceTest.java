@@ -10,8 +10,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -72,6 +75,40 @@ public class PlanificacionServiceTest {
         assertNotNull("El restaurante no debería ser null", planificacion.getRestaurante());
         assertEquals("La Cevichería", planificacion.getRestaurante().getNombre());
     }
+
+    @Test
+    public void given_time_when_calculate_remaining_time_then_ok() {
+        // Hora actual simulada
+        LocalDateTime ahora = LocalDateTime.of(2025, 5, 12, 12, 30);
+        // Hora límite de votación
+        LocalDateTime horaLimite = LocalDateTime.of(2025, 5, 12, 13, 0);
+
+        PlanificacionService planificacionService = new PlanificacionService();
+        int minutos = planificacionService.calcularMinutosRestantesParaVotacion(ahora, horaLimite );
+
+        assertEquals(30, minutos);
+    }
+
+    @Test
+    public void given_votes_when_get_most_voted_restaurant_then_ok() {
+        Map<Restaurante, Integer> votos = new HashMap<>();
+        Restaurante restaurante1 = new Restaurante();
+        Restaurante restaurante2 = new Restaurante();
+        Restaurante restaurante3 = new Restaurante();
+
+        votos.put(restaurante1, 3);
+        votos.put(restaurante2, 1);
+        votos.put(restaurante3, 2);
+
+        PlanificacionService planificacionService = new PlanificacionService();
+        Restaurante restauranteMasVotado = planificacionService.obtenerRestauranteMasVotado(votos);
+
+        assertNotNull("El restaurante no debería ser null", restauranteMasVotado);
+        assertEquals(restaurante1, restauranteMasVotado);
+    }
+
+
+
 
 
 }
