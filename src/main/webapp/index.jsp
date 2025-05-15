@@ -42,6 +42,9 @@
                         <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info me-2">
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
+                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success me-2">
+                            <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
+                        </a>
                     </c:if>
                     <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
                         <i class="fas fa-bell me-2"></i>Notificaciones
@@ -107,8 +110,15 @@
                                            class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-star"></i> Calificar
                                         </a>
+                                        <form action="${pageContext.request.contextPath}/restaurante" method="post" style="display:inline;">
+                                            <input type="hidden" name="idRestaurante" value="${restaurante.id}" />
+                                            <input type="hidden" name="suscribirse" value="true" />
+                                            <input type="hidden" name="acction" value="suscribirse" />
+                                            <button type="submit" class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-bell"></i> Suscribirse
+                                            </button>
+                                        </form>
                                     </c:if>
-
                                     <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                                 data-bs-target="#menuModal${restaurante.id}">

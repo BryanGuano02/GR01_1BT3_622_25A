@@ -212,6 +212,7 @@
                 </div>
                 <form action="${pageContext.request.contextPath}/restaurante" method="post" id="menuForm">
                     <input type="hidden" name="accion" value="agregarHistoria">
+                    <!-- <input type="hidden" name="accion" value="agregarHistoria"> -->
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Descripción del Menú</label>
