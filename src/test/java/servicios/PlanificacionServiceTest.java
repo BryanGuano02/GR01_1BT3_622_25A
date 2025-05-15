@@ -28,9 +28,10 @@ public class PlanificacionServiceTest {
     public void given_name_hour_when_create_planification_then_planification_not_null() {
         String nombre = "Cena de Fin de Año";
         String hora = "20:00";
+        Long idComensalPlanificador = 1L;
 
         PlanificacionService planificacionService = new PlanificacionService();
-        Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora);
+        Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, idComensalPlanificador);
 
         assertNotNull(planificacion);
     }
@@ -131,8 +132,7 @@ public class PlanificacionServiceTest {
 
         PlanificacionService planificacionService = new PlanificacionService();
         // Crear una planificación para el test
-        Planificacion planificacion = new Planificacion("Comida Grupal", "12:00");
-        planificacionService.crearPlanificacion(planificacion.getNombre(), planificacion.getHora());
+        Planificacion planificacion = planificacionService.crearPlanificacion("Comida Grupal", "12:00", 1L);
 
         // Cancelar la planificación
         planificacionService.cancelarPlanificacion(planificacionId);
