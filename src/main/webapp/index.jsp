@@ -43,6 +43,9 @@
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
                     </c:if>
+                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                        <i class="fas fa-bell me-2"></i>Notificaciones
+                    </button>
                     <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
@@ -146,6 +149,41 @@
                 </c:forEach>
             </c:otherwise>
         </c:choose>
+    </div>
+</div>
+
+<!-- Modal de Notificaciones -->
+<div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificacionesModalLabel">
+                    <i class="fas fa-bell me-2"></i>Bandeja de Notificaciones
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Ejemplo de notificaciones -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        ¡Bienvenido a U-Food! Explora los restaurantes disponibles.
+                        <span class="badge bg-secondary float-end">Nuevo</span>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-star text-warning me-2"></i>
+                        Recuerda calificar tu restaurante favorito.
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-utensils text-success me-2"></i>
+                        Hay nuevos menús disponibles esta semana.
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 

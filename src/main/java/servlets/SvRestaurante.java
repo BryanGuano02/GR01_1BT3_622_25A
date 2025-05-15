@@ -102,21 +102,17 @@ public class SvRestaurante extends HttpServlet {
     private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
                                             Restaurante restauranteUsuario) throws IOException {
         try {
-            // Actualizar los datos del restaurante (que es el usuario)
             restauranteUsuario.setNombre(req.getParameter("nombre"));
             restauranteUsuario.setDescripcion(req.getParameter("descripcion"));
             restauranteUsuario.setTipoComida(req.getParameter("tipoComida"));
             restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
             restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
 
-            // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
-            // Actualizar el objeto en sesión
             HttpSession session = req.getSession();
             session.setAttribute("usuario", restauranteUsuario);
 
-            // Redirigir a la misma página con parámetro de éxito
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+exitosamente");
         } catch (Exception e) {
             resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
