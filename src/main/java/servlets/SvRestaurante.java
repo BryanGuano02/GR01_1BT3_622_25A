@@ -6,13 +6,16 @@ import entidades.Restaurante;
 import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalTime;
-import java.util.List;
 
 @WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
@@ -44,8 +47,6 @@ public class SvRestaurante extends HttpServlet {
         } else {
             resp.sendRedirect(req.getContextPath() + "/inicio");
         }
-
-
     }
 
     @Override
@@ -54,7 +55,7 @@ public class SvRestaurante extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null || session.getAttribute("usuario") == null ||
-                !"RESTAURANTE".equals(((Usuario)session.getAttribute("usuario")).getTipoUsuario())) {
+                !"RESTAURANTE".equals(((Usuario) session.getAttribute("usuario")).getTipoUsuario())) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
@@ -66,7 +67,9 @@ public class SvRestaurante extends HttpServlet {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
             procesarAgregarMenu(req, resp, restauranteUsuario);
-        }else {
+        } else if ("actualizar".equals(accion)) {
+            procesarActualizarRestaurante(req, resp, restauranteUsuario);
+        } else {
             resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp");
         }
     }
@@ -141,6 +144,36 @@ public class SvRestaurante extends HttpServlet {
 
             // Redirigir a la misma página con éxito
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú+agregado");
+        } catch (Exception e) {
+            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
+        }
+    }
+
+    private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+                                               Restaurante restauranteUsuario) throws IOException {
+        try {
+            // Actualizar los datos del restaurante con los parámetros recibidos
+            String nombre = req.getParameter("nombre");
+            String descripcion = req.getParameter("descripcion");
+            String tipoComida = req.getParameter("tipoComida");
+            String horaApertura = req.getParameter("horaApertura");
+            String horaCierre = req.getParameter("horaCierre");
+
+            if (nombre != null) restauranteUsuario.setNombre(nombre);
+            if (descripcion != null) restauranteUsuario.setDescripcion(descripcion);
+            if (tipoComida != null) restauranteUsuario.setTipoComida(tipoComida);
+            if (horaApertura != null) restauranteUsuario.setHoraApertura(LocalTime.parse(horaApertura));
+            if (horaCierre != null) restauranteUsuario.setHoraCierre(LocalTime.parse(horaCierre));
+
+            // Guardar en la base de datos
+            usuarioDAO.save(restauranteUsuario);
+
+            // Actualizar el objeto en sesión
+            HttpSession session = req.getSession();
+            session.setAttribute("usuario", restauranteUsuario);
+
+            // Redirigir a la misma página con parámetro de éxito
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+correctamente");
         } catch (Exception e) {
             resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
