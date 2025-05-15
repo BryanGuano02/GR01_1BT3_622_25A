@@ -10,6 +10,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class SvRestaurante extends HttpServlet {
         } else {
             resp.sendRedirect(req.getContextPath() + "/inicio");
         }
+
+
     }
 
     @Override
@@ -63,16 +66,29 @@ public class SvRestaurante extends HttpServlet {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
             procesarAgregarMenu(req, resp, restauranteUsuario);
+        }else {
+            resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp");
         }
     }
 
     private void mostrarPanelRestaurante(HttpServletRequest req, HttpServletResponse resp,
                                          Restaurante restauranteUsuario) throws ServletException, IOException {
         try {
-            // Obtener el restaurante del usuario actual
-            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
+            // Manejar mensajes de éxito/error
+            String success = req.getParameter("success");
+            String error = req.getParameter("error");
 
+            if (success != null) {
+                req.setAttribute("successMessage", success);
+            }
+            if (error != null) {
+                req.setAttribute("errorMessage", error);
+            }
+
+            // Obtener el restaurante actualizado
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
             req.setAttribute("restaurante", restaurante);
+
             req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar datos del restaurante: " + e.getMessage());
@@ -90,21 +106,28 @@ public class SvRestaurante extends HttpServlet {
             restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
             restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
 
+            // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
-            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante actualizado exitosamente");
+
+            // Actualizar el objeto en sesión
+            HttpSession session = req.getSession();
+            session.setAttribute("usuario", restauranteUsuario);
+
+            // Redirigir a la misma página con parámetro de éxito
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+exitosamente");
         } catch (Exception e) {
-            resp.sendRedirect(req.getContextPath() + "/restaurante?error=Error al guardar: " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
 
 
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
-                                     Restaurante restauranteUsuario) throws IOException {
+                                     Restaurante restauranteUsuario) throws IOException, ServletException {
         try {
             String menu = req.getParameter("historia");
 
             if (menu == null || menu.trim().isEmpty()) {
-                resp.sendRedirect(req.getContextPath() + "/restaurante?error=El menú no puede estar vacío");
+                resp.sendRedirect(req.getContextPath() + "/restaurante?error=El+menú+no+puede+estar+vacío");
                 return;
             }
 
@@ -112,10 +135,14 @@ public class SvRestaurante extends HttpServlet {
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
             restaurante.agregarHistoria(menu);
 
+            // Guardar y actualizar la sesión
             usuarioDAO.save(restaurante);
-            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú agregado");
+            req.getSession().setAttribute("usuario", restaurante);
+
+            // Redirigir a la misma página con éxito
+            resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú+agregado");
         } catch (Exception e) {
-            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
 
