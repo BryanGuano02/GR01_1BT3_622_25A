@@ -52,6 +52,12 @@ public class SvAuth extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("usuario", usuario);
 
+                // Si el usuario es Comensal, guardar notificaciones en sesión
+                if (usuario instanceof Comensal) {
+                    Comensal comensal = (Comensal) usuario;
+                    session.setAttribute("notificaciones", comensal.getNotificaciones());
+                }
+
                 if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
                     response.sendRedirect("crearRestaurante.jsp");
                 } else {

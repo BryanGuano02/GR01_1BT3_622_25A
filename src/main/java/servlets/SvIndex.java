@@ -3,6 +3,8 @@ package servlets;
 import DAO.CalificacionDAO;
 import DAO.UsuarioDAO;
 import DAO.UsuarioDAOImpl;
+import entidades.Comensal;
+import entidades.Notificacion;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -11,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,15 +49,15 @@ public class SvIndex extends HttpServlet {
             }
 
             // Calcular promedios
-            Map<Long, Double> promedios = new HashMap<>();
-            for (Restaurante r : restaurantes) {
-                Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
-                promedios.put(r.getId(), promedio);
-                r.setPuntajePromedio(promedio);
-            }
+            // Map<Long, Double> promedios = new HashMap<>();
+            // for (Restaurante r : restaurantes) {
+            //     Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
+            //     promedios.put(r.getId(), promedio);
+            //     r.setPuntajePromedio(promedio);
+            // }
 
             req.setAttribute("restaurantes", restaurantes);
-            req.setAttribute("promedios", promedios);
+            // req.setAttribute("promedios", promedios);
 
             req.getRequestDispatcher("/index.jsp").forward(req, resp);
 

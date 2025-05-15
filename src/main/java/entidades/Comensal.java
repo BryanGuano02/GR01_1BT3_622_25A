@@ -12,16 +12,15 @@ public class Comensal extends Usuario {
 
     @ManyToMany(mappedBy = "comensales")
     private List<Planificacion> planificaciones;
+
     @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL)
     private List<Preferencia> preferencias;
 
-    @ManyToMany
-    @JoinTable(
-        name = "suscripcion_restaurante",
-        joinColumns = @JoinColumn(name = "comensal_id"),
-        inverseJoinColumns = @JoinColumn(name = "restaurante_id")
-    )
-    private List<Restaurante> restaurantesSuscritos = new ArrayList<>();
+    @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Notificacion> notificaciones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Suscripcion> suscripciones = new ArrayList<>();
 
     public Comensal() {
         this.setTipoUsuario("COMENSAL");
@@ -73,27 +72,33 @@ public class Comensal extends Usuario {
         this.planificaciones = planificaciones;
     }
 
-    public List<Restaurante> getRestaurantesSuscritos() {
-        return restaurantesSuscritos;
+    public List<Suscripcion> getSuscripciones() {
+        return suscripciones;
     }
 
-    public void setRestaurantesSuscritos(List<Restaurante> restaurantesSuscritos) {
-        this.restaurantesSuscritos = restaurantesSuscritos;
+    public void setSuscripciones(List<Suscripcion> suscripciones) {
+        this.suscripciones = suscripciones;
     }
 
-    public void suscribirseARestaurante(Restaurante restaurante) {
-        if (!restaurantesSuscritos.contains(restaurante)) {
-            restaurantesSuscritos.add(restaurante);
-            if (restaurante.getSuscriptores() != null && !restaurante.getSuscriptores().contains(this)) {
-                restaurante.getSuscriptores().add(this);
-            }
-        }
+    public List<Notificacion> getNotificaciones() {
+        return notificaciones;
     }
 
-    public void desuscribirseDeRestaurante(Restaurante restaurante) {
-        restaurantesSuscritos.remove(restaurante);
-        if (restaurante.getSuscriptores() != null) {
-            restaurante.getSuscriptores().remove(this);
-        }
+    public void setNotificaciones(List<Notificacion> notificaciones) {
+        this.notificaciones = notificaciones;
+    }
+
+    public void agregarNotificacion(String mensaje) {
+        System.out.println("dentro de agregarNotificacion");
+        Notificacion notificacion = new Notificacion();
+        notificacion.setMensaje(mensaje);
+        notificacion.setComensal(this); // Relación bidireccional
+        System.out.println(notificacion.getMensaje());
+        notificaciones.add(notificacion);
+    }
+
+    @Override
+    public String toString() {
+        return "Comensal: " + super.getId();
     }
 }

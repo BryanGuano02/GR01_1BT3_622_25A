@@ -2,6 +2,7 @@ package servlets;
 
 import DAO.UsuarioDAO;
 import DAO.UsuarioDAOImpl;
+import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import servicios.NotificacionService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -67,16 +69,68 @@ public class SvRestaurante extends HttpServlet {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
             procesarAgregarMenu(req, resp, restauranteUsuario);
-//            notificarUsuariosSuscriptos(restauranteUsuario);
+            NotificacionService notificacionService = new NotificacionService();
+            notificacionService.notificarComensalesMenuDia(restauranteUsuario);
         } else if ("actualizar".equals(accion)) {
             procesarActualizarRestaurante(req, resp, restauranteUsuario);
+        } else if ("subscribirse".equals(accion)) {
+            procesarSubscribirse(req, resp, restauranteUsuario);
         } else {
             resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp");
         }
     }
 
+    private void procesarSubscribirse(HttpServletRequest req, HttpServletResponse resp,
+            Restaurante restauranteUsuario) throws IOException {
+        try {
+            // Obtener el comensal autenticado desde la sesión
+
+            Long idComensal = Long.parseLong(req.getParameter("idComensal"));
+            // Obtener el comensal actualizado desde la base de datos
+            Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
+            if (comensal == null) {
+                resp.sendRedirect(req.getContextPath() + "/restaurantesFiltrados.jsp?error=Comensal+no+encontrado");
+                return;
+            }
+
+            // Obtener el id del restaurante a suscribirse
+            String idRestauranteStr = req.getParameter("idRestaurante");
+            if (idRestauranteStr == null) {
+                resp.sendRedirect(
+                        req.getContextPath() + "/restaurantesFiltrados.jsp?error=Restaurante+no+especificado");
+                return;
+            }
+            Long idRestaurante = Long.parseLong(idRestauranteStr);
+
+            // Obtener el restaurante desde la base de datos
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
+            if (restaurante == null) {
+                // resp.sendRedirect(req.getContextPath() +
+                // "/restaurantesFiltrados.jsp?error=Restaurante+no+encontrado");
+                // return;
+                System.out.println("restaurante no encontrado");
+            }
+
+            // Suscribir al comensal al restaurante
+            // comensal.suscribirseARestaurante(restaurante);
+
+            // Guardar el comensal actualizado
+            usuarioDAO.save(comensal);
+
+            // Actualizar la sesión
+            req.getSession().setAttribute("usuario", comensal);
+
+            // Redirigir con mensaje de éxito
+            // resp.sendRedirect(req.getContextPath() +
+            // "/restaurantesFiltrados.jsp?success=Suscripci%C3%B3n+exitosa");
+        } catch (Exception e) {
+            // resp.sendRedirect(req.getContextPath() + "/restaurantesFiltrados.jsp?error="
+            // + URLEncoder.encode(e.getMessage(), "UTF-8"));
+        }
+    }
+
     private void mostrarPanelRestaurante(HttpServletRequest req, HttpServletResponse resp,
-                                         Restaurante restauranteUsuario) throws ServletException, IOException {
+            Restaurante restauranteUsuario) throws ServletException, IOException {
         try {
             // Manejar mensajes de éxito/error
             String success = req.getParameter("success");
@@ -101,7 +155,7 @@ public class SvRestaurante extends HttpServlet {
     }
 
     private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
-                                            Restaurante restauranteUsuario) throws IOException {
+            Restaurante restauranteUsuario) throws IOException {
         try {
             restauranteUsuario.setNombre(req.getParameter("nombre"));
             restauranteUsuario.setDescripcion(req.getParameter("descripcion"));
@@ -116,13 +170,13 @@ public class SvRestaurante extends HttpServlet {
 
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+exitosamente");
         } catch (Exception e) {
-            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
+            resp.sendRedirect(
+                    req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
 
-
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
-                                     Restaurante restauranteUsuario) throws IOException, ServletException {
+            Restaurante restauranteUsuario) throws IOException, ServletException {
         try {
             String menu = req.getParameter("historia");
 
@@ -142,12 +196,13 @@ public class SvRestaurante extends HttpServlet {
             // Redirigir a la misma página con éxito
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú+agregado");
         } catch (Exception e) {
-            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
+            resp.sendRedirect(
+                    req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
 
     private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
-                                               Restaurante restauranteUsuario) throws IOException {
+            Restaurante restauranteUsuario) throws IOException {
         try {
             // Actualizar los datos del restaurante con los parámetros recibidos
             String nombre = req.getParameter("nombre");
@@ -156,11 +211,16 @@ public class SvRestaurante extends HttpServlet {
             String horaApertura = req.getParameter("horaApertura");
             String horaCierre = req.getParameter("horaCierre");
 
-            if (nombre != null) restauranteUsuario.setNombre(nombre);
-            if (descripcion != null) restauranteUsuario.setDescripcion(descripcion);
-            if (tipoComida != null) restauranteUsuario.setTipoComida(tipoComida);
-            if (horaApertura != null) restauranteUsuario.setHoraApertura(LocalTime.parse(horaApertura));
-            if (horaCierre != null) restauranteUsuario.setHoraCierre(LocalTime.parse(horaCierre));
+            if (nombre != null)
+                restauranteUsuario.setNombre(nombre);
+            if (descripcion != null)
+                restauranteUsuario.setDescripcion(descripcion);
+            if (tipoComida != null)
+                restauranteUsuario.setTipoComida(tipoComida);
+            if (horaApertura != null)
+                restauranteUsuario.setHoraApertura(LocalTime.parse(horaApertura));
+            if (horaCierre != null)
+                restauranteUsuario.setHoraCierre(LocalTime.parse(horaCierre));
 
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
@@ -172,13 +232,16 @@ public class SvRestaurante extends HttpServlet {
             // Redirigir a la misma página con parámetro de éxito
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+correctamente");
         } catch (Exception e) {
-            resp.sendRedirect(req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
+            resp.sendRedirect(
+                    req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
 
     @Override
     public void destroy() {
-        if (usuarioDAO != null) usuarioDAO.close();
-        if (emf != null) emf.close();
+        if (usuarioDAO != null)
+            usuarioDAO.close();
+        if (emf != null)
+            emf.close();
     }
 }

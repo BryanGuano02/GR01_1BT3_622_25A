@@ -23,28 +23,25 @@ public class Restaurante extends Usuario {
     private int tiempoEspera;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "restaurante_historias",
-            joinColumns = @JoinColumn(name = "restaurante_id"),
-            foreignKey = @ForeignKey(name = "fk_restaurante_historias")
-    )
+    @CollectionTable(name = "restaurante_historias", joinColumns = @JoinColumn(name = "restaurante_id"), foreignKey = @ForeignKey(name = "fk_restaurante_historias"))
     @Column(name = "historia", length = 1000)
     private List<String> historias = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
     private List<Calificacion> calificaciones;
 
-    @ManyToMany(mappedBy = "restaurantesSuscritos")
-    private List<Comensal> suscriptores = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Suscripcion> suscripciones = new ArrayList<>();
 
     public Restaurante() {
     }
 
-    public Restaurante(String nombreUsuario, String contrasena, String email, String nombreComercial, String tipoComida) {
+    public Restaurante(String nombreUsuario, String contrasena, String email, String nombre,
+            String tipoComida) {
         this.setNombreUsuario(nombreUsuario);
         this.setContrasena(contrasena);
         this.setEmail(email);
-        this.nombre = nombreComercial;
+        this.nombre = nombre;
         this.tipoComida = tipoComida;
         this.setTipoUsuario("RESTAURANTE");
     }
@@ -146,12 +143,12 @@ public class Restaurante extends Usuario {
         this.historias.add(historia);
     }
 
-    public List<Comensal> getSuscriptores() {
-        return suscriptores;
+    public List<Suscripcion> getSuscripciones() {
+        return suscripciones;
     }
 
-    public void setSuscriptores(List<Comensal> suscriptores) {
-        this.suscriptores = suscriptores;
+    public void setSuscripciones(List<Suscripcion> suscripciones) {
+        this.suscripciones = suscripciones;
     }
 
     @Override

@@ -94,7 +94,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         try {
             return em.createQuery(
                             "SELECT r FROM Restaurante r WHERE " +
-                                    "LOWER(r.nombreComercial) LIKE LOWER(:busqueda) OR " +
+                                    "LOWER(r.nombre) LIKE LOWER(:busqueda) OR " +
                                     "LOWER(r.tipoComida) LIKE LOWER(:busqueda)", Restaurante.class)
                     .setParameter("busqueda", "%" + busqueda + "%")
                     .getResultList();
@@ -107,7 +107,12 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public Comensal obtenerComensalPorId(Long id) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.find(Comensal.class, id);
+            return em.createQuery(
+                "SELECT c FROM Comensal c LEFT JOIN FETCH c.notificaciones WHERE c.id = :id", Comensal.class)
+                .setParameter("id", id)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         } finally {
             em.close();
         }
