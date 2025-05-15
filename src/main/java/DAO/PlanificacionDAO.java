@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,10 +43,23 @@ public class PlanificacionDAO {
     }
 
     public Planificacion obtenerPlanificacionPorId(Long planificacionId) {
-        EntityManager em = null;
+        EntityManager em = emf.createEntityManager();
         try {
             em = emf.createEntityManager();
             return em.find(Planificacion.class, planificacionId);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    public List<Planificacion> obtenerPlanificacionesPorId(Long idComensalPlanificador) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT p FROM Planificacion p WHERE p.comensalPlanificador.id = :idComensalPlanificador", Planificacion.class)
+                    .setParameter("idComensalPlanificador", idComensalPlanificador)
+                    .getResultList();
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();

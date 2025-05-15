@@ -23,6 +23,10 @@ public class Planificacion {
     private List<Comensal> comensales = new ArrayList<>();
 
     @ManyToOne
+    @JoinColumn(name = "idComensalPlanificador")
+    private Comensal comensalPlanificador;
+
+    @ManyToOne
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;
 
@@ -32,6 +36,7 @@ public class Planificacion {
     public Planificacion(String hora, String nombre) {
         this.hora = hora;
         this.nombre = nombre;
+        estado = "Activa";
     }
 
     public Long getId() {
@@ -91,4 +96,12 @@ public class Planificacion {
     }
     public void setEstado(String estado) {}
     public String getEstado() { return estado; }
+
+    public Comensal getComensalPlanificador() {
+        return comensalPlanificador;
+    }
+
+    public void setComensalPlanificador(Comensal comensalPlanificador) {
+        this.comensalPlanificador = comensalPlanificador;
+    }
 }

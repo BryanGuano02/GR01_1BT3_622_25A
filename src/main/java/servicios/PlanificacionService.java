@@ -28,9 +28,14 @@ public class PlanificacionService {
         this.usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
-    public Planificacion crearPlanificacion(String nombre, String hora) {
+    public Planificacion crearPlanificacion(String nombre, String hora, Long idComensalPlanificador) {
         validarParametrosCreacion(nombre, hora);
         Planificacion planificacion = new Planificacion(nombre, hora);
+        Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensalPlanificador);
+        if (comensal == null) {
+            throw new IllegalArgumentException("Comensal no encontrado");
+        }
+        planificacion.setComensalPlanificador(comensal);
         planificacionDAO.crear(planificacion);
         return planificacion;
     }
@@ -164,4 +169,3 @@ public class PlanificacionService {
 
     }
 }
-
