@@ -80,7 +80,7 @@
                               placeholder="Describe tu experiencia..." rows="4" required></textarea>
                 </div>
 
-                <input type="hidden" name="idComensal" value="1">
+<%--                <input type="hidden" name="idComensal" value="1">--%>
 
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     <i class="fas fa-star me-2"></i> Enviar Calificación

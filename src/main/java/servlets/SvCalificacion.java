@@ -50,7 +50,6 @@ public class SvCalificacion extends HttpServlet {
                     em.close();
                 }
             }
-
             // Implementa otros métodos requeridos por la interfaz con return false
             @Override
             public List<Calificacion> obtenerCalificacionesPorRestaurante(Long idRestaurante) {
