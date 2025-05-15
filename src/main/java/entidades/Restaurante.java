@@ -34,13 +34,13 @@ public class Restaurante extends Usuario {
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
     private List<Calificacion> calificaciones;
 
+    @ManyToMany(mappedBy = "restaurantesSuscritos")
+    private List<Comensal> suscriptores = new ArrayList<>();
+
     public Restaurante() {
-        this.setTipoUsuario("RESTAURANTE");
     }
 
-    // Constructores
-    public Restaurante(String nombreUsuario, String contrasena, String email,
-                       String nombreComercial, String tipoComida) {
+    public Restaurante(String nombreUsuario, String contrasena, String email, String nombreComercial, String tipoComida) {
         this.setNombreUsuario(nombreUsuario);
         this.setContrasena(contrasena);
         this.setEmail(email);
@@ -97,7 +97,6 @@ public class Restaurante extends Usuario {
     }
 
     public void setPuntajePromedio(Double puntajePromedio) {
-        this.puntajePromedio = puntajePromedio;
     }
 
     public int getPrecio() {
@@ -145,6 +144,14 @@ public class Restaurante extends Usuario {
 
     public void agregarHistoria(String historia) {
         this.historias.add(historia);
+    }
+
+    public List<Comensal> getSuscriptores() {
+        return suscriptores;
+    }
+
+    public void setSuscriptores(List<Comensal> suscriptores) {
+        this.suscriptores = suscriptores;
     }
 
     @Override

@@ -3,6 +3,7 @@ package entidades;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "comensales")
@@ -13,6 +14,14 @@ public class Comensal extends Usuario {
     private List<Planificacion> planificaciones;
     @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL)
     private List<Preferencia> preferencias;
+
+    @ManyToMany
+    @JoinTable(
+        name = "suscripcion_restaurante",
+        joinColumns = @JoinColumn(name = "comensal_id"),
+        inverseJoinColumns = @JoinColumn(name = "restaurante_id")
+    )
+    private List<Restaurante> restaurantesSuscritos = new ArrayList<>();
 
     public Comensal() {
         this.setTipoUsuario("COMENSAL");
@@ -56,12 +65,35 @@ public class Comensal extends Usuario {
         preferencia.setComensal(null);
     }
 
-
     public List<Planificacion> getPlanificaciones() {
         return planificaciones;
     }
 
     public void setPlanificaciones(List<Planificacion> planificaciones) {
         this.planificaciones = planificaciones;
+    }
+
+    public List<Restaurante> getRestaurantesSuscritos() {
+        return restaurantesSuscritos;
+    }
+
+    public void setRestaurantesSuscritos(List<Restaurante> restaurantesSuscritos) {
+        this.restaurantesSuscritos = restaurantesSuscritos;
+    }
+
+    public void suscribirseARestaurante(Restaurante restaurante) {
+        if (!restaurantesSuscritos.contains(restaurante)) {
+            restaurantesSuscritos.add(restaurante);
+            if (restaurante.getSuscriptores() != null && !restaurante.getSuscriptores().contains(this)) {
+                restaurante.getSuscriptores().add(this);
+            }
+        }
+    }
+
+    public void desuscribirseDeRestaurante(Restaurante restaurante) {
+        restaurantesSuscritos.remove(restaurante);
+        if (restaurante.getSuscriptores() != null) {
+            restaurante.getSuscriptores().remove(this);
+        }
     }
 }
