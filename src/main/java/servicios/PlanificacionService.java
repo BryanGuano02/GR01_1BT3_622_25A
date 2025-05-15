@@ -12,6 +12,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
@@ -112,6 +114,43 @@ public class PlanificacionService {
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
+    }
+    public void cancelarPlanificacion(Long planificacionId) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            Planificacion planificacion = findPlanificacion(em, planificacionId);
+            List<Comensal> comensales = planificacion.getComensales();
+
+            for (Comensal comensal : comensales) {
+                notificar(comensal, "La planificación ha sido cancelada");
+            }
+
+            em.remove(planificacion);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+            emf.close();
+        }
+    }
+
+    public Restaurante resolverEmpateEnVotacion(Map<Restaurante, Integer> votos) {
+        int maxVotos = votos.values().stream().max(Integer::compare).orElse(0);
+        List<Restaurante> empatados = votos.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxVotos)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        if (empatados.size() > 1) {
+            Random random = new Random();
+            return empatados.get(random.nextInt(empatados.size()));
+        }
+        return empatados.isEmpty() ? null : empatados.get(0);
     }
 
     public void confirmarRestauranteDelGrupo(Planificacion planificacion, String restauranteConfirmado) {
