@@ -57,6 +57,35 @@
         </div>
     </div>
 
+    <!-- Después de la barra de búsqueda -->
+    <c:if test="${not empty restaurantesSugeridos}">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-heart me-2"></i> Recomendados para ti</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <c:forEach items="${restaurantesSugeridos}" var="restaurante">
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${restaurante.nombre}</h5>
+                                    <p class="text-muted">${restaurante.tipoComida}</p>
+                                    <div class="mb-2">
+                                        <c:forEach begin="1" end="5" var="i">
+                                            <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
+                                        </c:forEach>
+                                        <span>(${restaurante.puntajePromedio})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
     <!-- Listado de restaurantes -->
     <div class="row" id="restaurantes-container">
         <c:choose>

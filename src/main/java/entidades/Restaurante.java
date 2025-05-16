@@ -16,7 +16,7 @@ public class Restaurante extends Usuario {
     private String tipoComida;
     private LocalTime horaApertura;
     private LocalTime horaCierre;
-    private Double puntajePromedio;
+    private Double puntajePromedio = 0.0;
     private int precio;
     private Double distanciaUniversidad;
     private int calidad;
@@ -94,6 +94,7 @@ public class Restaurante extends Usuario {
     }
 
     public void setPuntajePromedio(Double puntajePromedio) {
+        this.puntajePromedio = puntajePromedio != null ? puntajePromedio : 0.0;
     }
 
     public int getPrecio() {

@@ -22,9 +22,13 @@ public class Comensal extends Usuario {
     @OneToMany(mappedBy = "comensal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Suscripcion> suscripciones = new ArrayList<>();
 
+    @Column(name = "tipo_comida_favorita")
+    private String tipoComidaFavorita;
+
     public Comensal() {
         this.setTipoUsuario("COMENSAL");
     }
+
 
     public Comensal(String nombreUsuario, String contrasena, String email, List<Preferencia> preferencias) {
         this.setNombreUsuario(nombreUsuario);
@@ -38,6 +42,14 @@ public class Comensal extends Usuario {
         if (preferencias != null) {
             preferencias.forEach(p -> p.setComensal(this));
         }
+    }
+
+    public String getTipoComidaFavorita() {
+        return tipoComidaFavorita;
+    }
+
+    public void setTipoComidaFavorita(String tipoComidaFavorita) {
+        this.tipoComidaFavorita = tipoComidaFavorita;
     }
 
     public List<Preferencia> getPreferencias() {
