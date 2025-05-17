@@ -21,6 +21,12 @@ public class NotificacionService {
         notificacionDAO = new NotificacionDAO(emf);
     }
 
+    private void notificarComensalMenuDia(Comensal comensal, String nombreRestaurante) {
+        comensal.agregarNotificacion(
+                "El restaurante " + nombreRestaurante + " ha publicado un nuevo menú del día:");
+        usuarioDAO.save(comensal);
+    }
+
     public boolean notificarComensalesMenuDia(Restaurante restaurante) {
         try {
             if (restaurante.getSuscripciones() == null || restaurante.getSuscripciones().isEmpty()) {
@@ -28,9 +34,7 @@ public class NotificacionService {
             }
             restaurante.getSuscripciones().forEach(suscripcion -> {
                 Comensal comensal = suscripcion.getComensal();
-                comensal.agregarNotificacion(
-                        "El restaurante " + restaurante.getNombre() + " ha publicado un nuevo menú del día:");
-                usuarioDAO.save(comensal);
+                notificarComensalMenuDia(comensal, restaurante.getNombre());
             });
             return true;
         } catch (Exception e) {

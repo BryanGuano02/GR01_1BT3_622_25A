@@ -27,7 +27,6 @@ public class NotificacionServiceTest {
         restaurante.setSuscripciones(Collections.singletonList(new Suscripcion(comensal, restaurante)));
         restaurante.agregarHistoria(menuDia);
 
-
         boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante);
 
         assertTrue("Debe notificar si hay comensales siguiendo", resultado);
