@@ -90,7 +90,7 @@ public class Restaurante extends Usuario {
     }
 
     public Double getPuntajePromedio() {
-        return puntajePromedio;
+        return this.puntajePromedio;
     }
 
     public void setPuntajePromedio(Double puntajePromedio) {

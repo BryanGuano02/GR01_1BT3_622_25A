@@ -16,7 +16,10 @@ import jakarta.servlet.http.HttpSession;
 import servicios.RecomendacionService;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "SvIndex", value = "/inicio")
 public class SvIndex extends HttpServlet {
@@ -31,50 +34,60 @@ public class SvIndex extends HttpServlet {
         usuarioDAO = new UsuarioDAOImpl(emf);
         calificacionDAO = new CalificacionDAO(emf);
         recomendacionService = new RecomendacionService(usuarioDAO);
+
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            HttpSession session = req.getSession();
-            Comensal comensal = (Comensal) session.getAttribute("usuario");
+            HttpSession session = req.getSession(false);
+            if (session != null) {
+                Comensal comensal = (Comensal) session.getAttribute("usuario");
 
-            String busqueda = req.getParameter("busqueda");
-            boolean isAjax = "XMLHttpRequest".equals(req.getHeader("X-Requested-With"));
+                if (comensal != null && comensal.getTipoComidaFavorita() == null) {
+                    // Cargar tipo de comida favorita si no está en sesión
+                    Comensal comensalBD = usuarioDAO.obtenerComensalPorId(comensal.getId());
+                    comensal.setTipoComidaFavorita(comensalBD.getTipoComidaFavorita());
+                    session.setAttribute("usuario", comensal); // Actualizar sesión
+                }
 
-            List<Restaurante> restaurantes;
-            if (busqueda != null && !busqueda.isEmpty()) {
-                restaurantes = usuarioDAO.buscarRestaurantes(busqueda);
-            } else {
-                restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+                // 1. Obtener todos los restaurantes
+                List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+
+                // 2. Calcular promedios
+                for (Restaurante r : restaurantes) {
+                    Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
+                    r.setPuntajePromedio(promedio != null ? promedio : 0.0);
+                }
+
+                // 3. Cargar recomendados SIEMPRE
+                if (comensal != null) {
+                    List<Restaurante> recomendados = recomendacionService.obtenerRecomendaciones(comensal);
+
+                    // Debug crucial
+                    System.out.println("DEBUG - Usuario: " + comensal.getNombreUsuario());
+                    System.out.println("DEBUG - Tipo comida: " + comensal.getTipoComidaFavorita());
+                    System.out.println("DEBUG - Restaurantes recomendados: " + recomendados.size());
+
+                    req.setAttribute("restaurantesRecomendados", recomendados);
+                }
+
+                req.setAttribute("restaurantes", restaurantes);
             }
 
-            // Calcular promedios (descomentar si se necesita)
-            /*
-            Map<Long, Double> promedios = new HashMap<>();
-            for (Restaurante r : restaurantes) {
-                Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
-                promedios.put(r.getId(), promedio);
-                r.setPuntajePromedio(promedio);
-            }
-            req.setAttribute("promedios", promedios);
-            */
+            // Importante: deshabilitar caché
+            resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            resp.setHeader("Pragma", "no-cache");
+            resp.setDateHeader("Expires", 0);
 
-            // Obtener recomendaciones solo si es comensal
-            if (comensal != null && comensal.getTipoComidaFavorita() != null) {
-                List<Restaurante> recomendados = recomendacionService.obtenerRecomendaciones(comensal);
-                req.setAttribute("restaurantesSugeridos", recomendados);
-            }
-
-            req.setAttribute("restaurantes", restaurantes);
             req.getRequestDispatcher("/index.jsp").forward(req, resp);
 
         } catch (Exception e) {
+            e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar restaurantes");
         }
     }
+
 
     @Override
     public void destroy() {

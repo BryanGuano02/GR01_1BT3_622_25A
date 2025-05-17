@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registrarComensal(Usuario usuario) throws ServiceException {
+    public void registrarComensal(Usuario usuario, String tipoComidaFavorita) throws ServiceException {
         if (usuarioDAO.findByNombreUsuario(usuario.getNombreUsuario()) != null) {
             throw new ServiceException("El nombre de usuario ya existe");
         }
@@ -61,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
         comensal.setNombreUsuario(usuario.getNombreUsuario());
         comensal.setContrasena(hashPassword(usuario.getContrasena()));
         comensal.setEmail(usuario.getEmail());
+        comensal.setTipoComidaFavorita(tipoComidaFavorita); // Nuevo campo
         comensal.setTipoUsuario("COMENSAL");
 
         usuarioDAO.save(comensal);

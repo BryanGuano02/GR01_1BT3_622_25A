@@ -91,8 +91,9 @@ public class SvAuth extends HttpServlet {
                 comensal.setNombreUsuario(request.getParameter("nombreUsuario"));
                 comensal.setContrasena(request.getParameter("contrasena"));
                 comensal.setEmail(request.getParameter("email"));
+                String tipoComidaFavorita = request.getParameter("tipoComidaFavorita");
 
-                authService.registrarComensal(comensal);
+                authService.registrarComensal(comensal, tipoComidaFavorita);
                 response.sendRedirect("login.jsp?registroExitoso=true");
             } catch (ServiceException e) {
                 request.setAttribute("error", e.getMessage());

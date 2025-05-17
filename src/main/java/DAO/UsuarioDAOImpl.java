@@ -12,6 +12,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public UsuarioDAOImpl(EntityManagerFactory emf) {
         this.emf = emf;
     }
+    
 
     @Override
     public Usuario findByNombreUsuario(String nombreUsuario) {
