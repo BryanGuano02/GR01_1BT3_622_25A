@@ -102,10 +102,10 @@ public class CalificacionDAO {
             em.getTransaction().commit();
             return true;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al crear calificación", e);
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            LOGGER.log(Level.SEVERE, "Error al crear calificación", e);
             return false;
         } finally {
             if (em != null && em.isOpen()) {

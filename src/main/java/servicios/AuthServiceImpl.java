@@ -8,12 +8,17 @@ import exceptions.ServiceException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 
 public class AuthServiceImpl implements AuthService {
     private final UsuarioDAO usuarioDAO;
 
     public AuthServiceImpl(UsuarioDAO usuarioDAO) {
         this.usuarioDAO = usuarioDAO;
+    }
+
+    public List<Restaurante> obtenerTodosRestaurantes() {
+        return usuarioDAO.obtenerTodosRestaurantes();
     }
 
     private String hashPassword(String password) {
@@ -52,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registrarComensal(Usuario usuario) throws ServiceException {
+    public void registrarComensal(Usuario usuario, String tipoComidaFavorita) throws ServiceException {
         if (usuarioDAO.findByNombreUsuario(usuario.getNombreUsuario()) != null) {
             throw new ServiceException("El nombre de usuario ya existe");
         }
@@ -61,6 +66,7 @@ public class AuthServiceImpl implements AuthService {
         comensal.setNombreUsuario(usuario.getNombreUsuario());
         comensal.setContrasena(hashPassword(usuario.getContrasena()));
         comensal.setEmail(usuario.getEmail());
+        comensal.setTipoComidaFavorita(tipoComidaFavorita); // Nuevo campo
         comensal.setTipoUsuario("COMENSAL");
 
         usuarioDAO.save(comensal);
