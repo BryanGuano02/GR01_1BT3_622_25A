@@ -21,6 +21,7 @@ public class Restaurante extends Usuario {
     private Double distanciaUniversidad;
     private int calidad;
     private int tiempoEspera;
+    private boolean votacionActiva = true;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "restaurante_historias", joinColumns = @JoinColumn(name = "restaurante_id"), foreignKey = @ForeignKey(name = "fk_restaurante_historias"))
@@ -137,6 +138,14 @@ public class Restaurante extends Usuario {
 
     public void setHistorias(List<String> historias) {
         this.historias = historias;
+    }
+
+    public boolean isVotacionActiva() {
+        return votacionActiva;
+    }
+
+    public void setVotacionActiva(boolean votacionActiva) {
+        this.votacionActiva = votacionActiva;
     }
 
     public void agregarHistoria(String historia) {

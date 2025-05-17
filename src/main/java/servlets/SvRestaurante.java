@@ -2,6 +2,8 @@ package servlets;
 
 import DAO.UsuarioDAO;
 import DAO.UsuarioDAOImpl;
+import DAO.VotacionDAO;
+import entidades.Calificacion;
 import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Usuario;
@@ -14,20 +16,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import servicios.NotificacionService;
+import servicios.VotacionService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalTime;
+import java.util.List;
 
 @WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
+    private VotacionService votacionService;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         usuarioDAO = new UsuarioDAOImpl(emf);
+        VotacionDAO votacionDAO = new VotacionDAO(emf);
+        votacionService = new VotacionService(votacionDAO, usuarioDAO);
     }
 
     @Override
@@ -75,9 +82,12 @@ public class SvRestaurante extends HttpServlet {
             procesarActualizarRestaurante(req, resp, restauranteUsuario);
         } else if ("subscribirse".equals(accion)) {
             procesarSubscribirse(req, resp, restauranteUsuario);
-        } else {
+        } else if ("detenerVotacion".equals(accion)) {
+            procesarDetenerVotacion(req, resp, restauranteUsuario);
+        }else {
             resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp");
         }
+
     }
 
     private void procesarSubscribirse(HttpServletRequest req, HttpServletResponse resp,
@@ -188,6 +198,7 @@ public class SvRestaurante extends HttpServlet {
             // Obtener el restaurante actualizado
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
             restaurante.agregarHistoria(menu);
+            restaurante.setVotacionActiva(true);
 
             // Guardar y actualizar la sesión
             usuarioDAO.save(restaurante);
@@ -236,6 +247,22 @@ public class SvRestaurante extends HttpServlet {
                     req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
     }
+    private void procesarDetenerVotacion(HttpServletRequest req, HttpServletResponse resp, Restaurante restauranteUsuario)
+            throws IOException, ServletException {
+        try {
+            double promedio = votacionService.detenerVotacion(restauranteUsuario.getId());
+            List<Calificacion> calificaciones = votacionService.obtenerCalificacionesPorRestaurante(restauranteUsuario.getId());
+
+            req.setAttribute("promedio", promedio);
+            req.setAttribute("calificaciones", calificaciones);
+
+            req.getRequestDispatcher("resumenVotacion.jsp").forward(req, resp);
+        } catch (Exception e) {
+            resp.sendRedirect(
+                    req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
+        }
+    }
+
 
     @Override
     public void destroy() {
