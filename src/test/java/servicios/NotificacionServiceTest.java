@@ -1,14 +1,9 @@
 package servicios;
 
-import DAO.NotificacionDAO;
-import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Notificacion;
 import entidades.Restaurante;
 import entidades.Suscripcion;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -20,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 public class NotificacionServiceTest {
 
-    //mock
+    // mock
     @Test
     public void given_diner_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_sent_successfully() {
         NotificacionService notificacionService = mock(NotificacionService.class);
@@ -71,4 +66,12 @@ public class NotificacionServiceTest {
 
         assertEquals(esperadoValido, leida);
     }
+
+    @Test
+    public void given_null_notification_when_mark_as_read_then_return_false() {
+        NotificacionService notificacionService = new NotificacionService(null, null);
+        boolean resultado = notificacionService.marcarComoLeida(null);
+        assertFalse("Debe devolver false si la notificación es null", resultado);
+    }
+
 }
