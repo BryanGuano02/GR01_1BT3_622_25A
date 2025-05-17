@@ -1,10 +1,15 @@
 package servicios;
 
+import DAO.NotificacionDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Suscripcion;
 import org.junit.Test;
 
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
@@ -14,7 +19,10 @@ public class NotificacionServiceTest {
 
     @Test
     public void given_restaurante_with_subscribers_when_create_menu_then_notification_in_notification_tray() {
-        NotificacionService notificacionService = new NotificacionService();
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
+        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
+        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
+        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
         String menuDia = "Menú del día: Pollo al horno";
         Comensal comensal = new Comensal();
         Restaurante restaurante = new Restaurante();
@@ -34,7 +42,10 @@ public class NotificacionServiceTest {
 
     @Test
     public void testNotificarComensalesMenuDia_sinComensales() {
-        NotificacionService notificacionService = new NotificacionService();
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
+        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
+        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
+        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
         Restaurante restaurante = new Restaurante();
         String menuDia = "Menú del día: Pollo al horno";
 

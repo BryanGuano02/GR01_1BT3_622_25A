@@ -10,6 +10,12 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collection;
 
+import DAO.NotificacionDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 @RunWith(Parameterized.class)
 public class NotificacionServiceParametrizedTest {
     @Parameterized.Parameters
@@ -34,8 +40,10 @@ public class NotificacionServiceParametrizedTest {
     public void given_unread_notifications_when_mark_as_read_then_notification_should_change_leida_boolean() {
         // Configuración
         Notificacion notificacion = new Notificacion(mensaje);
-        NotificacionService notificacionService = new NotificacionService();
-
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
+        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
+        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
+        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
         Boolean leida = notificacionService.marcarNotificacionComoLeida(notificacion);
         // Ejecución y verificación
         assertEquals(esperadoValido, leida);
