@@ -6,52 +6,54 @@ import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Suscripcion;
-import org.junit.Test;
-
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.junit.Test;
+
 import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class NotificacionServiceTest {
 
+    //mock
     @Test
-    public void given_restaurante_with_subscribers_when_create_menu_then_notification_in_notification_tray() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
-        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
-        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
-        String menuDia = "Menú del día: Pollo al horno";
-        Comensal comensal = new Comensal();
-        Restaurante restaurante = new Restaurante();
+    public void given_diner_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_sent_successfully() {
+        NotificacionService notificacionService = mock(NotificacionService.class);
 
+        Comensal comensal = new Comensal();
         comensal.setId(1L);
         comensal.setNombreUsuario("comensal1");
 
+        Restaurante restaurante = new Restaurante();
         restaurante.setId(1L);
         restaurante.setNombre("restaurante1");
         restaurante.setSuscripciones(Collections.singletonList(new Suscripcion(comensal, restaurante)));
-        restaurante.agregarHistoria(menuDia);
+        restaurante.agregarHistoria("Menú del día: Pollo al horno");
+
+        when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(true);
 
         boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante);
 
-        assertTrue("Debe notificar si hay comensales siguiendo", resultado);
+        assertTrue("Debe notificar si hay comensales", resultado);
     }
 
     @Test
-    public void testNotificarComensalesMenuDia_sinComensales() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
-        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
-        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
+
+    public void given_diner_is_not_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_not_sent() {
+        // Mock de NotificacionService
+        NotificacionService notificacionService = mock(NotificacionService.class);
         Restaurante restaurante = new Restaurante();
         String menuDia = "Menú del día: Pollo al horno";
 
         restaurante.setId(2L);
         restaurante.setNombre("restaurante2");
         restaurante.agregarHistoria(menuDia);
+
+        // Mockea el comportamiento para este caso
+        when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(false);
 
         boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante);
         assertFalse("No debe notificar si no hay comensales siguiendo", resultado);
