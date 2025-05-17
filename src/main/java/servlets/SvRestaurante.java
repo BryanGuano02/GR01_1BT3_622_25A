@@ -69,7 +69,8 @@ public class SvRestaurante extends HttpServlet {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
             procesarAgregarMenu(req, resp, restauranteUsuario);
-            NotificacionService notificacionService = new NotificacionService();
+            NotificacionService notificacionService = new NotificacionService(usuarioDAO, null);
+
             notificacionService.notificarComensalesMenuDia(restauranteUsuario);
         } else if ("actualizar".equals(accion)) {
             procesarActualizarRestaurante(req, resp, restauranteUsuario);

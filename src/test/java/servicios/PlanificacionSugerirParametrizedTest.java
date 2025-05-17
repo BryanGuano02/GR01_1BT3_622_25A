@@ -11,13 +11,13 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class PlanificacionSugerirTest {
+public class PlanificacionSugerirParametrizedTest {
     private final Double puntajePromedio;
     private final Double distanciaUniversidad;
     private final int tiempoEspera;
     private final boolean esperadoRecomendado;
 
-    public PlanificacionSugerirTest(Double puntajePromedio, Double distanciaUniversidad, int tiempoEspera, boolean esperadoRecomendado) {
+    public PlanificacionSugerirParametrizedTest(Double puntajePromedio, Double distanciaUniversidad, int tiempoEspera, boolean esperadoRecomendado) {
         this.puntajePromedio = puntajePromedio;
         this.distanciaUniversidad = distanciaUniversidad;
         this.tiempoEspera = tiempoEspera;
@@ -43,7 +43,7 @@ public class PlanificacionSugerirTest {
         restaurante.setDistanciaUniversidad(distanciaUniversidad);
         restaurante.setTiempoEspera(tiempoEspera);
 
-        PlanificacionService planificacion = new PlanificacionService();
+        PlanificacionService planificacion = new PlanificacionService(null);
         boolean esRecomendado = planificacion.recomendarRestaurante(restaurante);
 
         assertEquals(esperadoRecomendado, esRecomendado);

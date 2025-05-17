@@ -3,6 +3,7 @@ package DAO;
 import entidades.Planificacion;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 
 import java.util.List;
@@ -21,24 +22,23 @@ public class PlanificacionDAO {
         this.emf = Persistence.createEntityManagerFactory("UFood_PU");
     }
 
-    public boolean crear(Planificacion nuevaPlanificacion) {
-        EntityManager em = null;
+    public void save(Planificacion planificacion) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
         try {
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
-            em.persist(nuevaPlanificacion);
-            em.getTransaction().commit();
-            return true;
+            tx.begin();
+            if (planificacion.getId() == null) {
+                em.persist(planificacion);
+            } else {
+                em.merge(planificacion);
+            }
+            tx.commit();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al crear planificación", e);
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            return false;
+            if (tx != null && tx.isActive())
+                tx.rollback();
+            throw new RuntimeException("Error al guardar la planificación", e);
         } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+            em.close();
         }
     }
 
@@ -57,7 +57,10 @@ public class PlanificacionDAO {
     public List<Planificacion> obtenerPlanificacionesPorId(Long idComensalPlanificador) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT p FROM Planificacion p WHERE p.comensalPlanificador.id = :idComensalPlanificador", Planificacion.class)
+            return em
+                    .createQuery(
+                            "SELECT p FROM Planificacion p WHERE p.comensalPlanificador.id = :idComensalPlanificador",
+                            Planificacion.class)
                     .setParameter("idComensalPlanificador", idComensalPlanificador)
                     .getResultList();
         } finally {

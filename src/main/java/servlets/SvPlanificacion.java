@@ -1,5 +1,6 @@
 package servlets;
 
+import entidades.Comensal;
 import entidades.Planificacion;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servicios.PlanificacionService;
 import DAO.PlanificacionDAO;
+import DAO.UsuarioDAO;
+import DAO.UsuarioDAOImpl;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,11 +21,13 @@ import java.util.List;
 public class SvPlanificacion extends HttpServlet {
     private PlanificacionService planificacionService;
     private EntityManagerFactory emf;
+    private UsuarioDAO usuarioDAO;
 
     @Override
     public void init() throws ServletException {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        planificacionService = new PlanificacionService();
+        planificacionService = new PlanificacionService(new PlanificacionDAO());
+        usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
     @Override
@@ -83,7 +88,9 @@ public class SvPlanificacion extends HttpServlet {
         }
 
         try {
-            Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, idComensalPlanificador);
+            Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensalPlanificador);
+            Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, comensal);
+            planificacionService.guardarPlanificacion(planificacion);
             if (planificacion != null && planificacion.getId() != null) {
                 mensaje = "Planificación creada exitosamente.";
             } else {
