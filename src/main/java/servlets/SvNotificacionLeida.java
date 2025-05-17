@@ -39,7 +39,7 @@ public class SvNotificacionLeida extends HttpServlet {
                     if (n.getId() != null && n.getId().equals(id)) {
                         n.setLeida(true);
                         // Persistir usando el objeto completo
-                        notificacionService.marcarNotificacionComoLeida(n);
+                        notificacionService.marcarComoLeida(n);
                         break;
                     }
                 }

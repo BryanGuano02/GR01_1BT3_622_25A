@@ -20,11 +20,11 @@ import jakarta.persistence.Persistence;
 public class NotificacionServiceParametrizedTest {
     @Parameterized.Parameters
     public static Collection<Object[]> datosDePrueba() {
-        return Arrays.asList(new Object[][]{
+        return Arrays.asList(new Object[][] {
                 // nombrePlanificacion, hora, nombreRestaurante, esperadoValido
-                {"Notificacion 1", false},
-                {"Notificacion 2", false},
-                {"Notificacion 3", true}
+                { "Notificacion 1", false },
+                { "Notificacion 2", false },
+                { "Notificacion 3", true }
         });
     }
 
@@ -40,11 +40,8 @@ public class NotificacionServiceParametrizedTest {
     public void given_unread_notifications_when_mark_as_read_then_notification_should_change_leida_boolean() {
         // Configuración
         Notificacion notificacion = new Notificacion(mensaje);
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
-        NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
-        NotificacionService notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
-        Boolean leida = notificacionService.marcarNotificacionComoLeida(notificacion);
+        NotificacionService notificacionService = new NotificacionService(null, null);
+        Boolean leida = notificacionService.marcarComoLeida(notificacion);
         // Ejecución y verificación
         assertEquals(esperadoValido, leida);
     }

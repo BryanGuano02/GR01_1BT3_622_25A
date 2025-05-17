@@ -15,7 +15,11 @@ public class NotificacionService {
     private EntityManagerFactory emf;
 
     public NotificacionService(UsuarioDAO usuarioDAO, NotificacionDAO notificacionDAO) {
-        this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        if (usuarioDAO == null && notificacionDAO == null) {
+            this.emf = null;
+        } else {
+            this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        }
         this.usuarioDAO = usuarioDAO;
         this.notificacionDAO = notificacionDAO;
     }
@@ -41,13 +45,22 @@ public class NotificacionService {
         }
     }
 
-    public boolean marcarNotificacionComoLeida(Notificacion notificacion) {
+    public Boolean marcarComoLeida(Notificacion notificacion) {
+        if (notificacion != null && !notificacion.isLeida()) {
+            notificacion.setLeida(true);
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean marcarNotificacionComoLeida(Notificacion notificacion) {
         if (notificacion != null && notificacion.getId() != null) {
             Notificacion notifBD = notificacionDAO.buscarPorId(notificacion.getId());
             if (notifBD != null && !notifBD.isLeida()) {
-                notifBD.setLeida(true);
-                notificacionDAO.actualizar(notifBD);
-                return true;
+                if (marcarComoLeida(notifBD)) {
+                    notificacionDAO.actualizar(notifBD);
+                    return true;
+                }
             }
         }
         return false;
