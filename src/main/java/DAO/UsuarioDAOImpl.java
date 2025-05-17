@@ -12,7 +12,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public UsuarioDAOImpl(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
+
 
     @Override
     public Usuario findByNombreUsuario(String nombreUsuario) {
@@ -24,6 +24,18 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public Comensal obtenerComensalPorNombreUsuario(String nombreUsuario) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT c FROM Comensal c LEFT JOIN FETCH c.notificaciones WHERE c.nombreUsuario = :nombre", Comensal.class)
+                    .setParameter("nombre", nombreUsuario)
+                    .getSingleResult();
         } finally {
             em.close();
         }

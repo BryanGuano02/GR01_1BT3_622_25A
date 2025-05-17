@@ -8,12 +8,17 @@ import exceptions.ServiceException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 
 public class AuthServiceImpl implements AuthService {
     private final UsuarioDAO usuarioDAO;
 
     public AuthServiceImpl(UsuarioDAO usuarioDAO) {
         this.usuarioDAO = usuarioDAO;
+    }
+
+    public List<Restaurante> obtenerTodosRestaurantes() {
+        return usuarioDAO.obtenerTodosRestaurantes();
     }
 
     private String hashPassword(String password) {
