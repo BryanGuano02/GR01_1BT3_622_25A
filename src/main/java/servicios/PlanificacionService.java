@@ -17,14 +17,17 @@ import java.util.stream.Collectors;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
-    private final CalificacionDAO calificacionDAO;
     private final UsuarioDAOImpl usuarioDAO;
+    private EntityManagerFactory emf;
 
-    public PlanificacionService() {
-        this.planificacionDAO = new PlanificacionDAO();
-        this.calificacionDAO = new CalificacionDAO();
+    public PlanificacionService(PlanificacionDAO planificacionDAO) {
+        if (planificacionDAO == null) {
+            this.emf = null;
+        } else {
+            this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        }
+        this.planificacionDAO = planificacionDAO;
 
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         this.usuarioDAO = new UsuarioDAOImpl(emf);
     }
 

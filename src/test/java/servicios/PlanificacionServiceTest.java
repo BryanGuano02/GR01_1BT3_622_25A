@@ -23,7 +23,7 @@ public class PlanificacionServiceTest {
         String nombre = "Cena de Fin de Año";
         String hora = "20:00";
 
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         Comensal comensal = new Comensal();
         Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, comensal);
 
@@ -38,7 +38,7 @@ public class PlanificacionServiceTest {
         List<Comensal> comensales = Arrays.asList(new Comensal(), new Comensal());
         Planificacion planificacion = new Planificacion(nombre, hora);
 
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         Boolean exito = planificacionService.agregarComensales(planificacion, comensales);
 
         assertTrue(exito);
@@ -83,8 +83,8 @@ public class PlanificacionServiceTest {
         // Hora límite de votación
         LocalDateTime horaLimite = LocalDateTime.of(2025, 5, 12, 13, 0);
 
-        PlanificacionService planificacionService = new PlanificacionService();
-        int minutos = planificacionService.calcularMinutosRestantesParaVotacion(ahora, horaLimite );
+        PlanificacionService planificacionService = new PlanificacionService(null);
+        int minutos = planificacionService.calcularMinutosRestantesParaVotacion(ahora, horaLimite);
 
         assertEquals(30, minutos);
     }
@@ -100,7 +100,7 @@ public class PlanificacionServiceTest {
         votos.put(restaurante2, 1);
         votos.put(restaurante3, 2);
 
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         Restaurante restauranteMasVotado = planificacionService.obtenerRestauranteMasVotado(votos);
 
         assertNotNull("El restaurante no debería ser null", restauranteMasVotado);
@@ -109,7 +109,7 @@ public class PlanificacionServiceTest {
 
     @Test
     public void give_two_restaurants_when_resolve_empate_then_return_restaurant_randomly() {
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         Restaurante restaurante1 = new Restaurante();
         restaurante1.setNombre("Restaurante A");
         Restaurante restaurante2 = new Restaurante();
@@ -128,7 +128,7 @@ public class PlanificacionServiceTest {
         Long planificacionId = 1L;
         Comensal comensal = new Comensal();
 
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         // Crear una planificación para el test
         Planificacion planificacion = planificacionService.crearPlanificacion("Comida Grupal", "12:00", comensal);
 
@@ -138,9 +138,10 @@ public class PlanificacionServiceTest {
         // Verificar que no arroja excepciones
         assertNotNull(planificacion);
     }
+
     @Test
     public void given_restaurante_when_recomendarRestaurante_then_return_true() {
-        PlanificacionService planificacionService = new PlanificacionService();
+        PlanificacionService planificacionService = new PlanificacionService(null);
         Restaurante restauranteMock = mock(Restaurante.class);
         when(restauranteMock.getPuntajePromedio()).thenReturn(4.0);
         when(restauranteMock.getDistanciaUniversidad()).thenReturn(3.0);

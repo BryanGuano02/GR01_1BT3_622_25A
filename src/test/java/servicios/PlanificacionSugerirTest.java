@@ -43,7 +43,7 @@ public class PlanificacionSugerirTest {
         restaurante.setDistanciaUniversidad(distanciaUniversidad);
         restaurante.setTiempoEspera(tiempoEspera);
 
-        PlanificacionService planificacion = new PlanificacionService();
+        PlanificacionService planificacion = new PlanificacionService(null);
         boolean esRecomendado = planificacion.recomendarRestaurante(restaurante);
 
         assertEquals(esperadoRecomendado, esRecomendado);

@@ -22,10 +22,11 @@ public class SvPlanificacion extends HttpServlet {
     private PlanificacionService planificacionService;
     private EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
+
     @Override
     public void init() throws ServletException {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        planificacionService = new PlanificacionService();
+        planificacionService = new PlanificacionService(new PlanificacionDAO());
         usuarioDAO = new UsuarioDAOImpl(emf);
     }
 
