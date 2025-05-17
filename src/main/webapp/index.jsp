@@ -58,56 +58,7 @@
         </div>
     </div>
 
-
-    <!-- Sección de recomendaciones -->
-    <c:if test="${not empty sessionScope.usuario}">
-        <div class="card shadow mb-4" id="seccionRecomendados">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-heart me-2"></i>
-                    <c:choose>
-                        <c:when test="${not empty restaurantesRecomendados}">
-                            Recomendados para ti (${fn:length(restaurantesRecomendados)})
-                        </c:when>
-                        <c:otherwise>
-                            Restaurantes Sugeridos
-                        </c:otherwise>
-                    </c:choose>
-                </h4>
-            </div>
-            <div class="card-body">
-                <c:choose>
-                    <c:when test="${not empty restaurantesRecomendados}">
-                        <!-- Mostrar restaurantes recomendados -->
-                    </c:when>
-                    <c:otherwise>
-                        <div class="text-center py-3">
-                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
-                            <p class="text-muted">
-                                <c:choose>
-                                    <c:when test="${empty sessionScope.usuario.tipoComidaFavorita}">
-                                        Configura tu tipo de comida favorita para obtener recomendaciones personalizadas.
-                                    </c:when>
-                                    <c:otherwise>
-                                        No encontramos restaurantes que coincidan con tus preferencias.
-                                    </c:otherwise>
-                                </c:choose>
-                            </p>
-                            <c:if test="${empty sessionScope.usuario.tipoComidaFavorita}">
-                                <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp"
-                                   class="btn btn-sm btn-primary">
-                                    <i class="fas fa-sliders-h me-1"></i>Configurar preferencias
-                                </a>
-                            </c:if>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-        </div>
-    </c:if>
-
-
     <!-- Sección de restaurantes recomendados -->
-
     <c:if test="${not empty sessionScope.usuario}">
         <div class="card shadow mb-4">
             <div class="card-header bg-primary text-white">
@@ -125,7 +76,6 @@
                         </c:when>
                         <c:otherwise>
                             Restaurantes Sugeridos
-
                         </c:otherwise>
                     </c:choose>
                 </h4>
@@ -133,31 +83,47 @@
             <div class="card-body">
                 <c:choose>
                     <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
+                        <!-- Debug oculto -->
+                        <div style="display: none;">
+                            <p>DEBUG - Restaurantes recibidos: ${fn:length(restaurantesRecomendados)}</p>
+                            <c:forEach items="${restaurantesRecomendados}" var="r" varStatus="status">
+                                <p>${status.index + 1}. ${r.nombre} - Puntaje: <fmt:formatNumber value="${r.puntajePromedio}" pattern="#.##"/></p>
+                            </c:forEach>
+                        </div>
+
                         <div class="row">
-                            <c:forEach items="${restaurantesRecomendados}" var="restaurante">
+                            <c:forEach items="${restaurantesRecomendados}" var="restaurante" varStatus="status">
                                 <div class="col-md-6 col-lg-4 mb-4">
                                     <div class="card restaurant-card h-100">
                                         <div class="restaurant-img-placeholder">
                                             <i class="fas fa-utensils fa-3x"></i>
+                                            <!-- Mostrar posición según puntaje -->
+                                            <div class="position-badge">#${status.index + 1}</div>
                                         </div>
                                         <div class="card-body">
-                                            <h5 class="card-title">${restaurante.nombre}</h5>
+                                            <h5 class="card-title">
+                                                <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                            </h5>
                                             <p class="restaurant-type mb-2">
                                                 <i class="fas fa-utensils me-1"></i>
-                                                    ${restaurante.tipoComida}
+                                                <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
                                             </p>
+
                                             <div class="mb-2">
-                                                <c:if test="${restaurante.puntajePromedio > 0}">
-                                                    <c:forEach begin="1" end="5" var="i">
-                                                        <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
-                                                    </c:forEach>
-                                                    <span>(${restaurante.puntajePromedio})</span>
-                                                </c:if>
+                                                <!-- Mostrar siempre las 5 estrellas -->
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
+                                                </c:forEach>
+                                                <span class="ms-1">
+                                                (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
+                                                    <!-- Debug visible solo para desarrolladores -->
+                                                <span style="display: none;">ID: ${restaurante.id}</span>
+                                            </span>
                                             </div>
-                                            <a href="${pageContext.request.contextPath}/detalle-restaurante?id=${restaurante.id}"
-                                               class="btn btn-sm btn-outline-primary mt-2">
-                                                Ver detalles
-                                            </a>
+
+                                            <p class="card-text">
+                                                <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -168,12 +134,6 @@
                         <div class="text-center py-3">
                             <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
                             <p class="text-muted">No hay restaurantes sugeridos disponibles</p>
-                            <c:if test="${empty sessionScope.usuario.tipoComidaFavorita}">
-                                <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp"
-                                   class="btn btn-sm btn-primary">
-                                    <i class="fas fa-sliders-h me-1"></i>Configurar preferencias
-                                </a>
-                            </c:if>
                         </div>
                     </c:otherwise>
                 </c:choose>

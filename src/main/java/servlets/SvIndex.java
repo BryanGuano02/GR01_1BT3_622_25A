@@ -33,7 +33,7 @@ public class SvIndex extends HttpServlet {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         usuarioDAO = new UsuarioDAOImpl(emf);
         calificacionDAO = new CalificacionDAO(emf);
-        recomendacionService = new RecomendacionService(usuarioDAO);
+        recomendacionService = new RecomendacionService(usuarioDAO, calificacionDAO);
 
     }
 
@@ -44,44 +44,33 @@ public class SvIndex extends HttpServlet {
             if (session != null) {
                 Comensal comensal = (Comensal) session.getAttribute("usuario");
 
-                if (comensal != null && comensal.getTipoComidaFavorita() == null) {
-                    // Cargar tipo de comida favorita si no está en sesión
-                    Comensal comensalBD = usuarioDAO.obtenerComensalPorId(comensal.getId());
-                    comensal.setTipoComidaFavorita(comensalBD.getTipoComidaFavorita());
-                    session.setAttribute("usuario", comensal); // Actualizar sesión
-                }
-
-                // 1. Obtener todos los restaurantes
-                List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
-
-                // 2. Calcular promedios
-                for (Restaurante r : restaurantes) {
-                    Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
-                    r.setPuntajePromedio(promedio != null ? promedio : 0.0);
-                }
-
-                // 3. Cargar recomendados SIEMPRE
                 if (comensal != null) {
+                    // Obtener todos los restaurantes con sus promedios actualizados
+                    List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+                    restaurantes.forEach(r -> {
+                        Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
+                        r.setPuntajePromedio(promedio != null ? promedio : 0.0);
+                    });
+
+                    // Obtener recomendaciones ya ordenadas
                     List<Restaurante> recomendados = recomendacionService.obtenerRecomendaciones(comensal);
 
-                    // Debug crucial
-                    System.out.println("DEBUG - Usuario: " + comensal.getNombreUsuario());
-                    System.out.println("DEBUG - Tipo comida: " + comensal.getTipoComidaFavorita());
-                    System.out.println("DEBUG - Restaurantes recomendados: " + recomendados.size());
+                    // Debug
+                    System.out.println("Restaurantes recomendados ordenados:");
+                    recomendados.forEach(r ->
+                            System.out.println(r.getNombre() + " - " + r.getPuntajePromedio()));
 
                     req.setAttribute("restaurantesRecomendados", recomendados);
+                    req.setAttribute("restaurantes", restaurantes);
                 }
-
-                req.setAttribute("restaurantes", restaurantes);
             }
 
-            // Importante: deshabilitar caché
+            // Deshabilitar caché
             resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             resp.setHeader("Pragma", "no-cache");
             resp.setDateHeader("Expires", 0);
 
             req.getRequestDispatcher("/index.jsp").forward(req, resp);
-
         } catch (Exception e) {
             e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar restaurantes");
