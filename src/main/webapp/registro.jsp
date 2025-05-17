@@ -1,61 +1,3 @@
-<%--<%@ page contentType="text/html;charset=UTF-8" language="java" %>--%>
-<%--<html>--%>
-<%--<head>--%>
-<%--    <title>Registro - UFood</title>--%>
-<%--    <meta charset="UTF-8">--%>
-<%--    <meta name="viewport" content="width=device-width, initial-scale=1.0">--%>
-<%--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">--%>
-<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">--%>
-<%--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">--%>
-<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">--%>
-<%--    <link rel="stylesheet" href="styles.css">--%>
-<%--    <script>--%>
-<%--        function enviarFormulario() {--%>
-<%--            const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked').value;--%>
-<%--            const form = document.getElementById('formRegistro');--%>
-
-<%--            if (tipoUsuario === "COMENSAL") {--%>
-<%--                form.action = "${pageContext.request.contextPath}/registro-comensal";--%>
-<%--            } else {--%>
-<%--                form.action = "${pageContext.request.contextPath}/registro-restaurante";--%>
-<%--            }--%>
-<%--            form.submit();--%>
-<%--            return false;--%>
-<%--        }--%>
-<%--    </script>--%>
-<%--</head>--%>
-<%--<body>--%>
-<%--<div class="container mt-5">--%>
-<%--    <h1>Registro de Usuario</h1>--%>
-<%--    <% if (request.getAttribute("error") != null) { %>--%>
-<%--    <p style="color: red;">${error}</p>--%>
-<%--    <% } %>--%>
-<%--    <form id="formRegistro" method="post" onsubmit="return enviarFormulario()">--%>
-<%--        <div>--%>
-<%--            <label>Tipo de usuario:</label>--%>
-<%--            <input type="radio" id="restaurante" name="tipoUsuario" value="RESTAURANTE">--%>
-<%--            <label for="restaurante">Restaurante</label>--%>
-<%--            <input type="radio" id="comensal" name="tipoUsuario" value="COMENSAL" checked>--%>
-<%--            <label for="comensal">Comensal</label>--%>
-<%--        </div>--%>
-<%--        <div>--%>
-<%--            <label for="nombreUsuario">Nombre de usuario:</label>--%>
-<%--            <input type="text" id="nombreUsuario" name="nombreUsuario" required>--%>
-<%--        </div>--%>
-<%--        <div>--%>
-<%--            <label for="email">Email:</label>--%>
-<%--            <input type="email" id="email" name="email" required>--%>
-<%--        </div>--%>
-<%--        <div>--%>
-<%--            <label for="contrasena">Contraseña:</label>--%>
-<%--            <input type="password" id="contrasena" name="contrasena" required>--%>
-<%--        </div>--%>
-<%--        <button type="submit">Registrarse</button>--%>
-<%--    </form>--%>
-<%--    <p>¿Ya tienes una cuenta? <a href="${pageContext.request.contextPath}/login.jsp">Inicia sesión aquí</a></p>--%>
-<%--</div>--%>
-<%--</body>--%>
-<%--</html>--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -67,6 +9,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <script>
+        function toggleTipoComidaField() {
+            const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked').value;
+            const tipoComidaDiv = document.getElementById('tipoComidaDiv');
+
+            if (tipoUsuario === "COMENSAL") {
+                tipoComidaDiv.style.display = 'block';
+            } else {
+                tipoComidaDiv.style.display = 'none';
+            }
+        }
+
         function enviarFormulario() {
             const tipoUsuario = document.querySelector('input[name="tipoUsuario"]:checked').value;
             const form = document.getElementById('formRegistro');
@@ -79,6 +32,16 @@
             form.submit();
             return false;
         }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleTipoComidaField();
+
+            // Agregar listeners a los radio buttons
+            document.querySelectorAll('input[name="tipoUsuario"]').forEach(radio => {
+                radio.addEventListener('change', toggleTipoComidaField);
+            });
+        });
     </script>
 </head>
 <body class="bg-gray-50">
@@ -122,10 +85,26 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
-        <div class="mb-6">
+        <div class="mb-4">
             <label for="contrasena" class="block text-gray-700 mb-2">Contraseña:</label>
             <input type="password" id="contrasena" name="contrasena" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div id="tipoComidaDiv" class="mb-4">
+            <label for="tipoComidaFavorita" class="block text-gray-700 mb-2">Tipo de comida favorita:</label>
+            <select id="tipoComidaFavorita" name="tipoComidaFavorita"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione una opción</option>
+                <option value="Comida Rápida">Comida Rápida</option>
+                <option value="Comida Casera">Comida Casera</option>
+                <option value="Comida Costeña">Comida Costeña</option>
+                <option value="Comida Vegetariana">Comida Vegetariana</option>
+                <option value="Comida Italiana">Comida Italiana</option>
+                <option value="Comida Mexicana">Comida Mexicana</option>
+                <option value="Comida China">Comida China</option>
+                <option value="Comida Japonesa">Comida Japonesa</option>
+            </select>
         </div>
 
         <button type="submit"
@@ -136,8 +115,7 @@
 
     <p class="mt-4 text-center text-gray-600">
         ¿Ya tienes una cuenta?
-        <a href="${pageContext.request.contextPath}/login.jsp" class="text-blue-600 hover:text-blue-800">Inicia sesión
-            aquí</a>
+        <a href="${pageContext.request.contextPath}/login.jsp" class="text-blue-600 hover:text-blue-800">Inicia sesión aquí</a>
     </p>
 </div>
 </body>
