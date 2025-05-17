@@ -125,18 +125,13 @@ public class PlanificacionServiceTest {
 
     @Test
     public void given_planificacion_when_cancel_planificacion_then_ok() {
-        Long planificacionId = 1L;
         Comensal comensal = new Comensal();
-
         PlanificacionService planificacionService = new PlanificacionService(null);
-        // Crear una planificación para el test
         Planificacion planificacion = planificacionService.crearPlanificacion("Comida Grupal", "12:00", comensal);
 
-        // Cancelar la planificación
-        planificacionService.cancelarPlanificacion(planificacionId);
+        planificacionService.cancelarPlanificacion(planificacion);
 
-        // Verificar que no arroja excepciones
-        assertNotNull(planificacion);
+        assertEquals("Cancelado", planificacion.getEstado());
     }
 
     @Test

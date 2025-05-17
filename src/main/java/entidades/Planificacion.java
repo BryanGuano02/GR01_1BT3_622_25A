@@ -87,8 +87,6 @@ public class Planificacion {
         this.comensales.add(comensal);
     }
 
-    public void setEstado(String estado) {
-    }
 
     public String getEstado() {
         return estado;
@@ -100,5 +98,9 @@ public class Planificacion {
 
     public void setComensalPlanificador(Comensal comensalPlanificador) {
         this.comensalPlanificador = comensalPlanificador;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

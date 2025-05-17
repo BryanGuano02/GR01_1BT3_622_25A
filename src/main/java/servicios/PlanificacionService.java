@@ -42,7 +42,7 @@ public class PlanificacionService {
     }
 
     public void guardarPlanificacion(Planificacion planificacion) {
-        planificacionDAO.crear(planificacion);
+        planificacionDAO.save(planificacion);
     }
 
     private void validarParametrosCreacion(String nombre, String hora) {
@@ -103,29 +103,20 @@ public class PlanificacionService {
 
     }
 
-    public void cancelarPlanificacion(Long planificacionId) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            Planificacion planificacion = findPlanificacion(em, planificacionId);
-            List<Comensal> comensales = planificacion.getComensales();
+    public void cancelarPlanificacion(Planificacion planificacion) {
+        // List<Comensal> comensales = planificacion.getComensales();
 
-            for (Comensal comensal : comensales) {
-                notificar(comensal, "La planificación ha sido cancelada");
-            }
+        // for (Comensal comensal : comensales) {
+        // notificar(comensal, "La planificación ha sido cancelada");
+        // }
 
-            em.remove(planificacion);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive())
-                tx.rollback();
-            e.printStackTrace();
-        } finally {
-            em.close();
-            emf.close();
+        if (planificacion == null) {
+            throw new IllegalArgumentException("La planificación no puede ser nula");
         }
+        if (!"Activa".equalsIgnoreCase(planificacion.getEstado())) {
+            throw new IllegalStateException("Solo se puede cancelar una planificación activa");
+        }
+        planificacion.setEstado("Cancelado");
     }
 
     public Restaurante resolverEmpateEnVotacion(Map<Restaurante, Integer> votos) {
