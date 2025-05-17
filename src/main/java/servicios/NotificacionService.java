@@ -2,7 +2,6 @@ package servicios;
 
 import DAO.NotificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Notificacion;
 import entidades.Restaurante;
@@ -15,10 +14,10 @@ public class NotificacionService {
     private NotificacionDAO notificacionDAO;
     private EntityManagerFactory emf;
 
-    public NotificacionService() {
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
-        notificacionDAO = new NotificacionDAO(emf);
+    public NotificacionService(UsuarioDAO usuarioDAO, NotificacionDAO notificacionDAO) {
+        this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        this.usuarioDAO = usuarioDAO;
+        this.notificacionDAO = notificacionDAO;
     }
 
     private void notificarComensalMenuDia(Comensal comensal, String nombreRestaurante) {
