@@ -3,13 +3,7 @@ package servicios;
 import entidades.Comensal;
 import entidades.Planificacion;
 import entidades.Restaurante;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -28,21 +22,24 @@ public class PlanificacionServiceTest {
     public void given_name_hour_when_create_planification_then_planification_not_null() {
         String nombre = "Cena de Fin de Año";
         String hora = "20:00";
-        Long idComensalPlanificador = 1L;
 
         PlanificacionService planificacionService = new PlanificacionService();
-        Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, idComensalPlanificador);
+        Comensal comensal = new Comensal();
+        Planificacion planificacion = planificacionService.crearPlanificacion(nombre, hora, comensal);
 
         assertNotNull(planificacion);
     }
 
     @Test
-    public void given_diner_ids_when_add_to_planification_then_ok() {
-        Long planificacionId = 1L;
-        List<Long> comensalIds = Arrays.asList(1L, 2L);
+    public void given_diner_when_add_to_planification_then_ok() {
+        String nombre = "Almuerzo UTP";
+        String hora = "12:30";
+
+        List<Comensal> comensales = Arrays.asList(new Comensal(), new Comensal());
+        Planificacion planificacion = new Planificacion(nombre, hora);
 
         PlanificacionService planificacionService = new PlanificacionService();
-        Boolean exito = planificacionService.agregarComensales(planificacionId, comensalIds);
+        Boolean exito = planificacionService.agregarComensales(planificacion, comensales);
 
         assertTrue(exito);
     }
@@ -129,10 +126,11 @@ public class PlanificacionServiceTest {
     @Test
     public void given_planificacion_when_cancel_planificacion_then_ok() {
         Long planificacionId = 1L;
+        Comensal comensal = new Comensal();
 
         PlanificacionService planificacionService = new PlanificacionService();
         // Crear una planificación para el test
-        Planificacion planificacion = planificacionService.crearPlanificacion("Comida Grupal", "12:00", 1L);
+        Planificacion planificacion = planificacionService.crearPlanificacion("Comida Grupal", "12:00", comensal);
 
         // Cancelar la planificación
         planificacionService.cancelarPlanificacion(planificacionId);
