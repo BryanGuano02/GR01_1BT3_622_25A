@@ -71,6 +71,8 @@ public class SvAuth extends HttpServlet {
 
             // Redirección según tipo de usuario
             if (usuario instanceof Comensal) {
+                Comensal comensal = (Comensal) usuario;
+                session.setAttribute("notificaciones", comensal.getNotificaciones());
                 response.sendRedirect("inicio"); // La lógica de recomendaciones ahora está en SvIndex
             } else if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
                 response.sendRedirect("crearRestaurante.jsp");
