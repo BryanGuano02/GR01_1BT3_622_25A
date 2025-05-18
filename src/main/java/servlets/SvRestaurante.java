@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import servicios.MenuDelDiaService;
 import servicios.NotificacionService;
 
 import java.io.IOException;
@@ -78,6 +79,24 @@ public class SvRestaurante extends HttpServlet {
         } else {
             resp.sendRedirect(req.getContextPath() + "/crearRestaurante.jsp");
         }
+
+        if ("agregarMenuDelDia".equals(accion)) {
+            String descripcionMenu = req.getParameter("historia");
+            //Long idRestaurante = (Long) req.getSession().getAttribute("idRestaurante"); // Obtener ID de la sesión
+            //Usuario usuario = (Usuario) session.getAttribute("usuario");
+            System.out.println(restauranteUsuario.getId());
+            if (descripcionMenu != null && !descripcionMenu.trim().isEmpty()) {
+                // lógica para reemplazar o guardar el menú del día siguiente
+                MenuDelDiaService menuDelDiaService = new MenuDelDiaService();
+                Restaurante restaurante = menuDelDiaService.guardarMenuDelDia( descripcionMenu, restauranteUsuario.getId() );
+                session.setAttribute("usuario", restaurante );
+
+
+
+            }
+
+        }
+
     }
 
     private void procesarSubscribirse(HttpServletRequest req, HttpServletResponse resp,

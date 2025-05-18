@@ -140,4 +140,5 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             emf.close();
         }
     }
+
 }

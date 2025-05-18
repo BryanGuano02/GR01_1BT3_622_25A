@@ -19,6 +19,7 @@ public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
     private final CalificacionDAO calificacionDAO;
     private final UsuarioDAOImpl usuarioDAO;
+    private final NotificacionServiceInterface notificacionService;
 
     public PlanificacionService() {
         this.planificacionDAO = new PlanificacionDAO();
@@ -26,7 +27,17 @@ public class PlanificacionService {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
         this.usuarioDAO = new UsuarioDAOImpl(emf);
+        notificacionService = null;
+
     }
+    // Para el test
+    public PlanificacionService(NotificacionServiceInterface notificacionService) {
+        this.planificacionDAO = null;
+        this.calificacionDAO = null;
+        this.usuarioDAO = null;
+        this.notificacionService = notificacionService;
+    }
+
 
     public Planificacion crearPlanificacion(String nombre, String hora, Long idComensalPlanificador) {
         validarParametrosCreacion(nombre, hora);
@@ -161,7 +172,7 @@ public class PlanificacionService {
     public void confirmarRestauranteDelGrupo(Planificacion planificacion, String restauranteConfirmado) {
         List<Comensal> comensales = planificacion.getComensales();
         for (Comensal comensal : comensales) {
-            notificar(comensal, "Se ha confirmado: " + restauranteConfirmado);
+            notificacionService.notificarRestauranteElegido(comensal, "Se ha confirmado: " + restauranteConfirmado);
         }
     }
 

@@ -33,6 +33,10 @@ public class Restaurante extends Usuario {
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Suscripcion> suscripciones = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "menu_del_dia_id")
+    private MenuDelDia menuDelDia;
+
     public Restaurante() {
     }
 
@@ -149,6 +153,14 @@ public class Restaurante extends Usuario {
 
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;
+    }
+
+    public MenuDelDia getMenuDelDia() {
+        return menuDelDia;
+    }
+
+    public void setMenuDelDia(MenuDelDia menuDelDia) {
+        this.menuDelDia = menuDelDia;
     }
 
     @Override
