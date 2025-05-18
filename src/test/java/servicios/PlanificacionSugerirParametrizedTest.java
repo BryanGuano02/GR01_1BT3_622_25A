@@ -1,5 +1,6 @@
 package servicios;
 
+import DAO.PlanificacionDAO;
 import entidades.Restaurante;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +44,8 @@ public class PlanificacionSugerirParametrizedTest {
         restaurante.setDistanciaUniversidad(distanciaUniversidad);
         restaurante.setTiempoEspera(tiempoEspera);
 
-        PlanificacionService planificacion = new PlanificacionService(null);
+        PlanificacionDAO planificacionDAONull = null;
+        PlanificacionService planificacion = new PlanificacionService(planificacionDAONull);
         boolean esRecomendado = planificacion.recomendarRestaurante(restaurante);
 
         assertEquals(esperadoRecomendado, esRecomendado);

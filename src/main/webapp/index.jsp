@@ -249,11 +249,14 @@
                                                 <pre style="white-space: pre-wrap;" class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
 
                                                 <!-- Botón de Like -->
-                                                <button class="btn-like position-absolute"
+
+                                                    <button class="btn-like position-absolute"
+                                                        type="submit"
                                                         data-id="${restaurante.id}"
                                                         title="Me gusta">
                                                     <i class="fas fa-heart"></i>
-                                                </button>
+                                                    </button>
+
                                             </div>
                                         </c:if>
                                     </div>
@@ -478,26 +481,28 @@ setTimeout(function() {
                 btn.classList.add('clicked');
             });
         });
+
     }
-    <%--document.addEventListener('DOMContentLoaded', function () {--%>
-    <%--    document.querySelectorAll('.btn-like').forEach(function (btn) {--%>
-    <%--        btn.addEventListener('click', function () {--%>
-    <%--            if (btn.classList.contains('clicked')) return;--%>
 
-    <%--            const idRestaurante = btn.getAttribute('data-id');--%>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.btn-like').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (btn.classList.contains('clicked')) return;
 
-    <%--            fetch('${pageContext.request.contextPath}/SvMenuDelDia', {--%>
-    <%--                method: 'POST',--%>
-    <%--                headers: {--%>
-    <%--                    'Content-Type': 'application/x-www-form-urlencoded'--%>
-    <%--                },--%>
-    <%--                body: 'id=' + encodeURIComponent(idRestaurante)--%>
-    <%--            });--%>
+                const idRestaurante = btn.getAttribute('data-id');
 
-    <%--            btn.classList.add('clicked'); // Asegúrate de que esto se ejecuta--%>
-    <%--        });--%>
-    <%--    });--%>
-    <%--});--%>
+                fetch('${pageContext.request.contextPath}/SvMenuDelDia', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'id=' + encodeURIComponent(idRestaurante)
+                });
+
+                btn.classList.add('clicked'); // esto se debe ejecutar
+            });
+        });
+    });
 </script>
 </body>
 </html>
