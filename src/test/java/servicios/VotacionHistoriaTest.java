@@ -1,14 +1,10 @@
 package servicios;
 
-import DAO.VotoHistoriaDAO;
-import DAO.VotacionHistoriaDAO;
 import entidades.Comensal;
 import entidades.Restaurante;
-import entidades.VotoHistoria;
 import exceptions.ServiceException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
