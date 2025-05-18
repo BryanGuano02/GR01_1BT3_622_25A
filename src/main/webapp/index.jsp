@@ -20,13 +20,12 @@
         request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
         request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
     %>
-    <%@ include file="layout/header.jsp" %>
-
-    <!-- Barra de búsqueda y acciones -->
+    <%@ include file="layout/header.jsp" %>    <!-- Barra de búsqueda y acciones -->
     <div class="card shadow mb-4">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
+            <!-- Barra de búsqueda -->
+            <div class="row mb-3">
+                <div class="col-12">
                     <form id="searchForm" onsubmit="buscarRestaurantes(event)">
                         <div class="input-group">
                             <input type="text" class="form-control" id="searchInput" name="busqueda"
@@ -38,16 +37,20 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-4 text-end">
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row">
+                <div class="col-12 d-flex flex-wrap justify-content-center gap-2">
                     <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info me-2">
+                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info">
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
-                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success me-2">
+                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success">
                             <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
                         </a>
                     </c:if>
-                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
                         <i class="fas fa-bell me-2"></i>Notificaciones
                     </button>
                     <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
