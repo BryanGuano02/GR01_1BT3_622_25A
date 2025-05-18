@@ -11,23 +11,13 @@ public class VotoHistoriaService {
     private final VotoHistoriaDAO votoHistoriaDAO;
     private final VotacionHistoriaDAO votacionHistoriaDAO;
 
-    // Constructor actualizado
     public VotoHistoriaService(VotacionHistoriaDAO votacionHistoriaDAO, VotoHistoriaDAO votoHistoriaDAO) {
         this.votacionHistoriaDAO = votacionHistoriaDAO;
         this.votoHistoriaDAO = votoHistoriaDAO;
     }
 
-    public void cerrarVotacion(Long idRestaurante, String historia) throws ServiceException {
-        votacionHistoriaDAO.cerrarVotacion(idRestaurante, historia);
-    }
-
-    public boolean estaVotacionCerrada(Long idRestaurante, String historia) {
-        return votacionHistoriaDAO.estaCerrada(idRestaurante, historia);
-    }
-
-    // Modifica el método votar para validar si está cerrada
     public void votar(Long idComensal, Long idRestaurante, String historia, boolean like) throws ServiceException {
-        if (estaVotacionCerrada(idRestaurante, historia)) {
+        if (votacionHistoriaDAO.estaCerrada(idRestaurante, historia)) {
             throw new ServiceException("La votación para esta historia ya está cerrada.");
         }
         if (votoHistoriaDAO.existeVoto(idComensal, idRestaurante, historia)) {
@@ -46,6 +36,14 @@ public class VotoHistoriaService {
         if (!votoHistoriaDAO.crear(voto)) {
             throw new ServiceException("No se pudo registrar el voto.");
         }
+    }
+
+    public void cerrarVotacion(Long idRestaurante, String historia) throws ServiceException {
+        votacionHistoriaDAO.cerrarVotacion(idRestaurante, historia);
+    }
+
+    public boolean estaVotacionCerrada(Long idRestaurante, String historia) {
+        return votacionHistoriaDAO.estaCerrada(idRestaurante, historia);
     }
 
     public long contarLikes(Long idRestaurante, String historia) {

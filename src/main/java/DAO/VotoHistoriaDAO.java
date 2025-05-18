@@ -6,11 +6,11 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VotoHistoriaDAO {
+
     private static final Logger LOGGER = Logger.getLogger(VotoHistoriaDAO.class.getName());
     private final EntityManagerFactory emf;
 
@@ -31,10 +31,10 @@ public class VotoHistoriaDAO {
             em.getTransaction().commit();
             return true;
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al crear voto", e);
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            LOGGER.log(Level.SEVERE, "Error al crear voto", e);
             return false;
         } finally {
             if (em != null && em.isOpen()) {
@@ -55,6 +55,9 @@ public class VotoHistoriaDAO {
             query.setParameter("idRestaurante", idRestaurante);
             query.setParameter("historia", historia);
             return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar existencia de voto", e);
+            return false;
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
@@ -73,6 +76,9 @@ public class VotoHistoriaDAO {
             query.setParameter("idRestaurante", idRestaurante);
             query.setParameter("historia", historia);
             return query.getSingleResult();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al contar likes", e);
+            return 0;
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
@@ -91,6 +97,9 @@ public class VotoHistoriaDAO {
             query.setParameter("idRestaurante", idRestaurante);
             query.setParameter("historia", historia);
             return query.getSingleResult();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al contar dislikes", e);
+            return 0;
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
