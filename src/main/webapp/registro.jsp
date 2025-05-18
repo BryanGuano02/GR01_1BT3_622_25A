@@ -97,13 +97,14 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Seleccione una opción</option>
                 <option value="Comida Rápida">Comida Rápida</option>
-                <option value="Comida Casera">Comida Casera</option>
                 <option value="Comida Costeña">Comida Costeña</option>
-                <option value="Comida Vegetariana">Comida Vegetariana</option>
-                <option value="Comida Italiana">Comida Italiana</option>
-                <option value="Comida Mexicana">Comida Mexicana</option>
-                <option value="Comida China">Comida China</option>
-                <option value="Comida Japonesa">Comida Japonesa</option>
+                <option value="Comida Casera">Comida Casera</option>
+                <option value="Comida Casera">Platos a la Carta</option>
+<%--                <option value="Comida Vegetariana">Comida Vegetariana</option>--%>
+<%--                <option value="Comida Italiana">Comida Italiana</option>--%>
+<%--                <option value="Comida Mexicana">Comida Mexicana</option>--%>
+<%--                <option value="Comida China">Comida China</option>--%>
+<%--                <option value="Comida Japonesa">Comida Japonesa</option>--%>
             </select>
         </div>
 
