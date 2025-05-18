@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,13 +20,12 @@
         request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
         request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
     %>
-    <%@ include file="layout/header.jsp" %>
-
-    <!-- Barra de búsqueda y acciones -->
+    <%@ include file="layout/header.jsp" %>    <!-- Barra de búsqueda y acciones -->
     <div class="card shadow mb-4">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
+            <!-- Barra de búsqueda -->
+            <div class="row mb-3">
+                <div class="col-12">
                     <form id="searchForm" onsubmit="buscarRestaurantes(event)">
                         <div class="input-group">
                             <input type="text" class="form-control" id="searchInput" name="busqueda"
@@ -37,16 +37,20 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-4 text-end">
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row">
+                <div class="col-12 d-flex flex-wrap justify-content-center gap-2">
                     <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info me-2">
+                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info">
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
-                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success me-2">
+                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success">
                             <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
                         </a>
                     </c:if>
-                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
                         <i class="fas fa-bell me-2"></i>Notificaciones
                     </button>
                     <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
@@ -56,6 +60,99 @@
             </div>
         </div>
     </div>
+
+    <!-- Sección de restaurantes recomendados -->
+    <c:if test="${not empty sessionScope.usuario}">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-heart me-2"></i>
+                    <c:choose>
+                        <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.usuario.tipoComidaFavorita}">
+                                    Recomendados para ti (${fn:length(restaurantesRecomendados)})
+                                </c:when>
+                                <c:otherwise>
+                                    Restaurantes Sugeridos (${fn:length(restaurantesRecomendados)})
+                                </c:otherwise>
+                            </c:choose>
+                        </c:when>
+                        <c:otherwise>
+                            Restaurantes Sugeridos
+                        </c:otherwise>
+                    </c:choose>
+                </h4>
+            </div>
+            <div class="card-body">
+                <c:choose>
+                    <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
+                        <!-- Debug oculto -->
+                        <div style="display: none;">
+                            <p>DEBUG - Restaurantes recibidos: ${fn:length(restaurantesRecomendados)}</p>
+                            <c:forEach items="${restaurantesRecomendados}" var="r" varStatus="status">
+                                <p>${status.index + 1}. ${r.nombre} - Puntaje: <fmt:formatNumber value="${r.puntajePromedio}" pattern="#.##"/></p>
+                            </c:forEach>
+                        </div>
+
+                        <div class="row">
+                            <c:forEach items="${restaurantesRecomendados}" var="restaurante" varStatus="status">
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card restaurant-card h-100">
+                                        <div class="restaurant-img-placeholder">
+                                            <i class="fas fa-utensils fa-3x"></i>
+                                            <!-- Mostrar posición según puntaje -->
+                                            <div class="position-badge">#${status.index + 1}</div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                            </h5>
+                                            <p class="restaurant-type mb-2">
+                                                <i class="fas fa-utensils me-1"></i>
+                                                <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                            </p>
+
+                                            <div class="mb-2">
+                                                <!-- Mostrar siempre las 5 estrellas -->
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
+                                                </c:forEach>
+                                                <span class="ms-1">
+                                                (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
+                                                    <!-- Debug visible solo para desarrolladores -->
+                                                <span style="display: none;">ID: ${restaurante.id}</span>
+                                            </span>
+                                            </div>
+
+                                            <p class="card-text">
+                                                <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="text-center py-3">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No hay restaurantes sugeridos disponibles</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="mt-3 pt-3 border-top">
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Tipo de comida favorita:
+                        <strong>${not empty sessionScope.usuario.tipoComidaFavorita ?
+                                sessionScope.usuario.tipoComidaFavorita : 'No configurada'}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
 
     <!-- Listado de restaurantes -->
     <div class="row" id="restaurantes-container">
@@ -243,6 +340,16 @@ setTimeout(function() {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const seccionRecomendados = document.getElementById('seccionRecomendados');
+        const tieneRecomendados = ${not empty restaurantesRecomendados};
+
+        if (seccionRecomendados && tieneRecomendados) {
+            // Forzar repintado del componente
+            seccionRecomendados.style.display = 'none';
+            setTimeout(() => {
+                seccionRecomendados.style.display = 'block';
+            }, 50);
+        }
         // Manejar el formulario de búsqueda
         const searchForm = document.getElementById('searchForm');
         if (searchForm) {

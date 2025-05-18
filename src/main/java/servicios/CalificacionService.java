@@ -6,6 +6,8 @@ import entidades.Calificacion;
 import entidades.Comensal;
 import entidades.Restaurante;
 import exceptions.ServiceException;
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +22,9 @@ public class CalificacionService {
 
     public void crearCalificacion(Calificacion calificacion) throws ServiceException {
         try {
-            calificacionDAO.crear(calificacion);
+            if (!calificacionDAO.crear(calificacion)) {
+                throw new ServiceException("No se pudo crear la calificación");
+            }
             actualizarPuntajePromedio(calificacion.getRestaurante());
         } catch (Exception e) {
             throw new ServiceException("Error al crear calificación: " + e.getMessage(), e);
@@ -73,7 +77,7 @@ public class CalificacionService {
         try {
             Double nuevoPromedio = calcularPuntajePromedio(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
-            usuarioDAO.save(restaurante);
+            usuarioDAO.save(restaurante);  // Usar el DAO existente para guardar
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }

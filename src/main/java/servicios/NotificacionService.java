@@ -2,7 +2,6 @@ package servicios;
 
 import DAO.NotificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Notificacion;
 import entidades.Restaurante;
@@ -15,10 +14,20 @@ public class NotificacionService {
     private NotificacionDAO notificacionDAO;
     private EntityManagerFactory emf;
 
-    public NotificacionService() {
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
-        notificacionDAO = new NotificacionDAO(emf);
+    public NotificacionService(UsuarioDAO usuarioDAO, NotificacionDAO notificacionDAO) {
+        if (usuarioDAO == null && notificacionDAO == null) {
+            this.emf = null;
+        } else {
+            this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        }
+        this.usuarioDAO = usuarioDAO;
+        this.notificacionDAO = notificacionDAO;
+    }
+
+    private void notificarComensalMenuDia(Comensal comensal, String nombreRestaurante) {
+        comensal.agregarNotificacion(
+                "El restaurante " + nombreRestaurante + " ha publicado un nuevo menú del día:");
+        usuarioDAO.save(comensal);
     }
 
     public boolean notificarComensalesMenuDia(Restaurante restaurante) {
@@ -28,9 +37,7 @@ public class NotificacionService {
             }
             restaurante.getSuscripciones().forEach(suscripcion -> {
                 Comensal comensal = suscripcion.getComensal();
-                comensal.agregarNotificacion(
-                        "El restaurante " + restaurante.getNombre() + " ha publicado un nuevo menú del día:");
-                usuarioDAO.save(comensal);
+                notificarComensalMenuDia(comensal, restaurante.getNombre());
             });
             return true;
         } catch (Exception e) {
@@ -38,13 +45,22 @@ public class NotificacionService {
         }
     }
 
-    public boolean marcarNotificacionComoLeida(Notificacion notificacion) {
+    public Boolean marcarComoLeida(Notificacion notificacion) {
+        if (notificacion != null && !notificacion.isLeida()) {
+            notificacion.setLeida(true);
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean marcarNotificacionComoLeida(Notificacion notificacion) {
         if (notificacion != null && notificacion.getId() != null) {
             Notificacion notifBD = notificacionDAO.buscarPorId(notificacion.getId());
             if (notifBD != null && !notifBD.isLeida()) {
-                notifBD.setLeida(true);
-                notificacionDAO.actualizar(notifBD);
-                return true;
+                if (marcarComoLeida(notifBD)) {
+                    notificacionDAO.actualizar(notifBD);
+                    return true;
+                }
             }
         }
         return false;

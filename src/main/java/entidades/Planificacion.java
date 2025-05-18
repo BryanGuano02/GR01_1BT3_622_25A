@@ -1,6 +1,5 @@
 package entidades;
 
-
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -15,11 +14,7 @@ public class Planificacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToMany
-    @JoinTable(
-            name = "planificacion_comensal",
-            joinColumns = @JoinColumn(name = "planificacion_id"),
-            inverseJoinColumns = @JoinColumn(name = "comensal_id")
-    )
+    @JoinTable(name = "planificacion_comensal", joinColumns = @JoinColumn(name = "planificacion_id"), inverseJoinColumns = @JoinColumn(name = "comensal_id"))
     private List<Comensal> comensales = new ArrayList<>();
 
     @ManyToOne
@@ -86,16 +81,16 @@ public class Planificacion {
         if (this.comensales == null) {
             this.comensales = new ArrayList<>();
         }
-
-        // Verifica si el comensal ya existe
-        if (this.comensales.stream().anyMatch(c -> c.getId().equals(comensal.getId()))) {
+        if (this.comensales.contains(comensal)) {
             throw new IllegalArgumentException("El comensal ya está en esta planificación");
         }
-
         this.comensales.add(comensal);
     }
-    public void setEstado(String estado) {}
-    public String getEstado() { return estado; }
+
+
+    public String getEstado() {
+        return estado;
+    }
 
     public Comensal getComensalPlanificador() {
         return comensalPlanificador;
@@ -103,5 +98,9 @@ public class Planificacion {
 
     public void setComensalPlanificador(Comensal comensalPlanificador) {
         this.comensalPlanificador = comensalPlanificador;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

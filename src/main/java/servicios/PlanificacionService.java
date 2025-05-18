@@ -17,15 +17,21 @@ import java.util.stream.Collectors;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
-    private final CalificacionDAO calificacionDAO;
     private final UsuarioDAOImpl usuarioDAO;
+
     private final NotificacionServiceInterface notificacionService;
 
-    public PlanificacionService() {
-        this.planificacionDAO = new PlanificacionDAO();
-        this.calificacionDAO = new CalificacionDAO();
+    private EntityManagerFactory emf;
 
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
+
+    public PlanificacionService(PlanificacionDAO planificacionDAO) {
+        if (planificacionDAO == null) {
+            this.emf = null;
+        } else {
+            this.emf = Persistence.createEntityManagerFactory("UFood_PU");
+        }
+        this.planificacionDAO = planificacionDAO;
+
         this.usuarioDAO = new UsuarioDAOImpl(emf);
         notificacionService = null;
 
@@ -33,22 +39,24 @@ public class PlanificacionService {
     // Para el test
     public PlanificacionService(NotificacionServiceInterface notificacionService) {
         this.planificacionDAO = null;
-        this.calificacionDAO = null;
+        //this.calificacionDAO = null;
         this.usuarioDAO = null;
         this.notificacionService = notificacionService;
     }
 
 
-    public Planificacion crearPlanificacion(String nombre, String hora, Long idComensalPlanificador) {
+    public Planificacion crearPlanificacion(String nombre, String hora, Comensal comensal) {
         validarParametrosCreacion(nombre, hora);
         Planificacion planificacion = new Planificacion(nombre, hora);
-        Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensalPlanificador);
         if (comensal == null) {
             throw new IllegalArgumentException("Comensal no encontrado");
         }
         planificacion.setComensalPlanificador(comensal);
-        planificacionDAO.crear(planificacion);
         return planificacion;
+    }
+
+    public void guardarPlanificacion(Planificacion planificacion) {
+        planificacionDAO.save(planificacion);
     }
 
     private void validarParametrosCreacion(String nombre, String hora) {
@@ -60,27 +68,13 @@ public class PlanificacionService {
         }
     }
 
-
-    public Boolean agregarComensales(Long planificacionId, List<Long> comensalIds) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-
-            Planificacion planificacion = findPlanificacion(em, planificacionId);
-            agregarComensalesALaPlanificacion(em, planificacion, comensalIds);
-
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            e.printStackTrace();
-            return false;
-        } finally {
-            em.close();
-            emf.close();
+    public Boolean agregarComensales(Planificacion planificacion, List<Comensal> comensales) {
+        for (Comensal comensal : comensales) {
+            if (comensal != null) {
+                planificacion.addComensal(comensal);
+            }
         }
+        return true;
     }
 
     private Planificacion findPlanificacion(EntityManager em, Long planificacionId) {
@@ -91,16 +85,7 @@ public class PlanificacionService {
         return planificacion;
     }
 
-    private void agregarComensalesALaPlanificacion(EntityManager em, Planificacion planificacion, List<Long> comensalIds) {
-        for (Long comensalId : comensalIds) {
-            Comensal comensal = em.find(Comensal.class, comensalId);
-            if (comensal != null) {
-                planificacion.addComensal(comensal);
-            }
-        }
-    }
-
-    public Boolean recomendarRestaurante(Restaurante restaurante){
+    public Boolean recomendarRestaurante(Restaurante restaurante) {
         final Double PUNTAJE_MINIMO = 3.5;
         final Double DISTANCIA_MAXIMA = 5.0;
         final int TIEMPO_MAXIMO_ESPERA = 30;
@@ -108,7 +93,8 @@ public class PlanificacionService {
         if (restaurante == null) {
             throw new IllegalArgumentException("El restaurante no puede ser nulo");
         }
-        if (restaurante.getPuntajePromedio() == null || restaurante.getDistanciaUniversidad() == null || restaurante.getTiempoEspera() == 0) {
+        if (restaurante.getPuntajePromedio() == null || restaurante.getDistanciaUniversidad() == null
+                || restaurante.getTiempoEspera() == 0) {
             throw new IllegalArgumentException("Los atributos del restaurante no pueden ser nulos");
         }
 
@@ -117,8 +103,7 @@ public class PlanificacionService {
                 && restaurante.getTiempoEspera() <= TIEMPO_MAXIMO_ESPERA;
     }
 
-    public int calcularMinutosRestantesParaVotacion(LocalDateTime ahora, LocalDateTime horaLimite ) {
-
+    public int calcularMinutosRestantesParaVotacion(LocalDateTime ahora, LocalDateTime horaLimite) {
 
         return (int) Duration.between(ahora, horaLimite).toMinutes();
     }
@@ -131,28 +116,21 @@ public class PlanificacionService {
                 .orElse(null);
 
     }
-    public void cancelarPlanificacion(Long planificacionId) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            Planificacion planificacion = findPlanificacion(em, planificacionId);
-            List<Comensal> comensales = planificacion.getComensales();
 
-            for (Comensal comensal : comensales) {
-                notificar(comensal, "La planificación ha sido cancelada");
-            }
+    public void cancelarPlanificacion(Planificacion planificacion) {
+        // List<Comensal> comensales = planificacion.getComensales();
 
-            em.remove(planificacion);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            e.printStackTrace();
-        } finally {
-            em.close();
-            emf.close();
+        // for (Comensal comensal : comensales) {
+        // notificar(comensal, "La planificación ha sido cancelada");
+        // }
+
+        if (planificacion == null) {
+            throw new IllegalArgumentException("La planificación no puede ser nula");
         }
+        if (!"Activa".equalsIgnoreCase(planificacion.getEstado())) {
+            throw new IllegalStateException("Solo se puede cancelar una planificación activa");
+        }
+        planificacion.setEstado("Cancelado");
     }
 
     public Restaurante resolverEmpateEnVotacion(Map<Restaurante, Integer> votos) {

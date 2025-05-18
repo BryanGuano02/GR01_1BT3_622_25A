@@ -3,7 +3,7 @@ package servlets;
 import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Restaurante;
-import entidades.Usuario;  // Importación añadida
+import entidades.Usuario;
 import exceptions.ServiceException;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -25,7 +25,8 @@ public class SvAuth extends HttpServlet {
             if (emf == null) {
                 emf = Persistence.createEntityManagerFactory("UFood_PU");
             }
-            this.authService = new AuthServiceImpl(new UsuarioDAOImpl(emf));
+            UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+            this.authService = new AuthServiceImpl(usuarioDAO);
         } catch (Exception e) {
             throw new ServletException("Error al inicializar JPA", e);
         }
@@ -43,61 +44,91 @@ public class SvAuth extends HttpServlet {
 
         String path = request.getServletPath();
 
-        if ("/login".equals(path)) {
-            String nombreUsuario = request.getParameter("nombreUsuario");
-            String contrasena = request.getParameter("contrasena");
-
-            try {
-                Usuario usuario = authService.login(nombreUsuario, contrasena);
-                HttpSession session = request.getSession();
-                session.setAttribute("usuario", usuario);
-
-                // Si el usuario es Comensal, guardar notificaciones en sesión
-                if (usuario instanceof Comensal) {
-                    Comensal comensal = (Comensal) usuario;
-                    session.setAttribute("notificaciones", comensal.getNotificaciones());
-                }
-
-                if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
-                    response.sendRedirect("crearRestaurante.jsp");
-                } else {
-                    response.sendRedirect("index.jsp");
-                }
-            } catch (ServiceException e) {
-                request.setAttribute("error", e.getMessage());
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
-            }
+        switch (path) {
+            case "/login":
+                handleLogin(request, response);
+                break;
+            case "/registro-restaurante":
+                handleRestauranteRegistration(request, response);
+                break;
+            case "/registro-comensal":
+                handleComensalRegistration(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
-        else if ("/registro-restaurante".equals(path)) {
-            Restaurante restaurante = new Restaurante(
-                    request.getParameter("nombreUsuario"),
-                    request.getParameter("contrasena"),
-                    request.getParameter("email"),
-                    request.getParameter("nombreComercial"),
-                    request.getParameter("tipoComida")
-            );
+    }
 
-            try {
-                authService.registrarUsuarioRestaurante(restaurante);  // Método actualizado
-                response.sendRedirect("login.jsp?registroExitoso=true");
-            } catch (ServiceException e) {
-                request.setAttribute("error", e.getMessage());
-                request.getRequestDispatcher("/registro-restaurante.jsp").forward(request, response);
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String nombreUsuario = request.getParameter("nombreUsuario");
+        String contrasena = request.getParameter("contrasena");
+
+        try {
+            Usuario usuario = authService.login(nombreUsuario, contrasena);
+            HttpSession session = request.getSession();
+            session.setAttribute("usuario", usuario);
+
+            // Redirección según tipo de usuario
+            if (usuario instanceof Comensal) {
+                Comensal comensal = (Comensal) usuario;
+                session.setAttribute("notificaciones", comensal.getNotificaciones());
+                response.sendRedirect("inicio"); // La lógica de recomendaciones ahora está en SvIndex
+            } else if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
+                response.sendRedirect("crearRestaurante.jsp");
             }
+        } catch (ServiceException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
-        else if ("/registro-comensal".equals(path)) {
-            try {
-                Comensal comensal = new Comensal();
-                comensal.setNombreUsuario(request.getParameter("nombreUsuario"));
-                comensal.setContrasena(request.getParameter("contrasena"));
-                comensal.setEmail(request.getParameter("email"));
+    }
 
-                authService.registrarComensal(comensal);
-                response.sendRedirect("login.jsp?registroExitoso=true");
-            } catch (ServiceException e) {
-                request.setAttribute("error", e.getMessage());
-                request.getRequestDispatcher("/registro.jsp").forward(request, response);
+    private void handleRestauranteRegistration(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            // Crear instancia de Restaurante en lugar de Usuario
+            Restaurante restaurante = new Restaurante();
+            restaurante.setNombreUsuario(request.getParameter("nombreUsuario"));
+            restaurante.setContrasena(request.getParameter("contrasena"));
+            restaurante.setEmail(request.getParameter("email"));
+            restaurante.setTipoUsuario("RESTAURANTE");
+
+            authService.registrarUsuarioRestaurante(restaurante);
+            response.sendRedirect("login.jsp?registroExitoso=true");
+        } catch (ServiceException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/registro-restaurante.jsp").forward(request, response);
+        }
+    }
+
+    private void handleComensalRegistration(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String tipoComidaFavorita = request.getParameter("tipoComidaFavorita");
+            if (tipoComidaFavorita == null || tipoComidaFavorita.trim().isEmpty()) {
+                tipoComidaFavorita = "General";
             }
+
+            // Crear instancia de Comensal en lugar de Usuario
+            Comensal comensal = new Comensal();
+            comensal.setNombreUsuario(request.getParameter("nombreUsuario"));
+            comensal.setContrasena(request.getParameter("contrasena"));
+            comensal.setEmail(request.getParameter("email"));
+            comensal.setTipoComidaFavorita(tipoComidaFavorita);
+            comensal.setTipoUsuario("COMENSAL");
+
+            authService.registrarComensal(comensal, tipoComidaFavorita);
+            response.sendRedirect("login.jsp?registroExitoso=true");
+        } catch (ServiceException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/registro.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (emf != null && emf.isOpen()) {
+            emf.close();
         }
     }
 }
