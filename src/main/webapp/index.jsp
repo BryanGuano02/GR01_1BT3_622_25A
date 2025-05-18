@@ -243,7 +243,21 @@
                                                 </div>
                                             </c:if>
                                         </c:forEach>
+                                        <c:if test="${not empty restaurante.menuDelDia}">
+                                            <div class="position-relative alert alert-info">
+                                                <strong>Menú del Día:</strong>
+                                                <pre style="white-space: pre-wrap;" class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
+
+                                                <!-- Botón de Like -->
+                                                <button class="btn-like position-absolute"
+                                                        data-id="${restaurante.id}"
+                                                        title="Me gusta">
+                                                    <i class="fas fa-heart"></i>
+                                                </button>
+                                            </div>
+                                        </c:if>
                                     </div>
+
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar
                                         </button>
@@ -446,7 +460,44 @@ setTimeout(function() {
                 new bootstrap.Modal(modalEl);
             });
         }
+        document.querySelectorAll('.btn-like').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (btn.classList.contains('clicked')) return;
+
+                const idRestaurante = btn.getAttribute('data-id');
+                console.log('Like enviado para restaurante con ID:', idRestaurante);
+
+                fetch('${pageContext.request.contextPath}/SvMenuDelDia', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'id=' + encodeURIComponent(idRestaurante)
+                });
+
+                btn.classList.add('clicked');
+            });
+        });
     }
+    <%--document.addEventListener('DOMContentLoaded', function () {--%>
+    <%--    document.querySelectorAll('.btn-like').forEach(function (btn) {--%>
+    <%--        btn.addEventListener('click', function () {--%>
+    <%--            if (btn.classList.contains('clicked')) return;--%>
+
+    <%--            const idRestaurante = btn.getAttribute('data-id');--%>
+
+    <%--            fetch('${pageContext.request.contextPath}/SvMenuDelDia', {--%>
+    <%--                method: 'POST',--%>
+    <%--                headers: {--%>
+    <%--                    'Content-Type': 'application/x-www-form-urlencoded'--%>
+    <%--                },--%>
+    <%--                body: 'id=' + encodeURIComponent(idRestaurante)--%>
+    <%--            });--%>
+
+    <%--            btn.classList.add('clicked'); // Asegúrate de que esto se ejecuta--%>
+    <%--        });--%>
+    <%--    });--%>
+    <%--});--%>
 </script>
 </body>
 </html>

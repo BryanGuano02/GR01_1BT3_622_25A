@@ -15,25 +15,27 @@ public class PlanificacionRestauranteMocked {
     @Test
     public void given_confirmed_restaurante_when_give_notification_then_expect_confirmed() {
         // Arrange
-        PlanificacionService servicioSpy = spy(PlanificacionService.class);
+        NotificacionServiceInterface notificacionMock = mock(NotificacionServiceInterface.class);
+        PlanificacionService planificacionService = new PlanificacionService(notificacionMock);
 
-        Comensal comensal1 = new Comensal();
+        Comensal comensal1 = new Comensal( );
         Comensal comensal2 = new Comensal();
+        comensal1.setId(1L);
+        comensal2.setId(2L);
 
-        Planificacion planificacion = new Planificacion("Almuerzo", "13:00");
+        Planificacion planificacion = new Planificacion("13:00", "Almuerzo" );
         planificacion.addComensal(comensal1);
         planificacion.addComensal(comensal2);
-
 
         String restauranteSeleccionado = "Poli Burguer";
 
         // Act
-        doNothing().when(servicioSpy).notificar(any(Comensal.class), anyString());
+        planificacionService.confirmarRestauranteDelGrupo(planificacion, restauranteSeleccionado);
 
-        // Assert: verifica que se haya notificado a ambos usuarios
-        verify(servicioSpy).notificar(comensal1, "Se ha confirmado: Poli Burguer");
-        verify(servicioSpy).notificar(comensal2, "Se ha confirmado: Poli Burguer");
-        verifyNoMoreInteractions(servicioSpy);
+        // Assert
+        verify(notificacionMock).notificarRestauranteElegido(comensal1, "Se ha confirmado: Poli Burguer");
+        verify(notificacionMock).notificarRestauranteElegido(comensal2, "Se ha confirmado: Poli Burguer");
+        verifyNoMoreInteractions(notificacionMock);
     }
 
 //    @Test
