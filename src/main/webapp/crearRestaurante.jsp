@@ -68,6 +68,22 @@
                         <%= restauranteUsuario.getHoraApertura() %> - <%= restauranteUsuario.getHoraCierre() %>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Tiempo de Espera (minutos)</label>
+                    <div class="view-content"><%= restauranteUsuario.getTiempoEspera() %></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Calidad (1-5)</label>
+                    <div class="view-content"><%= restauranteUsuario.getCalidad() %></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Precio (1-5)</label>
+                    <div class="view-content"><%= restauranteUsuario.getPrecio() %></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Distancia a la Universidad (km)</label>
+                    <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "N/A" %></div>
+                </div>
                 <button id="btnEditar" class="btn btn-primary">
                     <i class="fas fa-edit me-2"></i> Editar Información
                 </button>
@@ -109,6 +125,22 @@
                             <input type="time" class="form-control ms-2" style="width: 150px;" name="horaCierre" required value="<%= restauranteUsuario.getHoraCierre() %>">
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="tiempoEspera" class="form-label">Tiempo de Espera (minutos)</label>
+                        <input type="number" class="form-control" name="tiempoEspera" id="tiempoEspera" required min="0" value="<%= restauranteUsuario.getTiempoEspera() %>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="calidad" class="form-label">Calidad (1-5)</label>
+                        <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" value="<%= restauranteUsuario.getCalidad() %>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="precio" class="form-label">Precio (1-5)</label>
+                        <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" value="<%= restauranteUsuario.getPrecio() %>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
+                        <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" value="<%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "" %>">
+                    </div>
                     <div class="d-flex justify-content-between">
                         <button type="button" id="btnCancelarEdicion" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i> Cancelar
@@ -140,8 +172,8 @@
                     <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
                 </select>
                 <div class="mb-3">
-                    <label for="precio" class="form-label">Precio Promedio</label>
                     <input type="number" class="form-control"  name="precio" id="precio" required placeholder="Ej: 10.00">
+                    <label for="precio" class="form-label">Precio Promedio</label>
                 </div>
                 <div class="mb-3">
                     <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
@@ -156,6 +188,22 @@
                         <span class="mx-2">a</span>
                         <input type="time" class="form-control ms-2" style="width: 150px;" name="horaCierre" required>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label for="tiempoEspera" class="form-label">Tiempo de Espera (minutos)</label>
+                    <input type="number" class="form-control" name="tiempoEspera" id="tiempoEspera" required min="0" placeholder="Ej: 15">
+                </div>
+                <div class="mb-3">
+                    <label for="calidad" class="form-label">Calidad (1-5)</label>
+                    <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" placeholder="Ej: 4">
+                </div>
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio (1-5)</label>
+                    <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" placeholder="Ej: 3">
+                </div>
+                <div class="mb-3">
+                    <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
+                    <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" placeholder="Ej: 1.5">
                 </div>
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     <i class="fas fa-save me-2"></i> Registrar Restaurante
