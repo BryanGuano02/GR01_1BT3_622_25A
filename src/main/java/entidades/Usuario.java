@@ -1,7 +1,6 @@
 package entidades;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
