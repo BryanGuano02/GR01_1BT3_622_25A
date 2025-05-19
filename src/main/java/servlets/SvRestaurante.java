@@ -274,6 +274,7 @@ public class SvRestaurante extends HttpServlet {
 // 4
 // 5
 // 6
+// 7
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
