@@ -97,26 +97,26 @@
                         <td>${restaurante1.horaApertura} - ${restaurante1.horaCierre}</td>
                         <td>${restaurante2.horaApertura} - ${restaurante2.horaCierre}</td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td>Puntaje Promedio</td>
                         <td>${restaurante1.puntajePromedio} ★</td>
                         <td>${restaurante2.puntajePromedio} ★</td>
-                    </tr>
-                    <tr>
+                    </tr> -->
+                    <!-- <tr>
                         <td>Tiempo de Espera</td>
                         <td>${restaurante1.tiempoEspera} minutos</td>
                         <td>${restaurante2.tiempoEspera} minutos</td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <td>Distancia Universidad</td>
                         <td>${restaurante1.distanciaUniversidad} km</td>
                         <td>${restaurante2.distanciaUniversidad} km</td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td>Calidad</td>
                         <td>${restaurante1.calidad}🍴</td>
                         <td>${restaurante2.calidad}🍴</td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <td>Precio</td>
                         <td>${restaurante1.precio}$</td>

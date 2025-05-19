@@ -182,6 +182,9 @@ public class SvRestaurante extends HttpServlet {
             restauranteUsuario.setTipoComida(req.getParameter("tipoComida"));
             restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
             restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
+            restauranteUsuario.setDistanciaUniversidad(
+                    Double.parseDouble(req.getParameter("distanciaUniversidad")));
+            restauranteUsuario.setPrecio(Integer.parseInt(req.getParameter("precio")));
 
             usuarioDAO.save(restauranteUsuario);
 
@@ -230,7 +233,8 @@ public class SvRestaurante extends HttpServlet {
             String tipoComida = req.getParameter("tipoComida");
             String horaApertura = req.getParameter("horaApertura");
             String horaCierre = req.getParameter("horaCierre");
-
+            Double distanciaUniversidad = Double.parseDouble(req.getParameter("distanciaUniversidad"));
+            int precio = Integer.parseInt(req.getParameter("precio"));
             if (nombre != null)
                 restauranteUsuario.setNombre(nombre);
             if (descripcion != null)
@@ -241,6 +245,10 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setHoraApertura(LocalTime.parse(horaApertura));
             if (horaCierre != null)
                 restauranteUsuario.setHoraCierre(LocalTime.parse(horaCierre));
+            if (distanciaUniversidad != null)
+                restauranteUsuario.setDistanciaUniversidad(distanciaUniversidad);
+            if (precio > 0)
+                restauranteUsuario.setPrecio(precio);
 
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
