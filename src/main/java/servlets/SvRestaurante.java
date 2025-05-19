@@ -260,14 +260,14 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setPrecio(precio);
 
             // Procesar nuevos campos
-            if (tiempoEspera != null && !tiempoEspera.isEmpty())
-                restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
-            if (calidad != null && !calidad.isEmpty())
-                restauranteUsuario.setCalidad(Integer.parseInt(calidad));
-            if (precio != null && !precio.isEmpty())
-                restauranteUsuario.setPrecio(Integer.parseInt(precio));
-            if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
+            // if (tiempoEspera != null && !tiempoEspera.isEmpty())
+            //     restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
+            // if (calidad != null && !calidad.isEmpty())
+            //     restauranteUsuario.setCalidad(Integer.parseInt(calidad));
+            // if (precio != null && !precio.isEmpty())
+            //     restauranteUsuario.setPrecio(Integer.parseInt(precio));
+            // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
+            //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
 
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
