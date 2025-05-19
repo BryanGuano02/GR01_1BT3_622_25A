@@ -53,31 +53,46 @@ public class CalificacionService {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
-            Calificacion calificacion = new Calificacion();
-            calificacion.setPuntaje(puntaje);
-            calificacion.setComentario(comentario);
-            calificacion.setComensal(comensal);
-            calificacion.setRestaurante(restaurante);
+            // Buscar si ya existe una calificación previa del mismo comensal para el mismo
+            // restaurante
+            Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(idComensal,
+                    idRestaurante);
 
-            crearCalificacion(calificacion);
+            if (calificacionExistente != null) {
+
+                System.out.println("Calificación id existente: " + calificacionExistente.getId() + " - comentario:"
+                        + calificacionExistente.getComentario());
+                // Actualizar la calificación existente
+                calificacionExistente.setPuntaje(puntaje);
+                calificacionExistente.setComentario(comentario);
+
+                if (!calificacionDAO.actualizar(calificacionExistente)) {
+                    throw new ServiceException("No se pudo actualizar la calificación existente");
+                }
+
+                // Actualizar el promedio del restaurante
+                actualizarPuntajePromedio(restaurante);
+            } else {
+                // Crear una nueva calificación
+                Calificacion nuevaCalificacion = new Calificacion();
+                nuevaCalificacion.setPuntaje(puntaje);
+                nuevaCalificacion.setComentario(comentario);
+                nuevaCalificacion.setComensal(comensal);
+                nuevaCalificacion.setRestaurante(restaurante);
+
+                crearCalificacion(nuevaCalificacion);
+            }
         } catch (Exception e) {
             throw new ServiceException("Error al procesar la calificación: " + e.getMessage(), e);
         }
     }
 
-    public Double calcularPuntajePromedio(Long restauranteId) {
-        try {
-            return calificacionDAO.calcularPromedioCalificaciones(restauranteId);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al calcular promedio", e);
-        }
-    }
-
     private void actualizarPuntajePromedio(Restaurante restaurante) {
         try {
-            Double nuevoPromedio = calcularPuntajePromedio(restaurante.getId());
+            Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
+            System.out.println("Nuevo promedio calculado: " + nuevoPromedio);
             restaurante.setPuntajePromedio(nuevoPromedio);
-            usuarioDAO.save(restaurante);  // Usar el DAO existente para guardar
+            usuarioDAO.save(restaurante); // Usar el DAO existente para guardar
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }

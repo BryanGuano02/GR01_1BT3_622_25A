@@ -60,13 +60,21 @@ public class CalificacionDAO {
         EntityManager em = null;
         try {
             em = emf.createEntityManager();
+            // Usamos JOIN FETCH para cargar tanto el restaurante como el comensal de cada
+            // calificación
+            // Esto evita problemas de LazyInitializationException si las entidades se
+            // utilizan luego fuera de la sesión
             TypedQuery<Calificacion> query = em.createQuery(
-                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante ORDER BY c.id DESC",
+                    "SELECT c FROM Calificacion c " +
+                            "JOIN FETCH c.restaurante r " +
+                            "JOIN FETCH c.comensal " +
+                            "WHERE r.id = :idRestaurante " +
+                            "ORDER BY c.id DESC",
                     Calificacion.class);
             query.setParameter("idRestaurante", idRestaurante);
             return query.getResultList();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones por restaurante", e);
+            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones para el restaurante ID: " + idRestaurante, e);
             return new ArrayList<>();
         } finally {
             if (em != null && em.isOpen()) {
@@ -115,18 +123,96 @@ public class CalificacionDAO {
     }
 
     public Double calcularPromedioCalificaciones(Long idRestaurante) {
+        System.out.println("Calculando promedio de calificaciones para el restaurante ID: " + idRestaurante);
+        try {
+            // Verificamos que el restaurante exista
+            if (idRestaurante == null) {
+                System.out.println("ID de restaurante es nulo, retornando 0.0");
+                return 0.0;
+            }
+
+            // Obtener todas las calificaciones para este restaurante
+            List<Calificacion> calificaciones = this.obtenerCalificacionesPorRestaurante(idRestaurante);
+
+            System.out.println("Número de calificaciones encontradas para restaurante ID " + idRestaurante + ": " + calificaciones.size());
+
+            if (calificaciones.isEmpty()) {
+                System.out.println("No hay calificaciones para este restaurante, retornando 0.0");
+                return 0.0;
+            }
+
+            // Calcular promedio manualmente
+            double suma = 0.0;
+            int contador = 0;
+
+            for (Calificacion c : calificaciones) {
+                System.out.println("  - ID: " + c.getId() + ", Puntaje: " + c.getPuntaje());
+                if (c.getPuntaje() != null) {
+                    suma += c.getPuntaje();
+                    contador++;
+                }
+            }
+
+            if (contador == 0) {
+                System.out.println("No hay calificaciones con puntaje válido, retornando 0.0");
+                return 0.0;
+            }
+
+            Double promedio = suma / contador;
+            System.out.println("Promedio calculado manualmente: " + promedio);
+
+            return promedio;
+        } catch (Exception e) {
+            System.out.println("Excepción al calcular promedio: " + e.getMessage());
+            e.printStackTrace();
+            LOGGER.log(Level.WARNING,
+                    "Error al calcular promedio de calificaciones para el restaurante ID: " + idRestaurante, e);
+            return 0.0;
+        }
+    }
+    // public Double calcularPromedioCalificaciones(Long idRestaurante) {
+    //     EntityManager em = null;
+    //     try {
+    //         em = emf.createEntityManager();
+    //         // Primero verificamos que el restaurante exista
+    //         if (idRestaurante == null) {
+    //             return 0.0;
+    //         }
+
+    //         // Usamos JOIN FETCH para cargar completamente el restaurante con sus relaciones
+    //         TypedQuery<Double> query = em.createQuery(
+    //                 "SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+    //                 Double.class);
+    //         query.setParameter("idRestaurante", idRestaurante);
+
+    //         Double promedio = query.getSingleResult();
+    //         return promedio != null ? promedio : 0.0;
+    //     } catch (Exception e) {
+    //         LOGGER.log(Level.WARNING,
+    //                 "Error al calcular promedio de calificaciones para el restaurante ID: " + idRestaurante, e);
+    //         return 0.0;
+    //     } finally {
+    //         if (em != null && em.isOpen()) {
+    //             em.close();
+    //         }
+    //     }
+    // }
+
+    public Calificacion obtenerCalificacionPorComensalYRestaurante(Long idComensal, Long idRestaurante) {
         EntityManager em = null;
         try {
             em = emf.createEntityManager();
-            TypedQuery<Double> query = em.createQuery(
-                    "SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
-                    Double.class);
+            TypedQuery<Calificacion> query = em.createQuery(
+                    "SELECT c FROM Calificacion c WHERE c.comensal.id = :idComensal AND c.restaurante.id = :idRestaurante",
+                    Calificacion.class);
+            query.setParameter("idComensal", idComensal);
             query.setParameter("idRestaurante", idRestaurante);
-            Double promedio = query.getSingleResult();
-            return promedio != null ? promedio : 0.0;
+
+            List<Calificacion> resultados = query.getResultList();
+            return resultados.isEmpty() ? null : resultados.get(0);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error al calcular promedio de calificaciones", e);
-            return 0.0;
+            LOGGER.log(Level.SEVERE, "Error al obtener calificación por comensal y restaurante", e);
+            return null;
         } finally {
             if (em != null && em.isOpen()) {
                 em.close();
