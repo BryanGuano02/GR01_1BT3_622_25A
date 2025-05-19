@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MenuDelDiaTest {
+public class MenuDelDiaTest {
 
     private MenuDelDiaService menuDelDiaService;
     private Restaurante restauranteMock;
@@ -69,5 +69,28 @@ class MenuDelDiaTest {
         menuDelDiaService.sumarVoto(1L);
 
         assertEquals(1, restauranteMock.getMenuDelDia().getCantidadVotos());
+    }
+        @Test
+    void givenRestauranteWithMenu_whenGuardarMenuDelDia_thenSobrescribeMenu() {
+        restauranteMock.getMenuDelDia().setDescripcion("Antiguo menú");
+        Restaurante actualizado = menuDelDiaService.guardarMenuDelDia("Nuevo menú", 1L);
+
+        assertNotNull(actualizado.getMenuDelDia());
+        assertEquals("Nuevo menú", actualizado.getMenuDelDia().getDescripcion());
+    }
+
+    @Test
+    void givenRestauranteWithoutMenu_whenSumarVoto_thenThrowsNullPointerException() {
+        restauranteMock.setMenuDelDia(null);
+
+        assertThrows(NullPointerException.class, () -> menuDelDiaService.sumarVoto(1L));
+    }
+
+    @Test
+    void givenRestauranteWithMenu_whenGuardarMenuDelDia_thenVoteCountResets() {
+        restauranteMock.getMenuDelDia().setCantidadVotos(5);
+        Restaurante actualizado = menuDelDiaService.guardarMenuDelDia("Menú reiniciado", 1L);
+
+        assertEquals(0, actualizado.getMenuDelDia().getCantidadVotos());
     }
 }

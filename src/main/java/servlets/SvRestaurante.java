@@ -180,6 +180,21 @@ public class SvRestaurante extends HttpServlet {
             restauranteUsuario.setTipoComida(req.getParameter("tipoComida"));
             restauranteUsuario.setHoraApertura(LocalTime.parse(req.getParameter("horaApertura")));
             restauranteUsuario.setHoraCierre(LocalTime.parse(req.getParameter("horaCierre")));
+            restauranteUsuario.setDistanciaUniversidad(
+                    Double.parseDouble(req.getParameter("distanciaUniversidad")));
+            restauranteUsuario.setPrecio(Integer.parseInt(req.getParameter("precio")));
+
+            // Procesar nuevos campos
+            try {
+                restauranteUsuario.setTiempoEspera(Integer.parseInt(req.getParameter("tiempoEspera")));
+                restauranteUsuario.setCalidad(Integer.parseInt(req.getParameter("calidad")));
+                restauranteUsuario.setPrecio(Integer.parseInt(req.getParameter("precio")));
+                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(req.getParameter("distanciaUniversidad")));
+            } catch (NumberFormatException e) {
+                // Manejar errores de conversión
+                resp.sendRedirect(req.getContextPath() + "/restaurante?error=Formato+inválido+en+campos+numéricos");
+                return;
+            }
 
             // Procesar nuevos campos
             try {
@@ -238,10 +253,14 @@ public class SvRestaurante extends HttpServlet {
             String tipoComida = req.getParameter("tipoComida");
             String horaApertura = req.getParameter("horaApertura");
             String horaCierre = req.getParameter("horaCierre");
+
             String tiempoEspera = req.getParameter("tiempoEspera");
             String calidad = req.getParameter("calidad");
             String precio = req.getParameter("precio");
             String distanciaUniversidad = req.getParameter("distanciaUniversidad");
+            Double distanciaUniversidad = Double.parseDouble(req.getParameter("distanciaUniversidad"));
+            int precio = Integer.parseInt(req.getParameter("precio"));
+
 
             if (nombre != null)
                 restauranteUsuario.setNombre(nombre);
@@ -253,8 +272,13 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setHoraApertura(LocalTime.parse(horaApertura));
             if (horaCierre != null)
                 restauranteUsuario.setHoraCierre(LocalTime.parse(horaCierre));
+            if (distanciaUniversidad != null)
+                restauranteUsuario.setDistanciaUniversidad(distanciaUniversidad);
+            if (precio > 0)
+                restauranteUsuario.setPrecio(precio);
 
             // Procesar nuevos campos
+
             if (tiempoEspera != null && !tiempoEspera.isEmpty())
                 restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
             if (calidad != null && !calidad.isEmpty())
@@ -263,6 +287,16 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setPrecio(Integer.parseInt(precio));
             if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
                 restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
+
+
+            // if (tiempoEspera != null && !tiempoEspera.isEmpty())
+            //     restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
+            // if (calidad != null && !calidad.isEmpty())
+            //     restauranteUsuario.setCalidad(Integer.parseInt(calidad));
+            // if (precio != null && !precio.isEmpty())
+            //     restauranteUsuario.setPrecio(Integer.parseInt(precio));
+            // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
+            //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
 
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);

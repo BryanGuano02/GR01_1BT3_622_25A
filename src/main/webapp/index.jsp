@@ -500,9 +500,50 @@ setTimeout(function() {
                 });
 
                 btn.classList.add('clicked'); // esto se debe ejecutar
+                var modal = new bootstrap.Modal(document.getElementById('modalVotoConfirmado'));
+                modal.show();
             });
         });
     });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
+    var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
+    if (modalVotoConfirmado) {
+        modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
+            // Cierra cualquier modal de menú abierto
+            document.querySelectorAll('.modal.show').forEach(function(modal) {
+                if (modal.id.startsWith('menuModal')) {
+                    var bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                }
+            });
+        });
+    }
+});
+</script>
+<!-- Modal de voto confirmado -->
+<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="modalVotoConfirmadoLabel">
+          <i class="fas fa-check-circle me-2"></i>Voto confirmado
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        ¡Tu voto ha sido registrado correctamente!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

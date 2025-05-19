@@ -53,7 +53,21 @@
                 <div class="mb-3">
                     <label class="form-label">Tipo de Comida</label>
                     <div class="view-content"><%= restauranteUsuario.getTipoComida() %></div>
-                </div>                <div class="mb-3">
+
+                </div>                
+                <div class="mb-3">
+
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Precio Promedio</label> 
+                    <div class="view-content"><%= restauranteUsuario.getPrecio() %> </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Distancia de Universidad</label> 
+                    <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() %></div>
+                </div>
+                <div class="mb-3">
+
                     <label class="form-label">Horario de Atención</label>
                     <div class="view-content">
                         <%= restauranteUsuario.getHoraApertura() %> - <%= restauranteUsuario.getHoraCierre() %>
@@ -99,7 +113,19 @@
                             <option value="Comida Costeña" <%= "Comida Costeña".equals(restauranteUsuario.getTipoComida()) ? "selected" : "" %>>🐟 Comida Costeña</option>
                             <option value="Platos a la Carta" <%= "Platos a la Carta".equals(restauranteUsuario.getTipoComida()) ? "selected" : "" %>>🍽️ Platos a la Carta</option>
                         </select>
+
                     </div>                    <div class="mb-3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="precio" class="form-label">Precio Promedio</label>
+                        <input type="number" class="form-control" name="precio" id="precioPromedio" required value="<%= restauranteUsuario.getPrecio() %>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
+                        <input type="number" class="form-control" step="0.01" name="distanciaUniversidad" id="distanciaUniversidad" required value="<%= restauranteUsuario.getDistanciaUniversidad() %>">
+                    </div>
+                    <div class="mb-4">
+
                         <label class="form-label">Horario de Atención</label>
                         <div class="d-flex align-items-center">
                             <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura" required value="<%= restauranteUsuario.getHoraApertura() %>">
@@ -145,7 +171,24 @@
                     <label for="descripcion" class="form-label">Descripción</label>
                     <input type="text" class="form-control" name="descripcion" id="descripcion" required placeholder="Ej: Almuerzos ricos">
                 </div>
+                <label for="tipoComida" class="form-label">Tipo de Comida</label>
+                <select class="form-select" name="tipoComida" id="tipoComida" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="Comida Rápida">🍔 Comida Rápida</option>
+                    <option value="Comida Casera">🍲 Comida Casera</option>
+                    <option value="Comida Costeña">🐟 Comida Costeña</option>
+                    <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
+                </select>
                 <div class="mb-3">
+                    <input type="number" class="form-control"  name="precio" id="precio" required placeholder="Ej: 10.00">
+                    <label for="precio" class="form-label">Precio Promedio</label>
+                </div>
+                <div class="mb-3">
+                    <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
+                    <input type="number" class="form-control" step="0.01" name="distanciaUniversidad" id="distanciaUniversidad" required placeholder="Ej: 5.0">
+                </div>
+                <div class="mb-3">
+
                     <label for="tipoComida" class="form-label">Tipo de Comida</label>
                     <select class="form-select" name="tipoComida" id="tipoComida" required>
                         <option value="" disabled selected>Seleccione una opción</option>
@@ -155,6 +198,10 @@
                         <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
                     </select>
                 </div>                <div class="mb-4">
+
+                </div>
+                <div class="mb-4">
+
                     <label class="form-label">Horario de Atención</label>
                     <div class="d-flex align-items-center">
                         <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura" required>

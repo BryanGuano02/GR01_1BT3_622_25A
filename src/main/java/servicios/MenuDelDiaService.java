@@ -21,23 +21,31 @@ public class MenuDelDiaService {
 
     public Restaurante guardarMenuDelDia(String descripcion, Long idRestaurante) {
 
-        Restaurante restaurante = (Restaurante) usuarioDAO.findById( idRestaurante );
+        Restaurante restaurante = buscarRestaurante(idRestaurante);
         MenuDelDia menuDelDia = new MenuDelDia( descripcion, 0 );
         restaurante.setMenuDelDia(menuDelDia);
-        usuarioDAO.save(restaurante);
+        guardarRestaurante(restaurante);
         return restaurante;
-
 
     }
 
     public void sumarVoto ( Long idRestaurante ) {
 
-        Restaurante restaurante = (Restaurante) usuarioDAO.findById( idRestaurante );
+        Restaurante restaurante = buscarRestaurante(idRestaurante);
         MenuDelDia menuDelDia = restaurante.getMenuDelDia();
         menuDelDia.setCantidadVotos( menuDelDia.getCantidadVotos() + 1 );
-        usuarioDAO.save(restaurante);
+        guardarRestaurante(restaurante);
 
 
     }
+
+    private Restaurante buscarRestaurante(Long id) {
+        return (Restaurante) usuarioDAO.findById(id);
+    }
+
+    private void guardarRestaurante(Restaurante restaurante) {
+        usuarioDAO.save(restaurante);
+    }
+
 
 }
