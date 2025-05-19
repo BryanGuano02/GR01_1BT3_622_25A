@@ -47,7 +47,6 @@ public class SvComparar extends HttpServlet {
                     return;
                 }
 
-                // Obtener restaurantes usando el DAO
                 Restaurante rest1 = (Restaurante) usuarioDAO.findById(id1);
                 Restaurante rest2 = (Restaurante) usuarioDAO.findById(id2);
 
@@ -57,10 +56,16 @@ public class SvComparar extends HttpServlet {
                     return;
                 }
 
-                request.getSession().setAttribute("restaurante1", rest1);
-                request.getSession().setAttribute("restaurante2", rest2);
+                // Realiza la comparación aquí
+                entidades.Comparacion comparacion = new entidades.Comparacion(rest1, rest2);
+                comparacion.realizarComparacion();
 
-                response.sendRedirect(request.getContextPath() + "/resultadoComparacion.jsp");
+                request.setAttribute("restaurante1", rest1);
+                request.setAttribute("restaurante2", rest2);
+                request.setAttribute("comparaciones", comparacion.getComparaciones());
+                request.setAttribute("resultadoFinal", comparacion.getResultadoFinal());
+
+                request.getRequestDispatcher("/resultadoComparacion.jsp").forward(request, response);
             }
         } catch (Exception e) {
             request.setAttribute("error", "Ha ocurrido un error en el proceso");
