@@ -269,6 +269,7 @@ public class SvRestaurante extends HttpServlet {
             // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
             //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
 // 1
+// 2
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
