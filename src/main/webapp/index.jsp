@@ -215,7 +215,7 @@
                                             </button>
                                         </form>
                                     </c:if>
-                                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
+                                    <c:if test="${not empty restaurante.historias or not empty restaurante.menuDelDia }">
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                                 data-bs-target="#menuModal${restaurante.id}">
                                             <i class="fas fa-utensils"></i> Ver Menú
@@ -227,7 +227,7 @@
                     </div>
 
                     <!-- Modal para el menú -->
-                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
+                    <c:if test="${not empty restaurante.historias or not empty restaurante.menuDelDia}">
                         <div class="modal fade" id="menuModal${restaurante.id}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
