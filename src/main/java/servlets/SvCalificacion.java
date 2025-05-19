@@ -117,6 +117,8 @@ public class SvCalificacion extends HttpServlet {
         parametrosCalificacion.put("comentario", req.getParameter("comentario"));
         parametrosCalificacion.put("idComensal", Long.parseLong(req.getParameter("idComensal")));
         parametrosCalificacion.put("idRestaurante", Long.parseLong(req.getParameter("idRestaurante")));
+        // System.out.println("puntucación");
+        // System.out.println("Parametros de calificación: " + parametrosCalificacion.get("puntaje"));
         return parametrosCalificacion;
     }
 
