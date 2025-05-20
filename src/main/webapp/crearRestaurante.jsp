@@ -1,4 +1,4 @@
-<%@ page import="DAO.UsuarioDAOImpl" %>
+<%@ page import="DAO.UsuarioDAO" %>
 <%@ page import="jakarta.persistence.EntityManagerFactory" %>
 <%@ page import="jakarta.persistence.Persistence" %>
 <%@ page import="entidades.Restaurante" %>

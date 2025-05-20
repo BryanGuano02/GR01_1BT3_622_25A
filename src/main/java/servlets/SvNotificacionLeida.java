@@ -2,7 +2,6 @@ package servlets;
 
 import DAO.NotificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Notificacion;
 import jakarta.persistence.EntityManagerFactory;
@@ -22,7 +21,7 @@ public class SvNotificacionLeida extends HttpServlet {
     private NotificacionService notificacionService;
     public SvNotificacionLeida() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAO usuarioDAO = new UsuarioDAOImpl(emf);
+        UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
         NotificacionDAO notificacionDAO = new NotificacionDAO(emf);
         this.notificacionService = new NotificacionService(usuarioDAO, notificacionDAO);
     }

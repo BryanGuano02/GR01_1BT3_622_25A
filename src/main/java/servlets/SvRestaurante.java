@@ -1,7 +1,6 @@
 package servlets;
 
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Usuario;
@@ -28,7 +27,7 @@ public class SvRestaurante extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
     }
 
     @Override

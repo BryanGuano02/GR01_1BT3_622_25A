@@ -2,7 +2,6 @@ package servlets;
 
 import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -25,7 +24,7 @@ public class SvSuscripcion extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
         suscripcionDAO = new SuscripcionDAO();
         suscripcionService = new SuscripcionService(usuarioDAO, suscripcionDAO);
     }

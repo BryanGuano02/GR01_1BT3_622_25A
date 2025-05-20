@@ -2,7 +2,6 @@ package servlets;
 
 import DAO.CalificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
@@ -16,10 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import servicios.RecomendacionService;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet(name = "SvIndex", value = "/inicio")
 public class SvIndex extends HttpServlet {
@@ -31,7 +27,7 @@ public class SvIndex extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
         calificacionDAO = new CalificacionDAO(emf);
         recomendacionService = new RecomendacionService(usuarioDAO, calificacionDAO);
 

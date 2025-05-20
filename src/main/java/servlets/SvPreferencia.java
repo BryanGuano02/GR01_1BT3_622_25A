@@ -1,6 +1,6 @@
 package servlets;
 
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -25,7 +25,7 @@ public class SvPreferencia extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+        UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
         preferenciaService = new PreferenciaService(usuarioDAO);
     }
 

@@ -1,6 +1,6 @@
 package servlets;
 
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.Comensal;
 import entidades.Restaurante;
 import entidades.Usuario;
@@ -25,7 +25,7 @@ public class SvAuth extends HttpServlet {
             if (emf == null) {
                 emf = Persistence.createEntityManagerFactory("UFood_PU");
             }
-            UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+            UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
             this.authService = new AuthServiceImpl(usuarioDAO);
         } catch (Exception e) {
             throw new ServletException("Error al inicializar JPA", e);
