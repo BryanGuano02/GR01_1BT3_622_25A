@@ -10,13 +10,13 @@ import jakarta.persistence.Persistence;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import servicios.AuthServiceImpl;
+import servicios.AuthService;
 
 import java.io.IOException;
 
 @WebServlet(name = "SvAuth", urlPatterns = {"/login", "/registro-restaurante", "/registro-comensal"})
 public class SvAuth extends HttpServlet {
-    private AuthServiceImpl authService;
+    private AuthService authService;
     private static EntityManagerFactory emf;
 
     @Override
@@ -26,7 +26,7 @@ public class SvAuth extends HttpServlet {
                 emf = Persistence.createEntityManagerFactory("UFood_PU");
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
-            this.authService = new AuthServiceImpl(usuarioDAO);
+            this.authService = new AuthService(usuarioDAO);
         } catch (Exception e) {
             throw new ServletException("Error al inicializar JPA", e);
         }
