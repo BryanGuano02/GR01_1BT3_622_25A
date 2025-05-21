@@ -3,6 +3,7 @@
 <%@ page import="jakarta.persistence.Persistence" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
+<%@ page import="entidades.Historia" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -220,10 +221,10 @@
             <% if (!restauranteUsuario.getHistorias().isEmpty()) { %>
             <div class="mb-4">
                 <h5>Menús Registrados</h5>
-                <% for (String menu : restauranteUsuario.getHistorias()) { %>
+                <% for (Historia historia : restauranteUsuario.getHistorias()) { %>
                 <div class="card mb-2">
                     <div class="card-body">
-                        <%= menu %>
+                        <%= historia.getContenido() %>
                     </div>
                 </div>
                 <% } %>

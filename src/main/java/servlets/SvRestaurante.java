@@ -2,6 +2,7 @@ package servlets;
 
 import DAO.UsuarioDAO;
 import entidades.Comensal;
+import entidades.Historia;
 import entidades.Restaurante;
 import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
@@ -210,16 +211,16 @@ public class SvRestaurante extends HttpServlet {
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
             Restaurante restauranteUsuario) throws IOException, ServletException {
         try {
-            String menu = req.getParameter("historia");
+            Historia historia = new Historia(req.getParameter("historia"));
 
-            if (menu == null || menu.trim().isEmpty()) {
+            if (historia == null) {
                 resp.sendRedirect(req.getContextPath() + "/restaurante?error=El+menú+no+puede+estar+vacío");
                 return;
             }
 
             // Obtener el restaurante actualizado
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
-            restaurante.agregarHistoria(menu);
+            restaurante.agregarHistoria(historia);
 
             // Guardar y actualizar la sesión
             usuarioDAO.save(restaurante);

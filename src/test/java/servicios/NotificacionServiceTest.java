@@ -1,9 +1,6 @@
 package servicios;
 
-import entidades.Comensal;
-import entidades.Notificacion;
-import entidades.Restaurante;
-import entidades.Suscripcion;
+import entidades.*;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -28,7 +25,7 @@ public class NotificacionServiceTest {
         restaurante.setId(1L);
         restaurante.setNombre("restaurante1");
         restaurante.setSuscripciones(Collections.singletonList(new Suscripcion(comensal, restaurante)));
-        restaurante.agregarHistoria("Menú del día: Pollo al horno");
+        restaurante.agregarHistoria(new Historia("Menú del día: Pollo al horno"));
 
         when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(true);
 
@@ -42,11 +39,11 @@ public class NotificacionServiceTest {
         // Mock de NotificacionService
         NotificacionService notificacionService = mock(NotificacionService.class);
         Restaurante restaurante = new Restaurante();
-        String menuDia = "Menú del día: Pollo al horno";
+        Historia historia = new Historia("Menú del día: Pollo al horno");
 
         restaurante.setId(2L);
         restaurante.setNombre("restaurante2");
-        restaurante.agregarHistoria(menuDia);
+        restaurante.agregarHistoria(historia);
 
         // Mockea el comportamiento para este caso
         when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(false);
