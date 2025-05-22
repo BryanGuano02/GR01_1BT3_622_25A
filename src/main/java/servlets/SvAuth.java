@@ -14,7 +14,7 @@ import servicios.AuthService;
 
 import java.io.IOException;
 
-@WebServlet(name = "SvAuth", urlPatterns = {"/login", "/registro-restaurante", "/registro-comensal"})
+@WebServlet(name = "SvAuth", urlPatterns = { "/login", "/registro-restaurante", "/registro-comensal" })
 public class SvAuth extends HttpServlet {
     private AuthService authService;
     private static EntityManagerFactory emf;
@@ -35,7 +35,39 @@ public class SvAuth extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Crear usuarios de prueba solo cuando se inicia la aplicación
+        crearUsuarios();
         request.getRequestDispatcher("/login.jsp").forward(request, response);
+    }
+
+    private void crearUsuarios() {
+        try {
+            int numeroComensales = 3;
+            for (int i = 1; i <= numeroComensales; i++) {
+                String nombreUsuario = "c" + i;
+                String contrasena = "c" + i;
+                String email = "c" + i + "@c" + i + ".com";
+                String tipoComidaFavorita = "Comida Rápida";
+
+                // Verificar si ya existe el usuario
+                if (authService.usuarioExiste(nombreUsuario)) {
+                    continue; // Si ya existe, pasar al siguiente
+                }
+
+                // Crear nuevo comensal
+                Comensal comensal = new Comensal();
+                comensal.setNombreUsuario(nombreUsuario);
+                comensal.setContrasena(contrasena);
+                comensal.setEmail(email);
+                comensal.setTipoComidaFavorita(tipoComidaFavorita);
+                comensal.setTipoUsuario("COMENSAL");
+
+                authService.registrarComensal(comensal, tipoComidaFavorita);
+                System.out.println("Usuario creado: " + nombreUsuario);
+            }
+        } catch (ServiceException e) {
+            System.out.println("Error al crear usuarios: " + e.getMessage());
+        }
     }
 
     @Override

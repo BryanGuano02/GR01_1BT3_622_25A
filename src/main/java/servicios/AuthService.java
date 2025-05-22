@@ -68,4 +68,8 @@ public class AuthService {
 
         usuarioDAO.save(comensal);
     }
+
+    public boolean usuarioExiste(String nombreUsuario) {
+        return usuarioDAO.findByNombreUsuario(nombreUsuario) != null;
+    }
 }
