@@ -2,7 +2,7 @@ package servlets;
 
 import DAO.CalificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
+import DTO.RestauranteDTO;
 import entidades.Comensal;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
@@ -16,10 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import servicios.RecomendacionService;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet(name = "SvIndex", value = "/inicio")
 public class SvIndex extends HttpServlet {
@@ -31,7 +28,7 @@ public class SvIndex extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
         calificacionDAO = new CalificacionDAO(emf);
         recomendacionService = new RecomendacionService(usuarioDAO, calificacionDAO);
 
@@ -46,22 +43,21 @@ public class SvIndex extends HttpServlet {
 
                 if (comensal != null) {
                     // Obtener todos los restaurantes con sus promedios actualizados
-                    List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
-                    restaurantes.forEach(r -> {
-                        Double promedio = calificacionDAO.calcularPromedioCalificaciones(r.getId());
-                        r.setPuntajePromedio(promedio != null ? promedio : 0.0);
-                    });
+//                    List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+                    SvRestaurante svRestaurante = new SvRestaurante();
+                    List<RestauranteDTO> restauranteDTOs = svRestaurante.getRestaurantesConSuscripcion(comensal.getId());
 
                     // Obtener recomendaciones ya ordenadas
                     List<Restaurante> recomendados = recomendacionService.obtenerRecomendaciones(comensal);
 
                     // Debug
-                    System.out.println("Restaurantes recomendados ordenados:");
+//                    System.out.println("Restaurantes recomendados ordenados:");
                     recomendados.forEach(r ->
                             System.out.println(r.getNombre() + " - " + r.getPuntajePromedio()));
 
                     req.setAttribute("restaurantesRecomendados", recomendados);
-                    req.setAttribute("restaurantes", restaurantes);
+                    // req.setAttribute("restaurantes", restaurantes);
+                    req.setAttribute("restaurantes", restauranteDTOs);
                 }
             }
 

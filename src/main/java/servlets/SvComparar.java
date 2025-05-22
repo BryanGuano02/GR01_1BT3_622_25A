@@ -1,7 +1,6 @@
 package servlets;
 
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -22,7 +21,7 @@ public class SvComparar extends HttpServlet {
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
     }
 
     @Override

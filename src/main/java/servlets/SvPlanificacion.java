@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import servicios.PlanificacionService;
 import DAO.PlanificacionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +26,7 @@ public class SvPlanificacion extends HttpServlet {
     public void init() throws ServletException {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         planificacionService = new PlanificacionService(new PlanificacionDAO());
-        usuarioDAO = new UsuarioDAOImpl(emf);
+        usuarioDAO = new UsuarioDAO(emf);
     }
 
     @Override

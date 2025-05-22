@@ -101,7 +101,6 @@ public class Comensal extends Usuario {
     }
 
     public void agregarNotificacion(String mensaje) {
-        System.out.println("dentro de agregarNotificacion");
         Notificacion notificacion = new Notificacion();
         notificacion.setMensaje(mensaje);
         notificacion.setComensal(this); // Relación bidireccional

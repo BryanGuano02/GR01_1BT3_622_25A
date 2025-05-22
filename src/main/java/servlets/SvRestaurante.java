@@ -1,8 +1,11 @@
 package servlets;
 
+import DAO.RestauranteDAO;
+import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
-import DAO.UsuarioDAOImpl;
+import DTO.RestauranteDTO;
 import entidades.Comensal;
+import entidades.Historia;
 import entidades.Restaurante;
 import entidades.Usuario;
 import jakarta.persistence.EntityManagerFactory;
@@ -19,17 +22,19 @@ import servicios.NotificacionService;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
-    private UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO = new UsuarioDAO(Persistence.createEntityManagerFactory("UFood_PU"));
 
-    @Override
-    public void init() {
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAOImpl(emf);
-    }
+    // @Override
+    // public void init() {
+    // emf =
+    // usuarioDAO = new UsuarioDAO(emf);
+    // }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -69,10 +74,10 @@ public class SvRestaurante extends HttpServlet {
         if ("guardar".equals(accion)) {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
-            procesarAgregarMenu(req, resp, restauranteUsuario);
+            Historia historia = new Historia(req.getParameter("historia"));
+            procesarAgregarMenu(req, resp, restauranteUsuario, historia);
             NotificacionService notificacionService = new NotificacionService(usuarioDAO, null);
-
-            notificacionService.notificarComensalesMenuDia(restauranteUsuario);
+            notificacionService.notificarComensalesMenuDia(restauranteUsuario, historia);
         } else if ("actualizar".equals(accion)) {
             procesarActualizarRestaurante(req, resp, restauranteUsuario);
         } else if ("subscribirse".equals(accion)) {
@@ -83,16 +88,16 @@ public class SvRestaurante extends HttpServlet {
 
         if ("agregarMenuDelDia".equals(accion)) {
             String descripcionMenu = req.getParameter("historia");
-            //Long idRestaurante = (Long) req.getSession().getAttribute("idRestaurante"); // Obtener ID de la sesión
-            //Usuario usuario = (Usuario) session.getAttribute("usuario");
+            // Long idRestaurante = (Long) req.getSession().getAttribute("idRestaurante");
+            // // Obtener ID de la sesión
+            // Usuario usuario = (Usuario) session.getAttribute("usuario");
             System.out.println(restauranteUsuario.getId());
             if (descripcionMenu != null && !descripcionMenu.trim().isEmpty()) {
                 // lógica para reemplazar o guardar el menú del día siguiente
                 MenuDelDiaService menuDelDiaService = new MenuDelDiaService();
-                Restaurante restaurante = menuDelDiaService.guardarMenuDelDia( descripcionMenu, restauranteUsuario.getId() );
-                session.setAttribute("usuario", restaurante );
-
-
+                Restaurante restaurante = menuDelDiaService.guardarMenuDelDia(descripcionMenu,
+                        restauranteUsuario.getId());
+                session.setAttribute("usuario", restaurante);
 
             }
 
@@ -124,12 +129,6 @@ public class SvRestaurante extends HttpServlet {
 
             // Obtener el restaurante desde la base de datos
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
-            if (restaurante == null) {
-                // resp.sendRedirect(req.getContextPath() +
-                // "/restaurantesFiltrados.jsp?error=Restaurante+no+encontrado");
-                // return;
-                System.out.println("restaurante no encontrado");
-            }
 
             // Suscribir al comensal al restaurante
             // comensal.suscribirseARestaurante(restaurante);
@@ -172,7 +171,9 @@ public class SvRestaurante extends HttpServlet {
             req.setAttribute("error", "Error al cargar datos del restaurante: " + e.getMessage());
             req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
         }
-    }    private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+    }
+
+    private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
             Restaurante restauranteUsuario) throws IOException {
         try {
             restauranteUsuario.setNombre(req.getParameter("nombre"));
@@ -189,7 +190,8 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setTiempoEspera(Integer.parseInt(req.getParameter("tiempoEspera")));
                 restauranteUsuario.setCalidad(Integer.parseInt(req.getParameter("calidad")));
                 restauranteUsuario.setPrecio(Integer.parseInt(req.getParameter("precio")));
-                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(req.getParameter("distanciaUniversidad")));
+                restauranteUsuario
+                        .setDistanciaUniversidad(Double.parseDouble(req.getParameter("distanciaUniversidad")));
             } catch (NumberFormatException e) {
                 // Manejar errores de conversión
                 resp.sendRedirect(req.getContextPath() + "/restaurante?error=Formato+inválido+en+campos+numéricos");
@@ -209,18 +211,17 @@ public class SvRestaurante extends HttpServlet {
     }
 
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
-            Restaurante restauranteUsuario) throws IOException, ServletException {
+            Restaurante restauranteUsuario, Historia historia) throws IOException, ServletException {
         try {
-            String menu = req.getParameter("historia");
 
-            if (menu == null || menu.trim().isEmpty()) {
+            if (historia == null) {
                 resp.sendRedirect(req.getContextPath() + "/restaurante?error=El+menú+no+puede+estar+vacío");
                 return;
             }
 
             // Obtener el restaurante actualizado
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteUsuario.getId());
-            restaurante.agregarHistoria(menu);
+            restaurante.agregarHistoria(historia);
 
             // Guardar y actualizar la sesión
             usuarioDAO.save(restaurante);
@@ -232,7 +233,9 @@ public class SvRestaurante extends HttpServlet {
             resp.sendRedirect(
                     req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
-    }    private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+    }
+
+    private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
             Restaurante restauranteUsuario) throws IOException {
         try {
             // Actualizar los datos del restaurante con los parámetros recibidos
@@ -261,28 +264,28 @@ public class SvRestaurante extends HttpServlet {
 
             // Procesar nuevos campos
             // if (tiempoEspera != null && !tiempoEspera.isEmpty())
-            //     restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
+            // restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
             // if (calidad != null && !calidad.isEmpty())
-            //     restauranteUsuario.setCalidad(Integer.parseInt(calidad));
+            // restauranteUsuario.setCalidad(Integer.parseInt(calidad));
             // if (precio != null && !precio.isEmpty())
-            //     restauranteUsuario.setPrecio(Integer.parseInt(precio));
+            // restauranteUsuario.setPrecio(Integer.parseInt(precio));
             // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-            //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
-// 1
-// 2
-// 3
-// 4
-// 5
-// 6
-// 7
-// 8
+            // restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
+            // 1
+            // 2
+            // 3
+            // 4
+            // 5
+            // 6
+            // 7
+            // 8
 
-// 9
-// 10
-// 11
-// 12
-// 13
-// 14
+            // 9
+            // 10
+            // 11
+            // 12
+            // 13
+            // 14
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
@@ -296,6 +299,16 @@ public class SvRestaurante extends HttpServlet {
             resp.sendRedirect(
                     req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
+    }
+
+    public List<RestauranteDTO> getRestaurantesConSuscripcion(Long comensalId) {
+        RestauranteDAO restauranteDAO = new RestauranteDAO(usuarioDAO);
+        SuscripcionDAO suscripcionDAO = new SuscripcionDAO();
+        List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
+        return restaurantes.stream().map(restaurante -> {
+            boolean estaSuscrito = suscripcionDAO.existeSuscripcion(comensalId, restaurante.getId());
+            return new RestauranteDTO(restaurante, estaSuscrito);
+        }).collect(Collectors.toList());
     }
 
     @Override
