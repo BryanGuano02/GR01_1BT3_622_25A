@@ -43,6 +43,8 @@ public class SvAuth extends HttpServlet {
     private void crearUsuarios() {
         try {
             int numeroComensales = 3;
+            int numeroRestaurantes = 6;
+
             for (int i = 1; i <= numeroComensales; i++) {
                 String nombreUsuario = "c" + i;
                 String contrasena = "c" + i;
@@ -63,7 +65,29 @@ public class SvAuth extends HttpServlet {
                 comensal.setTipoUsuario("COMENSAL");
 
                 authService.registrarComensal(comensal, tipoComidaFavorita);
-                System.out.println("Usuario creado: " + nombreUsuario);
+                System.out.println("Usuario comensal creado: " + nombreUsuario);
+            }
+
+
+            for (int i = 1; i <= numeroRestaurantes; i++) {
+                String nombreUsuario = "r" + i;
+                String contrasena = "r" + i;
+                String email = "r" + i + "@r" + i + ".com";
+
+                // Verificar si ya existe el usuario
+                if (authService.usuarioExiste(nombreUsuario)) {
+                    continue; // Si ya existe, pasar al siguiente
+                }
+
+                // Crear nuevo restaurante
+                Restaurante restaurante = new Restaurante();
+                restaurante.setNombreUsuario(nombreUsuario);
+                restaurante.setContrasena(contrasena);
+                restaurante.setEmail(email);
+                restaurante.setTipoUsuario("RESTAURANTE");
+
+                authService.registrarUsuarioRestaurante(restaurante);
+                System.out.println("Usuario restaurante creado: " + nombreUsuario);
             }
         } catch (ServiceException e) {
             System.out.println("Error al crear usuarios: " + e.getMessage());
