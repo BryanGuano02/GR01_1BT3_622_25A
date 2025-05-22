@@ -72,4 +72,8 @@ public class AuthService {
     public boolean usuarioExiste(String nombreUsuario) {
         return usuarioDAO.findByNombreUsuario(nombreUsuario) != null;
     }
+
+    public Usuario findByNombreUsuario(String nombreUsuario) {
+        return usuarioDAO.findByNombreUsuario(nombreUsuario);
+    }
 }

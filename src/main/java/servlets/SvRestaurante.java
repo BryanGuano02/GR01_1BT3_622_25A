@@ -83,16 +83,16 @@ public class SvRestaurante extends HttpServlet {
 
         if ("agregarMenuDelDia".equals(accion)) {
             String descripcionMenu = req.getParameter("historia");
-            //Long idRestaurante = (Long) req.getSession().getAttribute("idRestaurante"); // Obtener ID de la sesión
-            //Usuario usuario = (Usuario) session.getAttribute("usuario");
+            // Long idRestaurante = (Long) req.getSession().getAttribute("idRestaurante");
+            // // Obtener ID de la sesión
+            // Usuario usuario = (Usuario) session.getAttribute("usuario");
             System.out.println(restauranteUsuario.getId());
             if (descripcionMenu != null && !descripcionMenu.trim().isEmpty()) {
                 // lógica para reemplazar o guardar el menú del día siguiente
                 MenuDelDiaService menuDelDiaService = new MenuDelDiaService();
-                Restaurante restaurante = menuDelDiaService.guardarMenuDelDia( descripcionMenu, restauranteUsuario.getId() );
-                session.setAttribute("usuario", restaurante );
-
-
+                Restaurante restaurante = menuDelDiaService.guardarMenuDelDia(descripcionMenu,
+                        restauranteUsuario.getId());
+                session.setAttribute("usuario", restaurante);
 
             }
 
@@ -172,7 +172,9 @@ public class SvRestaurante extends HttpServlet {
             req.setAttribute("error", "Error al cargar datos del restaurante: " + e.getMessage());
             req.getRequestDispatcher("crearRestaurante.jsp").forward(req, resp);
         }
-    }    private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+    }
+
+    private void procesarGuardarRestaurante(HttpServletRequest req, HttpServletResponse resp,
             Restaurante restauranteUsuario) throws IOException {
         try {
             restauranteUsuario.setNombre(req.getParameter("nombre"));
@@ -189,7 +191,8 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setTiempoEspera(Integer.parseInt(req.getParameter("tiempoEspera")));
                 restauranteUsuario.setCalidad(Integer.parseInt(req.getParameter("calidad")));
                 restauranteUsuario.setPrecio(Integer.parseInt(req.getParameter("precio")));
-                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(req.getParameter("distanciaUniversidad")));
+                restauranteUsuario
+                        .setDistanciaUniversidad(Double.parseDouble(req.getParameter("distanciaUniversidad")));
             } catch (NumberFormatException e) {
                 // Manejar errores de conversión
                 resp.sendRedirect(req.getContextPath() + "/restaurante?error=Formato+inválido+en+campos+numéricos");
@@ -231,7 +234,9 @@ public class SvRestaurante extends HttpServlet {
             resp.sendRedirect(
                     req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
-    }    private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
+    }
+
+    private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
             Restaurante restauranteUsuario) throws IOException {
         try {
             // Actualizar los datos del restaurante con los parámetros recibidos
@@ -260,28 +265,28 @@ public class SvRestaurante extends HttpServlet {
 
             // Procesar nuevos campos
             // if (tiempoEspera != null && !tiempoEspera.isEmpty())
-            //     restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
+            // restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
             // if (calidad != null && !calidad.isEmpty())
-            //     restauranteUsuario.setCalidad(Integer.parseInt(calidad));
+            // restauranteUsuario.setCalidad(Integer.parseInt(calidad));
             // if (precio != null && !precio.isEmpty())
-            //     restauranteUsuario.setPrecio(Integer.parseInt(precio));
+            // restauranteUsuario.setPrecio(Integer.parseInt(precio));
             // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-            //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
-// 1
-// 2
-// 3
-// 4
-// 5
-// 6
-// 7
-// 8
+            // restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
+            // 1
+            // 2
+            // 3
+            // 4
+            // 5
+            // 6
+            // 7
+            // 8
 
-// 9
-// 10
-// 11
-// 12
-// 13
-// 14
+            // 9
+            // 10
+            // 11
+            // 12
+            // 13
+            // 14
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
