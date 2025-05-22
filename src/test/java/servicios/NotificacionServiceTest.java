@@ -16,6 +16,7 @@ public class NotificacionServiceTest {
     @Test
     public void given_diner_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_sent_successfully() {
         NotificacionService notificacionService = mock(NotificacionService.class);
+        Historia historia = new Historia("Menú del día: Pollo al horno");
 
         Comensal comensal = new Comensal();
         comensal.setId(1L);
@@ -25,11 +26,11 @@ public class NotificacionServiceTest {
         restaurante.setId(1L);
         restaurante.setNombre("restaurante1");
         restaurante.setSuscripciones(Collections.singletonList(new Suscripcion(comensal, restaurante)));
-        restaurante.agregarHistoria(new Historia("Menú del día: Pollo al horno"));
+        restaurante.agregarHistoria(historia);
 
-        when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(true);
+        when(notificacionService.notificarComensalesMenuDia(restaurante, historia)).thenReturn(true);
 
-        boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante);
+        boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante, historia);
 
         assertTrue("Debe notificar si hay comensales", resultado);
     }
@@ -46,9 +47,9 @@ public class NotificacionServiceTest {
         restaurante.agregarHistoria(historia);
 
         // Mockea el comportamiento para este caso
-        when(notificacionService.notificarComensalesMenuDia(restaurante)).thenReturn(false);
+        when(notificacionService.notificarComensalesMenuDia(restaurante, historia)).thenReturn(false);
 
-        boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante);
+        boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante, historia);
         assertFalse("No debe notificar si no hay comensales siguiendo", resultado);
     }
 

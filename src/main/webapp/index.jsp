@@ -1,3 +1,4 @@
+<%@ page import="entidades.Notificacion" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -50,7 +51,8 @@
                             <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
                         </a>
                     </c:if>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                            data-bs-target="#notificacionesModal">
                         <i class="fas fa-bell me-2"></i>Notificaciones
                     </button>
                     <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
@@ -90,7 +92,8 @@
                         <div style="display: none;">
                             <p>DEBUG - Restaurantes recibidos: ${fn:length(restaurantesRecomendados)}</p>
                             <c:forEach items="${restaurantesRecomendados}" var="r" varStatus="status">
-                                <p>${status.index + 1}. ${r.nombre} - Puntaje: <fmt:formatNumber value="${r.puntajePromedio}" pattern="#.##"/></p>
+                                <p>${status.index + 1}. ${r.nombre} - Puntaje: <fmt:formatNumber
+                                        value="${r.puntajePromedio}" pattern="#.##"/></p>
                             </c:forEach>
                         </div>
 
@@ -118,7 +121,8 @@
                                                     <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
                                                 </c:forEach>
                                                 <span class="ms-1">
-                                                (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
+                                                (<fmt:formatNumber value="${restaurante.puntajePromedio}"
+                                                                   pattern="#.##"/>)
                                                     <!-- Debug visible solo para desarrolladores -->
                                                 <span style="display: none;">ID: ${restaurante.id}</span>
                                             </span>
@@ -207,9 +211,10 @@
                                            class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-star"></i> Calificar
                                         </a>
-                                        <form action="${pageContext.request.contextPath}/suscribirse" method="post" style="display:inline;">
-                                            <input type="hidden" name="idRestaurante" value="${restaurante.id}" />
-                                            <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}" />
+                                        <form action="${pageContext.request.contextPath}/suscribirse" method="post"
+                                              style="display:inline;">
+                                            <input type="hidden" name="idRestaurante" value="${restaurante.id}"/>
+                                            <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}"/>
                                             <button type="submit" class="btn btn-sm btn-outline-info">
                                                 <i class="fas fa-bell"></i> Suscribirse
                                             </button>
@@ -246,16 +251,17 @@
                                         <c:if test="${not empty restaurante.menuDelDia}">
                                             <div class="position-relative alert alert-info">
                                                 <strong>Menú del Día:</strong>
-                                                <pre style="white-space: pre-wrap;" class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
+                                                <pre style="white-space: pre-wrap;"
+                                                     class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
 
                                                 <!-- Botón de Like -->
 
-                                                    <button class="btn-like position-absolute"
+                                                <button class="btn-like position-absolute"
                                                         type="submit"
                                                         data-id="${restaurante.id}"
                                                         title="Me gusta">
                                                     <i class="fas fa-heart"></i>
-                                                    </button>
+                                                </button>
 
                                             </div>
                                         </c:if>
@@ -276,7 +282,8 @@
 </div>
 
 <!-- Modal de Notificaciones -->
-<div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+<div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -293,18 +300,20 @@
                         </c:when>
                         <c:otherwise>
                             <c:forEach var="notificacion" items="${notificaciones}">
-                                <li class="list-group-item notificacion-item" data-id="${notificacion.id}" data-leida="${notificacion.leida}">
+                                <li class="list-group-item notificacion-item" data-id="${notificacion.id}"
+                                    data-leida="${notificacion.leida}">
                                     <i class="fas fa-info-circle text-primary me-2"></i>
                                     <c:out value="${notificacion.mensaje}"/>
                                     <c:if test="${!notificacion.leida}">
                                         <span class="badge bg-secondary float-end">Nuevo</span>
-                                        <button class="btn btn-sm btn-outline-success ms-2 marcar-leida-btn float-end">Marcar como leída</button>
+                                        <button class="btn btn-sm btn-outline-success ms-2 marcar-leida-btn float-end">
+                                            Marcar como leída
+                                        </button>
                                     </c:if>
                                     <br>
                                     <small class="text-muted">
-                                        <% java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                                           entidades.Notificacion notif = (entidades.Notificacion) pageContext.getAttribute("notificacion");
-                                           out.print(notif.getFechaCreacion().format(formatter)); %>
+                                            ${notificacion.fechaFormateada}
+                                    </small>
                                     </small>
                                 </li>
                             </c:forEach>
@@ -319,24 +328,24 @@
     </div>
 </div>
 <script>
-// Lógica para marcar como leída visualmente y por backend
-setTimeout(function() {
-    document.querySelectorAll('.marcar-leida-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var li = btn.closest('.notificacion-item');
-            var id = li.getAttribute('data-id');
-            fetch('notificaciones/leida?id=' + id, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    // Lógica para marcar como leída visualmente y por backend
+    setTimeout(function () {
+        document.querySelectorAll('.marcar-leida-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var li = btn.closest('.notificacion-item');
+                var id = li.getAttribute('data-id');
+                fetch('notificaciones/leida?id=' + id, {
+                    method: 'POST',
+                    headers: {'X-Requested-With': 'XMLHttpRequest'}
+                });
+                // Engaño visual: ocultar botón y badge, marcar como leída visualmente
+                btn.style.display = 'none';
+                var badge = li.querySelector('.badge');
+                if (badge) badge.style.display = 'none';
+                li.setAttribute('data-leida', 'true');
             });
-            // Engaño visual: ocultar botón y badge, marcar como leída visualmente
-            btn.style.display = 'none';
-            var badge = li.querySelector('.badge');
-            if (badge) badge.style.display = 'none';
-            li.setAttribute('data-leida', 'true');
         });
-    });
-}, 100);
+    }, 100);
 </script>
 
 <!-- Bootstrap JS -->
@@ -507,42 +516,43 @@ setTimeout(function() {
     });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
-    var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
-    if (modalVotoConfirmado) {
-        modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
-            // Cierra cualquier modal de menú abierto
-            document.querySelectorAll('.modal.show').forEach(function(modal) {
-                if (modal.id.startsWith('menuModal')) {
-                    var bsModal = bootstrap.Modal.getInstance(modal);
-                    if (bsModal) {
-                        bsModal.hide();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
+        var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
+        if (modalVotoConfirmado) {
+            modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
+                // Cierra cualquier modal de menú abierto
+                document.querySelectorAll('.modal.show').forEach(function (modal) {
+                    if (modal.id.startsWith('menuModal')) {
+                        var bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
                     }
-                }
+                });
             });
-        });
-    }
-});
+        }
+    });
 </script>
 <!-- Modal de voto confirmado -->
-<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="modalVotoConfirmadoLabel">
-          <i class="fas fa-check-circle me-2"></i>Voto confirmado
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center">
-        ¡Tu voto ha sido registrado correctamente!
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-      </div>
+<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalVotoConfirmadoLabel">
+                    <i class="fas fa-check-circle me-2"></i>Voto confirmado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                ¡Tu voto ha sido registrado correctamente!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 </body>

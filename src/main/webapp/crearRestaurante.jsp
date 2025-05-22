@@ -246,7 +246,7 @@
             <p class="text-muted">No hay menú del día registrado aún.</p>
             <% } %>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMenu" data-accion="agregarHistoria">
-                <i class="fas fa-plus me-2"></i> Agregar Nuevo Menú
+                <i class="fas fa-plus me-2"></i> Agregar Nueva Historia
             </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMenu" data-accion="agregarMenuDelDia">
                 <i class="fas fa-utensils me-2"></i>

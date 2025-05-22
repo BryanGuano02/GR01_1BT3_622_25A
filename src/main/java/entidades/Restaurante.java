@@ -22,7 +22,7 @@ public class Restaurante extends Usuario {
     private int calidad;
     private int tiempoEspera;
 
-    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Historia> historias = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)

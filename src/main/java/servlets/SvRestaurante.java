@@ -69,10 +69,10 @@ public class SvRestaurante extends HttpServlet {
         if ("guardar".equals(accion)) {
             procesarGuardarRestaurante(req, resp, restauranteUsuario);
         } else if ("agregarHistoria".equals(accion)) {
-            procesarAgregarMenu(req, resp, restauranteUsuario);
+            Historia historia = new Historia(req.getParameter("historia"));
+            procesarAgregarMenu(req, resp, restauranteUsuario, historia);
             NotificacionService notificacionService = new NotificacionService(usuarioDAO, null);
-
-            notificacionService.notificarComensalesMenuDia(restauranteUsuario);
+            notificacionService.notificarComensalesMenuDia(restauranteUsuario, historia);
         } else if ("actualizar".equals(accion)) {
             procesarActualizarRestaurante(req, resp, restauranteUsuario);
         } else if ("subscribirse".equals(accion)) {
@@ -209,9 +209,8 @@ public class SvRestaurante extends HttpServlet {
     }
 
     private void procesarAgregarMenu(HttpServletRequest req, HttpServletResponse resp,
-            Restaurante restauranteUsuario) throws IOException, ServletException {
+            Restaurante restauranteUsuario, Historia historia) throws IOException, ServletException {
         try {
-            Historia historia = new Historia(req.getParameter("historia"));
 
             if (historia == null) {
                 resp.sendRedirect(req.getContextPath() + "/restaurante?error=El+menú+no+puede+estar+vacío");
