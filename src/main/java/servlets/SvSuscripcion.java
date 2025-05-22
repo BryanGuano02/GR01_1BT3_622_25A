@@ -1,7 +1,10 @@
 package servlets;
 
+import DAO.RestauranteDAO;
 import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
+import DTO.RestauranteDTO;
+import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -13,6 +16,8 @@ import servicios.SuscripcionService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "suscribirse", value = "/suscribirse")
 public class SvSuscripcion extends HttpServlet {
@@ -30,6 +35,29 @@ public class SvSuscripcion extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        String action = req.getParameter("action");
+
+        if ("desuscribir".equals(action)) {
+            Long idComensal = Long.parseLong(req.getParameter("idComensal"));
+            Long idRestaurante = Long.parseLong(req.getParameter("idRestaurante"));
+
+            try {
+                suscripcionService.desuscribir(idComensal, idRestaurante);
+                req.getSession().setAttribute("mensaje", "Has cancelado tu suscripción correctamente");
+                resp.sendRedirect(req.getContextPath() + "/inicio?success=desuscrito");
+            } catch (Exception e) {
+                req.getSession().setAttribute("error", "Error al cancelar suscripción: " + e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
+                        URLEncoder.encode("Error al procesar la desuscripción: " + e.getMessage(), "UTF-8"));
+            }
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/inicio");
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         Long idComensal = Long.parseLong(req.getParameter("idComensal"));
@@ -39,6 +67,7 @@ public class SvSuscripcion extends HttpServlet {
             suscripcionService.suscribir(idComensal, idRestaurante);
             resp.sendRedirect(req.getContextPath() + "/inicio?success=suscrito");
         } catch (Exception e) {
+            req.getSession().setAttribute("error", "Error al suscribirte: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
                     URLEncoder.encode("Error al procesar la suscripción: " + e.getMessage(), "UTF-8"));
         }
@@ -54,57 +83,19 @@ public class SvSuscripcion extends HttpServlet {
         } catch (NumberFormatException e) {
             return null;
         }
+    }    /**
+     * Obtiene la lista de restaurantes, indicando si el comensal está suscrito a cada uno
+     * @param comensalId ID del comensal
+     * @return Lista de DTOs de restaurantes con indicador de suscripción
+     */
+    public List<RestauranteDTO> getRestaurantesConSuscripcion(Long comensalId) {
+        RestauranteDAO restauranteDAO = new RestauranteDAO(usuarioDAO);
+        List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
+        return restaurantes.stream().map(restaurante -> {
+            boolean estaSuscrito = suscripcionDAO.existeSuscripcion(comensalId, restaurante.getId());
+            return new RestauranteDTO(restaurante, estaSuscrito);
+        }).collect(Collectors.toList());
     }
-    // private void procesarDesuscribirse(HttpServletRequest req,
-    // HttpServletResponse resp)
-    // throws IOException {
-    // try {
-    // // Obtener el id del comensal
-    // Long idComensal = Long.parseLong(req.getParameter("idComensal"));
-
-    // // Obtener el comensal
-    // Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
-    // if (comensal == null) {
-    // resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
-    // URLEncoder.encode("Comensal no encontrado", "UTF-8"));
-    // return;
-    // }
-
-    // // Obtener el id del restaurante
-    // String idRestauranteStr = req.getParameter("idRestaurante");
-    // if (idRestauranteStr == null) {
-    // resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
-    // URLEncoder.encode("Restaurante no especificado", "UTF-8"));
-    // return;
-    // }
-    // Long idRestaurante = Long.parseLong(idRestauranteStr);
-
-    // // Obtener el restaurante
-    // Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
-    // if (restaurante == null) {
-    // resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
-    // URLEncoder.encode("Restaurante no encontrado", "UTF-8"));
-    // return;
-    // }
-
-    // // Desuscribir al comensal
-    // comensal.desuscribirseDeRestaurante(restaurante);
-
-    // // Guardar los cambios
-    // usuarioDAO.save(comensal);
-
-    // // Actualizar la sesión
-    // req.getSession().setAttribute("usuario", comensal);
-
-    // // Redirigir con mensaje de éxito
-    // resp.sendRedirect(req.getContextPath() + "/inicio?success=" +
-    // URLEncoder.encode("Te has desuscrito exitosamente de " +
-    // restaurante.getNombre(), "UTF-8"));
-    // } catch (Exception e) {
-    // resp.sendRedirect(req.getContextPath() + "/inicio?error=" +
-    // URLEncoder.encode("Error al desuscribirse: " + e.getMessage(), "UTF-8"));
-    // }
-    // }
 
     @Override
     public void destroy() {

@@ -21,6 +21,27 @@ public class SuscripcionDAO {
         this.emf = Persistence.createEntityManagerFactory("UFood_PU");
     }
 
+    public boolean existeSuscripcion(Long idComensal, Long idRestaurante) {
+        EntityManager em = null;
+        try {
+            em = emf.createEntityManager();
+            Long count = em.createQuery(
+                "SELECT COUNT(s) FROM Suscripcion s WHERE s.comensal.id = :idComensal AND s.restaurante.id = :idRestaurante",
+                Long.class)
+                .setParameter("idComensal", idComensal)
+                .setParameter("idRestaurante", idRestaurante)
+                .getSingleResult();
+            return count > 0;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al verificar suscripción", e);
+            return false;
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
     public boolean crear(Suscripcion nuevaSuscripcion) {
         EntityManager em = null;
         try {

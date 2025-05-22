@@ -1,5 +1,6 @@
 package servlets;
 
+import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
 import entidades.Restaurante;
@@ -205,6 +206,8 @@ public class SvAuth extends HttpServlet {
             // Redirección según tipo de usuario
             if (usuario instanceof Comensal) {
                 Comensal comensal = (Comensal) usuario;
+//                SuscripcionDAO suscripcionDAO = new SuscripcionDAO(emf);
+//                suscripcionDAO.
                 session.setAttribute("notificaciones", comensal.getNotificaciones());
                 response.sendRedirect("inicio"); // La lógica de recomendaciones ahora está en SvIndex
             } else if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {

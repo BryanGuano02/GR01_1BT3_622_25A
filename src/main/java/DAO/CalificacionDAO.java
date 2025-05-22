@@ -123,21 +123,17 @@ public class CalificacionDAO {
     }
 
     public Double calcularPromedioCalificaciones(Long idRestaurante) {
-        System.out.println("Calculando promedio de calificaciones para el restaurante ID: " + idRestaurante);
         try {
             // Verificamos que el restaurante exista
             if (idRestaurante == null) {
-                System.out.println("ID de restaurante es nulo, retornando 0.0");
                 return 0.0;
             }
 
             // Obtener todas las calificaciones para este restaurante
             List<Calificacion> calificaciones = this.obtenerCalificacionesPorRestaurante(idRestaurante);
 
-            System.out.println("Número de calificaciones encontradas para restaurante ID " + idRestaurante + ": " + calificaciones.size());
 
             if (calificaciones.isEmpty()) {
-                System.out.println("No hay calificaciones para este restaurante, retornando 0.0");
                 return 0.0;
             }
 
@@ -146,7 +142,6 @@ public class CalificacionDAO {
             int contador = 0;
 
             for (Calificacion c : calificaciones) {
-                System.out.println("  - ID: " + c.getId() + ", Puntaje: " + c.getPuntaje());
                 if (c.getPuntaje() != null) {
                     suma += c.getPuntaje();
                     contador++;
@@ -154,16 +149,13 @@ public class CalificacionDAO {
             }
 
             if (contador == 0) {
-                System.out.println("No hay calificaciones con puntaje válido, retornando 0.0");
                 return 0.0;
             }
 
             Double promedio = suma / contador;
-            System.out.println("Promedio calculado manualmente: " + promedio);
 
             return promedio;
         } catch (Exception e) {
-            System.out.println("Excepción al calcular promedio: " + e.getMessage());
             e.printStackTrace();
             LOGGER.log(Level.WARNING,
                     "Error al calcular promedio de calificaciones para el restaurante ID: " + idRestaurante, e);

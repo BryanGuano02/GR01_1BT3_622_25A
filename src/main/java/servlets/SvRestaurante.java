@@ -1,6 +1,9 @@
 package servlets;
 
+import DAO.RestauranteDAO;
+import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
+import DTO.RestauranteDTO;
 import entidades.Comensal;
 import entidades.Historia;
 import entidades.Restaurante;
@@ -19,17 +22,19 @@ import servicios.NotificacionService;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "SvRestaurante", value = "/restaurante")
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
-    private UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO = new UsuarioDAO(Persistence.createEntityManagerFactory("UFood_PU"));
 
-    @Override
-    public void init() {
-        emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAO(emf);
-    }
+    // @Override
+    // public void init() {
+    // emf =
+    // usuarioDAO = new UsuarioDAO(emf);
+    // }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -124,12 +129,6 @@ public class SvRestaurante extends HttpServlet {
 
             // Obtener el restaurante desde la base de datos
             Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
-            if (restaurante == null) {
-                // resp.sendRedirect(req.getContextPath() +
-                // "/restaurantesFiltrados.jsp?error=Restaurante+no+encontrado");
-                // return;
-                System.out.println("restaurante no encontrado");
-            }
 
             // Suscribir al comensal al restaurante
             // comensal.suscribirseARestaurante(restaurante);
@@ -300,6 +299,16 @@ public class SvRestaurante extends HttpServlet {
             resp.sendRedirect(
                     req.getContextPath() + "/restaurante?error=" + URLEncoder.encode(e.getMessage(), "UTF-8"));
         }
+    }
+
+    public List<RestauranteDTO> getRestaurantesConSuscripcion(Long comensalId) {
+        RestauranteDAO restauranteDAO = new RestauranteDAO(usuarioDAO);
+        SuscripcionDAO suscripcionDAO = new SuscripcionDAO();
+        List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
+        return restaurantes.stream().map(restaurante -> {
+            boolean estaSuscrito = suscripcionDAO.existeSuscripcion(comensalId, restaurante.getId());
+            return new RestauranteDTO(restaurante, estaSuscrito);
+        }).collect(Collectors.toList());
     }
 
     @Override

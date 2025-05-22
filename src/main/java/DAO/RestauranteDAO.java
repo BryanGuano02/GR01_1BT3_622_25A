@@ -1,9 +1,11 @@
 package DAO;
 
+import java.util.List;
+
 import entidades.Restaurante;
 
 public class RestauranteDAO {
-    private final UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO;
 
     public RestauranteDAO(UsuarioDAO usuarioDAO) {
         this.usuarioDAO = usuarioDAO;
@@ -11,6 +13,10 @@ public class RestauranteDAO {
 
     public Restaurante obtenerRestaurantePorId(Long id) {
         return (Restaurante) usuarioDAO.findById(id);
+    }
+
+    public List<Restaurante> obtenerTodosRestaurantes() {
+        return usuarioDAO.obtenerTodosRestaurantes();
     }
 
 }
