@@ -184,3 +184,118 @@ body {
 .btn-like:focus {
     outline: none;
 }
+
+/* Estilos para el modal de notificaciones - Diseño moderno */
+#notificacionesModal .modal-header {
+    background: linear-gradient(135deg, #42275a, #734b6d);
+    border-bottom: none;
+    padding: 16px 20px;
+}
+
+#notificacionesModal .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#notificacionesModal .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#notificacionesModal .modal-footer {
+    border-top: none;
+    background-color: #f8f9fa;
+    padding: 15px;
+}
+
+#notificacionesModal .btn-primary {
+    background: linear-gradient(135deg, #42275a, #734b6d);
+    border: none;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notificacion-item {
+    position: relative;
+    padding: 16px 15px 16px 18px;
+    margin-bottom: 8px;
+    background-color: #fff;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.notificacion-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.notificacion-item:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(to bottom, #42275a, #734b6d);
+    border-radius: 5px 0 0 5px;
+}
+
+.notificacion-item .notificacion-contenido {
+    padding: 15px 100px 5px 28px;
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.notificacion-item i.fas.fa-info-circle {
+    position: absolute;
+    left: 15px;
+    top: 18px;
+    color: #734b6d;
+    font-size: 1.2rem;
+}
+
+.notificacion-item .badge {
+    position: absolute;
+    top: 15px;
+    right: 135px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    background-color: #734b6d;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.notificacion-item .marcar-leida-btn {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    background-color: white;
+    border: 1px solid #42275a;
+    color: #42275a;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.notificacion-item .marcar-leida-btn:hover {
+    background-color: #42275a;
+    color: white;
+}
+
+.notificacion-item .notificacion-fecha {
+    display: block;
+    margin-top: 8px;
+    margin-left: 28px;
+    color: #9a9a9a;
+    font-size: 0.75rem;
+    font-style: italic;
+}

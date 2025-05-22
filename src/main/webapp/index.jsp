@@ -218,21 +218,17 @@
 
                                 <div class="mb-2">
                                     <c:choose>
-                                        <c:when
-                                                test="${restaurante.puntajePromedio > 0}">
+                                        <c:when test="${restaurante.puntajePromedio > 0}">
                                             <c:forEach begin="1" end="5" var="i">
-                                                <i
-                                                        class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
+                                                <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
                                             </c:forEach>
                                             <span class="ms-1">(
-                                                                                <fmt:formatNumber
-                                                                                        value="${restaurante.puntajePromedio}"
-                                                                                        pattern="#.##"/>)
+                                                <fmt:formatNumber value="${restaurante.puntajePromedio}"
+                                                                  pattern="#.##"/>)
                                                                             </span>
                                         </c:when>
                                         <c:otherwise>
-                                                                            <span class="text-muted">Sin
-                                                                                calificaciones</span>
+                                            <span class="text-muted">Sin calificaciones</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
@@ -366,15 +362,15 @@
      aria-labelledby="notificacionesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="notificacionesModalLabel">
                     <i class="fas fa-bell me-2"></i>Bandeja de Notificaciones
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                <ul class="list-group">
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
                     <c:choose>
                         <c:when test="${empty notificaciones}">
                             <li class="list-group-item text-muted">No tienes notificaciones.
@@ -386,18 +382,17 @@
                                     data-id="${notificacion.id}"
                                     data-leida="${notificacion.leida}">
                                     <i class="fas fa-info-circle text-primary me-2"></i>
-                                    <c:out value="${notificacion.mensaje}"/>
+                                    <div class="notificacion-contenido">
+                                        <c:out value="${notificacion.mensaje}"/>
+                                    </div>
                                     <c:if test="${!notificacion.leida}">
-                                        <span class="badge bg-secondary float-end">Nuevo</span>
-                                        <button
-                                                class="btn btn-sm btn-outline-success ms-2 marcar-leida-btn float-end">
+                                        <span class="badge bg-secondary">Nuevo</span>
+                                        <button class="btn btn-sm btn-outline-success marcar-leida-btn">
                                             Marcar como leída
                                         </button>
                                     </c:if>
-                                    <br>
-                                    <small class="text-muted">
+                                    <small class="text-muted notificacion-fecha">
                                             ${notificacion.fechaFormateada}
-                                    </small>
                                     </small>
                                 </li>
                             </c:forEach>
@@ -406,32 +401,45 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Cerrar
+                <button type="button" class="btn btn-primary"
+                        data-bs-dismiss="modal"><i class="fas fa-check me-1"></i>Cerrar
                 </button>
             </div>
         </div>
     </div>
 </div>
-<script>
-    // Lógica para marcar como leída visualmente y por backend
-    setTimeout(function () {
-        document.querySelectorAll('.marcar-leida-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var li = btn.closest('.notificacion-item');
-                var id = li.getAttribute('data-id');
-                fetch('notificaciones/leida?id=' + id, {
-                    method: 'POST',
-                    headers: {'X-Requested-With': 'XMLHttpRequest'}
-                });
-                // Engaño visual: ocultar botón y badge, marcar como leída visualmente
-                btn.style.display = 'none';
-                var badge = li.querySelector('.badge');
-                if (badge) badge.style.display = 'none';
-                li.setAttribute('data-leida', 'true');
-            });
+<script>    // Lógica para marcar como leída visualmente y por backend
+setTimeout(function () {
+    document.querySelectorAll('.marcar-leida-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var li = btn.closest('.notificacion-item');
+            var id = li.getAttribute('data-id');
+
+            // Envío de request al servidor
+            fetch('notificaciones/leida?id=' + id, {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Animación suave para ocultar elementos
+                        btn.style.opacity = '0';
+                        var badge = li.querySelector('.badge');
+                        if (badge) badge.style.opacity = '0';
+
+                        // Después de la animación, ocultarlos completamente
+                        setTimeout(() => {
+                            btn.style.display = 'none';
+                            if (badge) badge.style.display = 'none';
+                            li.setAttribute('data-leida', 'true');
+                            li.classList.add('bg-light');
+                        }, 300);
+                    }
+                })
+                .catch(error => console.error('Error al marcar como leída:', error));
         });
-    }, 100);
+    });
+}, 100);
 </script>
 
 <!-- Bootstrap JS -->
