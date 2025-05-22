@@ -19,9 +19,12 @@ public class SuscripcionService {
         this.usuarioDAO = usuarioDAO;
         this.suscripcionDAO = suscripcionDAO;
         // No necesitamos crear un NotificacionService aquí para esta implementación
-    }    /**
+    }
+
+    /**
      * Suscribe un comensal a un restaurante
-     * @param idComensal ID del comensal
+     *
+     * @param idComensal    ID del comensal
      * @param idRestaurante ID del restaurante
      * @throws ServiceException si hay problemas al procesar la suscripción
      */
@@ -61,19 +64,15 @@ public class SuscripcionService {
             usuarioDAO.save(comensal);
 
             LOGGER.log(Level.INFO, "Suscripción creada: Comensal {0} - Restaurante {1}",
-                    new Object[]{comensal.getNombreUsuario(), restaurante.getNombre()});
+                    new Object[] { comensal.getNombreUsuario(), restaurante.getNombre() });
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al procesar la suscripción", e);
             throw new ServiceException("Error al procesar la suscripción: " + e.getMessage());
         }
-    }    /**
-     * Cancela la suscripción de un comensal a un restaurante
-     * @param idComensal ID del comensal
-     * @param idRestaurante ID del restaurante
-     * @throws ServiceException si hay problemas al procesar la desuscripción
-     */
+    }
+
     public void desuscribir(Long idComensal, Long idRestaurante) throws ServiceException {
         try {
             // Verificar si existe la suscripción
@@ -94,12 +93,13 @@ public class SuscripcionService {
             System.out.println("Desuscripción exitosa: " + resultado);
 
             // Crear notificación para el comensal
-//            String mensaje = "Has cancelado tu suscripción al restaurante " + restaurante.getNombre() + ".";
-//            comensal.agregarNotificacion(mensaje);
+            // String mensaje = "Has cancelado tu suscripción al restaurante " +
+            // restaurante.getNombre() + ".";
+            // comensal.agregarNotificacion(mensaje);
             usuarioDAO.save(comensal);
 
             LOGGER.log(Level.INFO, "Suscripción eliminada: Comensal {0} - Restaurante {1}",
-                    new Object[]{comensal.getNombreUsuario(), restaurante.getNombre()});
+                    new Object[] { comensal.getNombreUsuario(), restaurante.getNombre() });
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
@@ -110,7 +110,8 @@ public class SuscripcionService {
 
     /**
      * Verifica si un comensal está suscrito a un restaurante
-     * @param idComensal ID del comensal
+     *
+     * @param idComensal    ID del comensal
      * @param idRestaurante ID del restaurante
      * @return true si está suscrito, false en caso contrario
      */

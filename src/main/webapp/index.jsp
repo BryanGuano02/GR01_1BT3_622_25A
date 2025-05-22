@@ -177,8 +177,7 @@
                         <i class="fas fa-info-circle me-1"></i>
                         Tipo de comida favorita:
                         <strong>${not empty sessionScope.usuario.tipoComidaFavorita ?
-                                sessionScope.usuario.tipoComidaFavorita : 'No
-                                configurada'}</strong>
+                                sessionScope.usuario.tipoComidaFavorita : 'No configurada'}</strong>
                     </p>
                 </div>
             </div>
@@ -321,7 +320,7 @@
                                                    var="menu">
                                             <c:if test="${not empty menu}">
                                                 <div class="menu-item mb-2">
-                                                        ${menu}
+                                                        ${menu.contenido}
                                                 </div>
                                             </c:if>
                                         </c:forEach>

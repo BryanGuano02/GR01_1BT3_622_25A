@@ -50,9 +50,6 @@ public class Historia {
 
     @Override
     public String toString() {
-        return "Historia{" +
-                "id=" + id +
-                ", contenido='" + contenido + '\'' +
-                '}';
+        return contenido;
     }
 }

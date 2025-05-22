@@ -26,10 +26,11 @@ public class SuscripcionDAO {
         try {
             em = emf.createEntityManager();
             Long count = em.createQuery(
-                "SELECT COUNT(s) FROM Suscripcion s WHERE s.comensal.id = :idComensal AND s.restaurante.id = :idRestaurante",
+                "SELECT COUNT(s) FROM Suscripcion s WHERE s.comensal.id = :idComensal AND s.restaurante.id = :idRestaurante AND s.estado = :estado",
                 Long.class)
                 .setParameter("idComensal", idComensal)
                 .setParameter("idRestaurante", idRestaurante)
+                .setParameter("estado", "ACTIVA")
                 .getSingleResult();
             return count > 0;
         } catch (Exception e) {
@@ -68,19 +69,25 @@ public class SuscripcionDAO {
         try {
             em = emf.createEntityManager();
             em.getTransaction().begin();
+
+            // Buscar la suscripción por idComensal e idRestaurante
             Suscripcion suscripcion = em.createQuery(
                 "SELECT s FROM Suscripcion s WHERE s.comensal.id = :idComensal AND s.restaurante.id = :idRestaurante",
                 Suscripcion.class)
                 .setParameter("idComensal", idComensal)
                 .setParameter("idRestaurante", idRestaurante)
                 .getSingleResult();
-            if (suscripcion != null) {
-                em.remove(em.contains(suscripcion) ? suscripcion : em.merge(suscripcion));
-            }
+
+            // Cambiar el estado a "INACTIVA" en lugar de eliminar
+            suscripcion.setEstado("INACTIVA");
+
+            // Guardar los cambios
+            em.merge(suscripcion);
             em.getTransaction().commit();
+
             return true;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al eliminar suscripción", e);
+            LOGGER.log(Level.SEVERE, "Error al cambiar estado de suscripción a INACTIVA", e);
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }

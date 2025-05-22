@@ -9,6 +9,8 @@ public class Suscripcion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String estado;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "comensal_id", nullable = false)
     private Comensal comensal;
@@ -18,11 +20,14 @@ public class Suscripcion {
     private Restaurante restaurante;
 
     // Constructor vacío
-    public Suscripcion() {}
+    public Suscripcion() {
+       this.estado = "ACTIVA";
+    }
 
     public Suscripcion(Comensal comensal, Restaurante restaurante) {
         this.comensal = comensal;
         this.restaurante = restaurante;
+        this.estado = "ACTIVA";
     }
 
     public Long getId() {
@@ -47,5 +52,13 @@ public class Suscripcion {
 
     public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
