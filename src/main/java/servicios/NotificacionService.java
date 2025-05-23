@@ -72,4 +72,29 @@ public class NotificacionService {
         }
         return false;
     }
+
+    /**
+     * Notifica a un comensal que se ha elegido un restaurante para una planificación
+     *
+     * @param comensal El comensal a notificar
+     * @param mensaje  El mensaje de la notificación
+     * @return true si la notificación fue enviada exitosamente, false en caso contrario
+     */
+    public boolean notificarRestauranteElegido(Comensal comensal, String mensaje) {
+        try {
+            if (comensal == null) {
+                return false;
+            }
+
+            comensal.agregarNotificacion(mensaje);
+
+            if (usuarioDAO != null) {
+                usuarioDAO.save(comensal);
+            }
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

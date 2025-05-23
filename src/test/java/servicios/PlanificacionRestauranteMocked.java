@@ -15,7 +15,7 @@ public class PlanificacionRestauranteMocked {
     @Test
     public void given_confirmed_restaurante_when_give_notification_then_expect_confirmed() {
         // Arrange
-        NotificacionServiceInterface notificacionMock = mock(NotificacionServiceInterface.class);
+        NotificacionService notificacionMock = mock(NotificacionService.class);
         PlanificacionService planificacionService = new PlanificacionService(notificacionMock);
 
         Comensal comensal1 = new Comensal( );

@@ -18,7 +18,7 @@ public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
     private final UsuarioDAO usuarioDAO;
 
-    private final NotificacionServiceInterface notificacionService;
+    private final NotificacionService notificacionService;
 
     private EntityManagerFactory emf;
 
@@ -36,7 +36,7 @@ public class PlanificacionService {
 
     }
     // Para el test
-    public PlanificacionService(NotificacionServiceInterface notificacionService) {
+    public PlanificacionService(NotificacionService notificacionService) {
         this.planificacionDAO = null;
         //this.calificacionDAO = null;
         this.usuarioDAO = null;
@@ -153,7 +153,4 @@ public class PlanificacionService {
         }
     }
 
-    public void notificar(Comensal comensal, String restauranteConfirmado) {
-
-    }
 }
