@@ -1,6 +1,7 @@
 package servlets;
 
 import DAO.CalificacionDAO;
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAOImpl;
 import entidades.Calificacion;
 import entidades.Restaurante;
@@ -31,6 +32,7 @@ public class SvCalificacion extends HttpServlet {
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+        RestauranteDAO restauranteDAO = new RestauranteDAO(emf.createEntityManager());
 
         CalificacionDAO calificacionDAO = new CalificacionDAO() {
             @Override
@@ -62,7 +64,7 @@ public class SvCalificacion extends HttpServlet {
             }
         };
 
-        this.restauranteService = new RestauranteService(usuarioDAO);
+        this.restauranteService = new RestauranteService(usuarioDAO, restauranteDAO);
         this.calificacionService = new CalificacionService(calificacionDAO, usuarioDAO);
     }
 

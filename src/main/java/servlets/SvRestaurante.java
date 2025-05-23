@@ -1,5 +1,6 @@
 package servlets;
 
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import DAO.UsuarioDAOImpl;
 import entidades.Comensal;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import servicios.MenuDelDiaService;
 import servicios.NotificacionService;
+import servicios.RestauranteService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -24,11 +26,16 @@ import java.time.LocalTime;
 public class SvRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
+    private RestauranteService restauranteService;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         usuarioDAO = new UsuarioDAOImpl(emf);
+        restauranteService = new RestauranteService(
+                usuarioDAO,
+                new RestauranteDAO(emf.createEntityManager())
+        );
     }
 
     @Override
@@ -256,8 +263,8 @@ public class SvRestaurante extends HttpServlet {
 
             String tiempoEspera = req.getParameter("tiempoEspera");
             String calidad = req.getParameter("calidad");
-            String precio = req.getParameter("precio");
-            String distanciaUniversidad = req.getParameter("distanciaUniversidad");
+            //String precio = req.getParameter("precio");
+            //String distanciaUniversidad = req.getParameter("distanciaUniversidad");
             Double distanciaUniversidad = Double.parseDouble(req.getParameter("distanciaUniversidad"));
             int precio = Integer.parseInt(req.getParameter("precio"));
 
@@ -279,14 +286,14 @@ public class SvRestaurante extends HttpServlet {
 
             // Procesar nuevos campos
 
-            if (tiempoEspera != null && !tiempoEspera.isEmpty())
+            /*if (tiempoEspera != null && !tiempoEspera.isEmpty())
                 restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
             if (calidad != null && !calidad.isEmpty())
                 restauranteUsuario.setCalidad(Integer.parseInt(calidad));
             if (precio != null && !precio.isEmpty())
                 restauranteUsuario.setPrecio(Integer.parseInt(precio));
             if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
+                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));*/
 
 
             // if (tiempoEspera != null && !tiempoEspera.isEmpty())

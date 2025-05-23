@@ -9,21 +9,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/styles.css">
 </head>
 <body>
 <div class="container mt-5">
     <%
-        request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
-        request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
+        request.setAttribute("titulo", "Lista de Restaurantes ");
+        request.setAttribute("botonAtras", false);
     %>
-    <%@ include file="layout/header.jsp" %>    <!-- Barra de búsqueda y acciones -->
+    <%@ include file="layout/header.jsp" %>
+
+    <!-- Barra de búsqueda y acciones -->
     <div class="card shadow mb-4">
         <div class="card-body">
-            <!-- Barra de búsqueda -->
             <div class="row mb-3">
                 <div class="col-12">
                     <form id="searchForm" onsubmit="buscarRestaurantes(event)">
@@ -39,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- Botones de acción -->
             <div class="row">
                 <div class="col-12 d-flex flex-wrap justify-content-center gap-2">
                     <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
@@ -86,7 +86,6 @@
             <div class="card-body">
                 <c:choose>
                     <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
-                        <!-- Debug oculto -->
                         <div style="display: none;">
                             <p>DEBUG - Restaurantes recibidos: ${fn:length(restaurantesRecomendados)}</p>
                             <c:forEach items="${restaurantesRecomendados}" var="r" varStatus="status">
@@ -100,7 +99,6 @@
                                     <div class="card restaurant-card h-100">
                                         <div class="restaurant-img-placeholder">
                                             <i class="fas fa-utensils fa-3x"></i>
-                                            <!-- Mostrar posición según puntaje -->
                                             <div class="position-badge">#${status.index + 1}</div>
                                         </div>
                                         <div class="card-body">
@@ -113,13 +111,11 @@
                                             </p>
 
                                             <div class="mb-2">
-                                                <!-- Mostrar siempre las 5 estrellas -->
                                                 <c:forEach begin="1" end="5" var="i">
                                                     <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
                                                 </c:forEach>
                                                 <span class="ms-1">
                                                 (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
-                                                    <!-- Debug visible solo para desarrolladores -->
                                                 <span style="display: none;">ID: ${restaurante.id}</span>
                                             </span>
                                             </div>
@@ -152,7 +148,6 @@
             </div>
         </div>
     </c:if>
-
 
     <!-- Listado de restaurantes -->
     <div class="row" id="restaurantes-container">
@@ -221,6 +216,10 @@
                                             <i class="fas fa-utensils"></i> Ver Menú
                                         </button>
                                     </c:if>
+                                    <button class="btn btn-sm btn-outline-primary ver-detalles-btn"
+                                            data-id="${restaurante.id}">
+                                        <i class="fas fa-info-circle"></i> Ver Detalles
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -247,23 +246,17 @@
                                             <div class="position-relative alert alert-info">
                                                 <strong>Menú del Día:</strong>
                                                 <pre style="white-space: pre-wrap;" class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
-
-                                                <!-- Botón de Like -->
-
-                                                    <button class="btn-like position-absolute"
+                                                <button class="btn-like position-absolute"
                                                         type="submit"
                                                         data-id="${restaurante.id}"
                                                         title="Me gusta">
                                                     <i class="fas fa-heart"></i>
-                                                    </button>
-
+                                                </button>
                                             </div>
                                         </c:if>
                                     </div>
-
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar
-                                        </button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                     </div>
                                 </div>
                             </div>
@@ -272,6 +265,15 @@
                 </c:forEach>
             </c:otherwise>
         </c:choose>
+    </div>
+</div>
+
+<!-- Modal ÚNICO para detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" id="detallesModalContent">
+            <!-- Contenido cargado dinámicamente -->
+        </div>
     </div>
 </div>
 
@@ -303,8 +305,8 @@
                                     <br>
                                     <small class="text-muted">
                                         <% java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                                           entidades.Notificacion notif = (entidades.Notificacion) pageContext.getAttribute("notificacion");
-                                           out.print(notif.getFechaCreacion().format(formatter)); %>
+                                            entidades.Notificacion notif = (entidades.Notificacion) pageContext.getAttribute("notificacion");
+                                            out.print(notif.getFechaCreacion().format(formatter)); %>
                                     </small>
                                 </li>
                             </c:forEach>
@@ -318,108 +320,192 @@
         </div>
     </div>
 </div>
-<script>
-// Lógica para marcar como leída visualmente y por backend
-setTimeout(function() {
-    document.querySelectorAll('.marcar-leida-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var li = btn.closest('.notificacion-item');
-            var id = li.getAttribute('data-id');
-            fetch('notificaciones/leida?id=' + id, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            // Engaño visual: ocultar botón y badge, marcar como leída visualmente
-            btn.style.display = 'none';
-            var badge = li.querySelector('.badge');
-            if (badge) badge.style.display = 'none';
-            li.setAttribute('data-leida', 'true');
-        });
-    });
-}, 100);
-</script>
+
+<!-- Modal de voto confirmado -->
+<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalVotoConfirmadoLabel">
+                    <i class="fas fa-check-circle me-2"></i>Voto confirmado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                ¡Tu voto ha sido registrado correctamente!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Scripts personalizados -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    // Modifica tu función cargarDetallesRestaurante para debuggear
+    function cargarDetallesRestaurante(id) {
+        console.log("Intentando cargar detalles para ID:", id);
+
+        if (!id || isNaN(id)) {
+            console.error("ID de restaurante inválido:", id);
+            mostrarErrorModal("ID de restaurante inválido");
+            return;
+        }
+
+        const modalElement = document.getElementById('detallesModal');
+        if (!modalElement) {
+            console.error("No se encontró el modal de detalles");
+            return;
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        const modalContent = document.getElementById('detallesModalContent');
+
+        // Mostrar spinner de carga
+        modalContent.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">Cargando detalles...</p>
+        </div>`;
+        modal.show();
+
+        // Construir URL correctamente
+        const url = `${window.location.origin}${window.location.pathname.includes('/U-Food') ? '/U-Food' : ''}/detallesRestaurante?id=${encodeURIComponent(id)}`;
+
+        console.log("URL de solicitud:", url);
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'text/html'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                if (!html.trim()) {
+                    throw new Error('El servidor respondió con contenido vacío');
+                }
+                modalContent.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error al cargar detalles:', error);
+                modalContent.innerHTML = `
+        <div class="alert alert-danger m-3">
+            <i class="fas fa-exclamation-triangle"></i> Error al cargar detalles: ${error.message}
+            <button class="btn btn-sm btn-link reintentar-btn" data-id="${id}">
+                Reintentar
+            </button>
+        </div>`;
+            });
+    }
+
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Delegación de eventos para botones de detalles
+        document.addEventListener('click', function(e) {
+            // Manejar clic en botón "Ver Detalles"
+            if (e.target.closest('.ver-detalles-btn')) {
+                const btn = e.target.closest('.ver-detalles-btn');
+                const id = btn.getAttribute('data-id');
+                console.log("Botón Ver Detalles clickeado, ID:", id);
+                cargarDetallesRestaurante(id);
+            }
+
+            // Manejar clic en botón "Reintentar"
+            if (e.target.closest('.reintentar-btn')) {
+                const btn = e.target.closest('.reintentar-btn');
+                const id = btn.getAttribute('data-id');
+                cargarDetallesRestaurante(id);
+            }
+        });
+        // Inicializar modales
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            document.querySelectorAll('.modal').forEach(modalEl => {
+                new bootstrap.Modal(modalEl);
+            });
+        }
+
+        // Forzar repintado de la sección de recomendados si existe
         const seccionRecomendados = document.getElementById('seccionRecomendados');
         const tieneRecomendados = ${not empty restaurantesRecomendados};
 
         if (seccionRecomendados && tieneRecomendados) {
-            // Forzar repintado del componente
             seccionRecomendados.style.display = 'none';
             setTimeout(() => {
                 seccionRecomendados.style.display = 'block';
             }, 50);
         }
+
         // Manejar el formulario de búsqueda
         const searchForm = document.getElementById('searchForm');
         if (searchForm) {
-            searchForm.addEventListener('submit', function (e) {
+            searchForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const searchTerm = document.getElementById('searchInput').value.trim();
                 buscarRestaurantes(searchTerm);
             });
         }
 
-        // Verificar si ya hay restaurantes cargados
-        const hasRestaurants = document.querySelectorAll('.restaurant-card').length > 0;
-        const hasSearchParam = new URL(window.location.href).searchParams.get('busqueda');
+        // Inicializar botones de like
+        document.querySelectorAll('.btn-like').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (btn.classList.contains('clicked')) return;
 
-        if (!hasRestaurants && !hasSearchParam) {
-            cargarRestaurantes();
-        }
+                const idRestaurante = btn.getAttribute('data-id');
+                fetch('${pageContext.request.contextPath}/SvMenuDelDia', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'id=' + encodeURIComponent(idRestaurante)
+                });
+
+                btn.classList.add('clicked');
+                const modal = new bootstrap.Modal(document.getElementById('modalVotoConfirmado'));
+                modal.show();
+            });
+        });
+
+        // Manejar notificaciones
+        setTimeout(function() {
+            document.querySelectorAll('.marcar-leida-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var li = btn.closest('.notificacion-item');
+                    var id = li.getAttribute('data-id');
+                    fetch('notificaciones/leida?id=' + id, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    btn.style.display = 'none';
+                    var badge = li.querySelector('.badge');
+                    if (badge) badge.style.display = 'none';
+                    li.setAttribute('data-leida', 'true');
+                });
+            });
+        }, 100);
     });
 
-    function cargarRestaurantes() {
-        const container = document.getElementById('restaurantes-container');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="col-12 loading-spinner">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-            </div>`;
-
-        fetch('${pageContext.request.contextPath}/inicio')
-            .then(response => {
-                if (!response.ok) throw new Error('Error en la respuesta del servidor');
-                return response.text();
-            })
-            .then(html => {
-                // Parsear el HTML para extraer solo los restaurantes
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const restaurantesHTML = tempDiv.querySelector('#restaurantes-container').innerHTML;
-                container.innerHTML = restaurantesHTML;
-                inicializarModales();
-            })
-            .catch(error => {
-                console.error('Error al cargar restaurantes:', error);
-                container.innerHTML = `
-                    <div class="col-12 error-message">
-                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
-                        <h4>Error al cargar los restaurantes</h4>
-                        <p>Por favor intenta recargar la página</p>
-                        <button onclick="location.reload()" class="btn btn-primary mt-2">
-                            <i class="fas fa-sync-alt me-2"></i>Recargar
-                        </button>
-                    </div>`;
-            });
-    }
-
+    // Funciones existentes
     function buscarRestaurantes(searchTerm) {
         const container = document.getElementById('restaurantes-container');
         if (!container) return;
 
         container.innerHTML = `
-            <div class="col-12 loading-spinner">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Buscando...</span>
-                </div>
-            </div>`;
+        <div class="col-12 loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Buscando...</span>
+            </div>
+        </div>`;
 
         const url = '${pageContext.request.contextPath}/inicio?busqueda=' + encodeURIComponent(searchTerm);
 
@@ -433,12 +519,10 @@ setTimeout(function() {
                 return response.text();
             })
             .then(html => {
-                // Parsear el HTML para extraer solo los restaurantes
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = html;
                 const restaurantesHTML = tempDiv.querySelector('#restaurantes-container').innerHTML;
                 container.innerHTML = restaurantesHTML;
-                inicializarModales();
 
                 // Actualizar URL sin recargar la página
                 window.history.pushState({}, '', url);
@@ -457,93 +541,41 @@ setTimeout(function() {
             });
     }
 
-    function inicializarModales() {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            document.querySelectorAll('.modal').forEach(modalEl => {
-                new bootstrap.Modal(modalEl);
+    function cargarRestaurantes() {
+        const container = document.getElementById('restaurantes-container');
+        if (!container) return;
+
+        container.innerHTML = `
+        <div class="col-12 loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>`;
+
+        fetch('${pageContext.request.contextPath}/inicio')
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la respuesta del servidor');
+                return response.text();
+            })
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const restaurantesHTML = tempDiv.querySelector('#restaurantes-container').innerHTML;
+                container.innerHTML = restaurantesHTML;
+            })
+            .catch(error => {
+                console.error('Error al cargar restaurantes:', error);
+                container.innerHTML = `
+                <div class="col-12 error-message">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4>Error al cargar los restaurantes</h4>
+                    <p>Por favor intenta recargar la página</p>
+                    <button onclick="location.reload()" class="btn btn-primary mt-2">
+                        <i class="fas fa-sync-alt me-2"></i>Recargar
+                    </button>
+                </div>`;
             });
-        }
-        document.querySelectorAll('.btn-like').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                if (btn.classList.contains('clicked')) return;
-
-                const idRestaurante = btn.getAttribute('data-id');
-                console.log('Like enviado para restaurante con ID:', idRestaurante);
-
-                fetch('${pageContext.request.contextPath}/SvMenuDelDia', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'id=' + encodeURIComponent(idRestaurante)
-                });
-
-                btn.classList.add('clicked');
-            });
-        });
-
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.btn-like').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                if (btn.classList.contains('clicked')) return;
-
-                const idRestaurante = btn.getAttribute('data-id');
-
-                fetch('${pageContext.request.contextPath}/SvMenuDelDia', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'id=' + encodeURIComponent(idRestaurante)
-                });
-
-                btn.classList.add('clicked'); // esto se debe ejecutar
-                var modal = new bootstrap.Modal(document.getElementById('modalVotoConfirmado'));
-                modal.show();
-            });
-        });
-    });
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
-    var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
-    if (modalVotoConfirmado) {
-        modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
-            // Cierra cualquier modal de menú abierto
-            document.querySelectorAll('.modal.show').forEach(function(modal) {
-                if (modal.id.startsWith('menuModal')) {
-                    var bsModal = bootstrap.Modal.getInstance(modal);
-                    if (bsModal) {
-                        bsModal.hide();
-                    }
-                }
-            });
-        });
-    }
-});
-</script>
-<!-- Modal de voto confirmado -->
-<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="modalVotoConfirmadoLabel">
-          <i class="fas fa-check-circle me-2"></i>Voto confirmado
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center">
-        ¡Tu voto ha sido registrado correctamente!
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>

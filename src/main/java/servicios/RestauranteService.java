@@ -1,14 +1,17 @@
 package servicios;
 
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Restaurante;
 import java.util.List;
 
 public class RestauranteService {
     private final UsuarioDAO usuarioDAO;
+    private final RestauranteDAO restauranteDAO;
 
-    public RestauranteService(UsuarioDAO usuarioDAO) {
+    public RestauranteService(UsuarioDAO usuarioDAO, RestauranteDAO restauranteDAO) {
         this.usuarioDAO = usuarioDAO;
+        this.restauranteDAO = restauranteDAO;
     }
 
     public void guardarRestaurante(Restaurante restaurante) {
@@ -29,5 +32,9 @@ public class RestauranteService {
 
     public void actualizarRestaurante(Restaurante restaurante) {
         usuarioDAO.save(restaurante);
+    }
+
+    public Restaurante obtenerRestauranteConDetalles(Long id) {
+        return restauranteDAO.obtenerRestauranteConDetalles(id);
     }
 }
