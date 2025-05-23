@@ -10,10 +10,12 @@ public class Planificacion {
     public String nombre;
     public String hora;
     public String estado;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "planificacion_comensal", joinColumns = @JoinColumn(name = "planificacion_id"), inverseJoinColumns = @JoinColumn(name = "comensal_id"))
     private List<Comensal> comensales = new ArrayList<>();
 
@@ -28,9 +30,9 @@ public class Planificacion {
     public Planificacion() {
     }
 
-    public Planificacion(String hora, String nombre) {
-        this.hora = hora;
+    public Planificacion(String nombre, String hora) {
         this.nombre = nombre;
+        this.hora = hora;
         estado = "Activa";
     }
 
@@ -86,7 +88,6 @@ public class Planificacion {
         }
         this.comensales.add(comensal);
     }
-
 
     public String getEstado() {
         return estado;

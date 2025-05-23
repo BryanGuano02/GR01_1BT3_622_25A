@@ -2,6 +2,8 @@ package servlets;
 
 import entidades.Comensal;
 import entidades.Planificacion;
+import entidades.Restaurante;
+import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -16,7 +18,7 @@ import DAO.UsuarioDAO;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "planificar", urlPatterns = { "/planificar" })
+@WebServlet(name = "planificar", urlPatterns = { "/planificar", "/agregarComensal", "/agregarRestaurante", "/terminarVotacion" })
 public class SvPlanificacion extends HttpServlet {
     private PlanificacionService planificacionService;
     private EntityManagerFactory emf;
@@ -27,10 +29,28 @@ public class SvPlanificacion extends HttpServlet {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         planificacionService = new PlanificacionService(new PlanificacionDAO());
         usuarioDAO = new UsuarioDAO(emf);
+    }    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String servletPath = request.getServletPath();
+
+        switch (servletPath) {
+            case "/agregarComensal":
+                procesarAgregarComensal(request, response);
+                break;
+            case "/agregarRestaurante":
+                procesarAgregarRestaurante(request, response);
+                break;
+            case "/terminarVotacion":
+                procesarTerminarVotacion(request, response);
+                break;
+            default: // /planificar
+                mostrarPlanificaciones(request, response);
+                break;
+        }
     }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    private void mostrarPlanificaciones(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         PlanificacionDAO planificacionDAO = new PlanificacionDAO();
 
@@ -69,10 +89,28 @@ public class SvPlanificacion extends HttpServlet {
             }
         }
         return null;
+    }    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String servletPath = request.getServletPath();
+
+        switch (servletPath) {
+            case "/agregarComensal":
+                procesarPostAgregarComensal(request, response);
+                break;
+            case "/agregarRestaurante":
+                procesarPostAgregarRestaurante(request, response);
+                break;
+            case "/terminarVotacion":
+                procesarPostTerminarVotacion(request, response);
+                break;
+            default: // /planificar
+                procesarPostCrearPlanificacion(request, response);
+                break;
+        }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    private void procesarPostCrearPlanificacion(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String nombre = request.getParameter("nombre");
         String hora = request.getParameter("hora");
@@ -105,5 +143,217 @@ public class SvPlanificacion extends HttpServlet {
         request.setAttribute("planificaciones", planificaciones);
         request.setAttribute("mensaje", mensaje);
         request.getRequestDispatcher("crearPlanificacion.jsp").forward(request, response);
+    }
+
+    private void procesarPostAgregarComensal(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("planificacionId");
+        String comensalIdStr = request.getParameter("comensalId");
+        String mensaje;
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty() || comensalIdStr == null || comensalIdStr.isEmpty()) {
+            mensaje = "Error: Faltan parámetros requeridos.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            Long comensalId = Long.parseLong(comensalIdStr);
+
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+            Comensal comensal = usuarioDAO.obtenerComensalPorId(comensalId);
+
+            if (planificacion == null || comensal == null) {
+                mensaje = "Error: No se encontró la planificación o el comensal.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            try {
+                planificacion.addComensal(comensal);
+                planificacionDAO.save(planificacion);
+                mensaje = "Comensal añadido exitosamente a la planificación.";
+            } catch (IllegalArgumentException e) {
+                mensaje = "Error: " + e.getMessage();
+            }
+
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID inválido.";
+        }
+
+        request.setAttribute("mensaje", mensaje);
+        mostrarPlanificaciones(request, response);
+    }
+
+    private void procesarPostAgregarRestaurante(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("planificacionId");
+        String restauranteIdStr = request.getParameter("restauranteId");
+        String mensaje;
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty() || restauranteIdStr == null || restauranteIdStr.isEmpty()) {
+            mensaje = "Error: Faltan parámetros requeridos.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            Long restauranteId = Long.parseLong(restauranteIdStr);
+
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
+
+            if (planificacion == null || restaurante == null) {
+                mensaje = "Error: No se encontró la planificación o el restaurante.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            try {
+                planificacion.setRestaurante(restaurante);
+                planificacionDAO.save(planificacion);
+                mensaje = "Restaurante añadido exitosamente a la planificación.";
+            } catch (IllegalArgumentException e) {
+                mensaje = "Error: " + e.getMessage();
+            }
+
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID inválido.";
+        }
+
+        request.setAttribute("mensaje", mensaje);
+        mostrarPlanificaciones(request, response);
+    }
+
+    private void procesarPostTerminarVotacion(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Este método no necesita implementación adicional ya que la terminación de la votación
+        // se realiza en el método procesarTerminarVotacion del doGet
+        // Se redirige directamente a mostrar las planificaciones
+        mostrarPlanificaciones(request, response);
+    }
+
+    private void procesarAgregarComensal(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("id");
+        String mensaje;
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty()) {
+            mensaje = "Error: No se especificó la planificación.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+
+            if (planificacion == null) {
+                mensaje = "Error: No se encontró la planificación.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            // Redirigir a una página para agregar comensales
+            request.setAttribute("planificacion", planificacion);
+            request.getRequestDispatcher("agregarComensal.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID de planificación inválido.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+        }
+    }
+
+    private void procesarAgregarRestaurante(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("id");
+        String mensaje;
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty()) {
+            mensaje = "Error: No se especificó la planificación.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+
+            if (planificacion == null) {
+                mensaje = "Error: No se encontró la planificación.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            // Obtener la lista de restaurantes disponibles
+            UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
+            List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+
+            // Redirigir a una página para agregar restaurantes
+            request.setAttribute("planificacion", planificacion);
+            request.setAttribute("restaurantes", restaurantes);
+            request.getRequestDispatcher("agregarRestaurante.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID de planificación inválido.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+        }
+    }
+
+    private void procesarTerminarVotacion(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("id");
+        String mensaje;
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty()) {
+            mensaje = "Error: No se especificó la planificación.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+
+            if (planificacion == null) {
+                mensaje = "Error: No se encontró la planificación.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            // Actualizar el estado de la planificación a "Terminada"
+            planificacion.setEstado("Terminada");
+            planificacionDAO.save(planificacion);
+
+            mensaje = "La votación ha sido terminada exitosamente.";
+            request.setAttribute("mensaje", mensaje);
+
+            // Mostrar planificaciones actualizadas
+            mostrarPlanificaciones(request, response);
+
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID de planificación inválido.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+        }
     }
 }

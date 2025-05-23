@@ -64,9 +64,6 @@ public class Restaurante extends Usuario {
         this.horaCierre = horaCierre;
     }
 
-    // Métodos getId() y setId() heredados de Usuario - No es necesario redefinirlos
-    // Se accede a ellos mediante super.getId() y super.setId() si es necesario
-
     public String getNombre() {
         return nombre;
     }
