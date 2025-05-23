@@ -1,7 +1,9 @@
 package entidades;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "notificaciones")
@@ -27,6 +29,10 @@ public class Notificacion {
 
     public Notificacion() {
 
+    }
+
+    public String getFechaFormateada() {
+        return this.fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
     // Getters y setters

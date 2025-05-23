@@ -1,6 +1,6 @@
 package servicios;
 
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.MenuDelDia;
 import entidades.Restaurante;
 import entidades.Usuario;
@@ -22,7 +22,7 @@ public class MenuDelDiaTest {
         restauranteMock.setMenuDelDia(new MenuDelDia("Menú inicial", 0));
 
 
-        UsuarioDAOImpl usuarioDAOMock = new UsuarioDAOImpl(null) {
+        UsuarioDAO usuarioDAOMock = new UsuarioDAO(null) {
 
             @Override
             public Restaurante findById(Long id) {

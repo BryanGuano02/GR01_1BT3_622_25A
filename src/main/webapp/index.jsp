@@ -1,26 +1,31 @@
+<%@ page import="entidades.Notificacion" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>U-Food | Inicio</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 <div class="container mt-5">
-    <%
-        request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
-        request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú
-    %>
-    <%@ include file="layout/header.jsp" %>    <!-- Barra de búsqueda y acciones -->
+    <% request.setAttribute("titulo", "Lista de Restaurantes "); // Ejemplo: para resaltar menú
+        request.setAttribute("botonAtras", false); // Ejemplo: para resaltar menú %>
+    <%@ include file="layout/header.jsp" %> <!-- Barra de búsqueda y acciones -->
     <div class="card shadow mb-4">
         <div class="card-body">
             <!-- Barra de búsqueda -->
@@ -28,8 +33,8 @@
                 <div class="col-12">
                     <form id="searchForm" onsubmit="buscarRestaurantes(event)">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="searchInput" name="busqueda"
-                                   placeholder="Buscar restaurantes..."
+                            <input type="text" class="form-control" id="searchInput"
+                                   name="busqueda" placeholder="Buscar restaurantes..."
                                    value="${param.busqueda}">
                             <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-search me-2"></i>Buscar
@@ -42,18 +47,23 @@
             <!-- Botones de acción -->
             <div class="row">
                 <div class="col-12 d-flex flex-wrap justify-content-center gap-2">
-                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp" class="btn btn-info">
+                    <c:if
+                            test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                        <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp"
+                           class="btn btn-info">
                             <i class="fas fa-filter me-2"></i>Filtrar
                         </a>
-                        <a href="${pageContext.request.contextPath}/planificar" class="btn btn-success">
+                        <a href="${pageContext.request.contextPath}/planificar"
+                           class="btn btn-success">
                             <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
                         </a>
                     </c:if>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-toggle="modal" data-bs-target="#notificacionesModal">
                         <i class="fas fa-bell me-2"></i>Notificaciones
                     </button>
-                    <a href="${pageContext.request.contextPath}/comparar" class="btn btn-warning">
+                    <a href="${pageContext.request.contextPath}/comparar"
+                       class="btn btn-warning">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
                 </div>
@@ -67,13 +77,17 @@
             <div class="card-header bg-primary text-white">
                 <h4 class="mb-0"><i class="fas fa-heart me-2"></i>
                     <c:choose>
-                        <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
+                        <c:when
+                                test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
                             <c:choose>
-                                <c:when test="${not empty sessionScope.usuario.tipoComidaFavorita}">
-                                    Recomendados para ti (${fn:length(restaurantesRecomendados)})
+                                <c:when
+                                        test="${not empty sessionScope.usuario.tipoComidaFavorita}">
+                                    Recomendados para ti
+                                    (${fn:length(restaurantesRecomendados)})
                                 </c:when>
                                 <c:otherwise>
-                                    Restaurantes Sugeridos (${fn:length(restaurantesRecomendados)})
+                                    Restaurantes Sugeridos
+                                    (${fn:length(restaurantesRecomendados)})
                                 </c:otherwise>
                             </c:choose>
                         </c:when>
@@ -85,47 +99,63 @@
             </div>
             <div class="card-body">
                 <c:choose>
-                    <c:when test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
+                    <c:when
+                            test="${not empty restaurantesRecomendados && fn:length(restaurantesRecomendados) > 0}">
                         <!-- Debug oculto -->
                         <div style="display: none;">
-                            <p>DEBUG - Restaurantes recibidos: ${fn:length(restaurantesRecomendados)}</p>
-                            <c:forEach items="${restaurantesRecomendados}" var="r" varStatus="status">
-                                <p>${status.index + 1}. ${r.nombre} - Puntaje: <fmt:formatNumber value="${r.puntajePromedio}" pattern="#.##"/></p>
+                            <p>DEBUG - Restaurantes recibidos:
+                                    ${fn:length(restaurantesRecomendados)}</p>
+                            <c:forEach items="${restaurantesRecomendados}" var="r"
+                                       varStatus="status">
+                                <p>${status.index + 1}. ${r.nombre} - Puntaje:
+                                    <fmt:formatNumber value="${r.puntajePromedio}"
+                                                      pattern="#.##"/>
+                                </p>
                             </c:forEach>
                         </div>
 
                         <div class="row">
-                            <c:forEach items="${restaurantesRecomendados}" var="restaurante" varStatus="status">
+                            <c:forEach items="${restaurantesRecomendados}"
+                                       var="restaurante" varStatus="status">
                                 <div class="col-md-6 col-lg-4 mb-4">
                                     <div class="card restaurant-card h-100">
                                         <div class="restaurant-img-placeholder">
                                             <i class="fas fa-utensils fa-3x"></i>
                                             <!-- Mostrar posición según puntaje -->
-                                            <div class="position-badge">#${status.index + 1}</div>
+                                            <div class="position-badge">#${status.index
+                                                    + 1}</div>
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title">
-                                                <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                                <c:out
+                                                        value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
                                             </h5>
                                             <p class="restaurant-type mb-2">
                                                 <i class="fas fa-utensils me-1"></i>
-                                                <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                                <c:out
+                                                        value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
                                             </p>
 
                                             <div class="mb-2">
                                                 <!-- Mostrar siempre las 5 estrellas -->
                                                 <c:forEach begin="1" end="5" var="i">
-                                                    <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
+                                                    <i
+                                                            class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
                                                 </c:forEach>
                                                 <span class="ms-1">
-                                                (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
+                                                                                    (
+                                                                                    <fmt:formatNumber
+                                                                                            value="${restaurante.puntajePromedio}"
+                                                                                            pattern="#.##"/>)
                                                     <!-- Debug visible solo para desarrolladores -->
-                                                <span style="display: none;">ID: ${restaurante.id}</span>
-                                            </span>
+                                                                                    <span style="display: none;">ID:
+                                                                                            ${restaurante.id}</span>
+                                                                                </span>
                                             </div>
 
                                             <p class="card-text">
-                                                <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                                <c:out
+                                                        value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
                                             </p>
                                         </div>
                                     </div>
@@ -136,7 +166,8 @@
                     <c:otherwise>
                         <div class="text-center py-3">
                             <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
-                            <p class="text-muted">No hay restaurantes sugeridos disponibles</p>
+                            <p class="text-muted">No hay restaurantes sugeridos
+                                disponibles</p>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -162,7 +193,8 @@
                     <div class="card no-restaurants">
                         <i class="fas fa-utensils fa-4x mb-3"></i>
                         <h3>No hay restaurantes disponibles</h3>
-                        <p class="text-muted">No se encontraron restaurantes que coincidan con tu búsqueda.</p>
+                        <p class="text-muted">No se encontraron restaurantes que
+                            coincidan con tu búsqueda.</p>
                     </div>
                 </div>
             </c:when>
@@ -175,11 +207,13 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                    <c:out
+                                            value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
                                 </h5>
                                 <p class="restaurant-type mb-2">
                                     <i class="fas fa-utensils me-1"></i>
-                                    <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                    <c:out
+                                            value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
                                 </p>
 
                                 <div class="mb-2">
@@ -188,8 +222,10 @@
                                             <c:forEach begin="1" end="5" var="i">
                                                 <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
                                             </c:forEach>
-                                            <span class="ms-1">(<fmt:formatNumber value="${restaurante.puntajePromedio}"
-                                                                                  pattern="#.##"/>)</span>
+                                            <span class="ms-1">(
+                                                <fmt:formatNumber value="${restaurante.puntajePromedio}"
+                                                                  pattern="#.##"/>)
+                                                                            </span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted">Sin calificaciones</span>
@@ -198,25 +234,61 @@
                                 </div>
 
                                 <p class="card-text">
-                                    <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                    <c:out
+                                            value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
                                 </p>
 
                                 <div class="restaurant-actions">
-                                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                                    <c:if
+                                            test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
                                         <a href="${pageContext.request.contextPath}/calificar?idRestaurante=${restaurante.id}"
                                            class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-star"></i> Calificar
                                         </a>
-                                        <form action="${pageContext.request.contextPath}/suscribirse" method="post" style="display:inline;">
-                                            <input type="hidden" name="idRestaurante" value="${restaurante.id}" />
-                                            <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}" />
-                                            <button type="submit" class="btn btn-sm btn-outline-info">
-                                                <i class="fas fa-bell"></i> Suscribirse
-                                            </button>
-                                        </form>
+                                        <c:choose>
+                                            <c:when test="${restaurante.estaSuscrito}">
+                                                <form
+                                                        action="${pageContext.request.contextPath}/suscribirse"
+                                                        method="get"
+                                                        style="display:inline;">
+                                                    <input type="hidden" name="action"
+                                                           value="desuscribir"/>
+                                                    <input type="hidden"
+                                                           name="idRestaurante"
+                                                           value="${restaurante.id}"/>
+                                                    <input type="hidden"
+                                                           name="idComensal"
+                                                           value="${sessionScope.usuario.id}"/>
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-bell-slash"></i> Cancelar Suscripción
+                                                    </button>
+                                                </form>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <form
+                                                        action="${pageContext.request.contextPath}/suscribirse"
+                                                        method="post"
+                                                        style="display:inline;">
+                                                    <input type="hidden"
+                                                           name="idRestaurante"
+                                                           value="${restaurante.id}"/>
+                                                    <input type="hidden"
+                                                           name="idComensal"
+                                                           value="${sessionScope.usuario.id}"/>
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-bell"></i>
+                                                        Suscribirse
+                                                    </button>
+                                                </form>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </c:if>
-                                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                    <c:if
+                                            test="${not empty restaurante.historias or not empty restaurante.menuDelDia }">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
                                                 data-bs-target="#menuModal${restaurante.id}">
                                             <i class="fas fa-utensils"></i> Ver Menú
                                         </button>
@@ -227,42 +299,52 @@
                     </div>
 
                     <!-- Modal para el menú -->
-                    <c:if test="${not empty restaurante.historias && !restaurante.historias.isEmpty()}">
-                        <div class="modal fade" id="menuModal${restaurante.id}" tabindex="-1">
+                    <c:if
+                            test="${not empty restaurante.historias or not empty restaurante.menuDelDia}">
+                        <div class="modal fade" id="menuModal${restaurante.id}"
+                             tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Menú de ${restaurante.nombre}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        <h5 class="modal-title">Menú de
+                                                ${restaurante.nombre}</h5>
+                                        <button type="button" class="btn-close"
+                                                data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body menu-container">
-                                        <c:forEach items="${restaurante.historias}" var="menu">
+                                        <c:forEach items="${restaurante.historias}"
+                                                   var="menu">
                                             <c:if test="${not empty menu}">
                                                 <div class="menu-item mb-2">
-                                                        ${menu}
+                                                        ${menu.contenido}
                                                 </div>
                                             </c:if>
                                         </c:forEach>
-                                        <c:if test="${not empty restaurante.menuDelDia}">
-                                            <div class="position-relative alert alert-info">
+                                        <c:if
+                                                test="${not empty restaurante.menuDelDia}">
+                                            <div
+                                                    class="position-relative alert alert-info">
                                                 <strong>Menú del Día:</strong>
-                                                <pre style="white-space: pre-wrap;" class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
+                                                <pre style="white-space: pre-wrap;"
+                                                     class="mb-0">${restaurante.menuDelDia.descripcion}</pre>
 
                                                 <!-- Botón de Like -->
 
-                                                    <button class="btn-like position-absolute"
+                                                <button
+                                                        class="btn-like position-absolute"
                                                         type="submit"
                                                         data-id="${restaurante.id}"
                                                         title="Me gusta">
                                                     <i class="fas fa-heart"></i>
-                                                    </button>
+                                                </button>
 
                                             </div>
                                         </c:if>
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar
+                                        <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cerrar
                                         </button>
                                     </div>
                                 </div>
@@ -276,35 +358,41 @@
 </div>
 
 <!-- Modal de Notificaciones -->
-<div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+<div class="modal fade" id="notificacionesModal" tabindex="-1"
+     aria-labelledby="notificacionesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="notificacionesModalLabel">
                     <i class="fas fa-bell me-2"></i>Bandeja de Notificaciones
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                <ul class="list-group">
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
                     <c:choose>
                         <c:when test="${empty notificaciones}">
-                            <li class="list-group-item text-muted">No tienes notificaciones.</li>
+                            <li class="list-group-item text-muted">No tienes notificaciones.
+                            </li>
                         </c:when>
                         <c:otherwise>
                             <c:forEach var="notificacion" items="${notificaciones}">
-                                <li class="list-group-item notificacion-item" data-id="${notificacion.id}" data-leida="${notificacion.leida}">
+                                <li class="list-group-item notificacion-item"
+                                    data-id="${notificacion.id}"
+                                    data-leida="${notificacion.leida}">
                                     <i class="fas fa-info-circle text-primary me-2"></i>
-                                    <c:out value="${notificacion.mensaje}"/>
+                                    <div class="notificacion-contenido">
+                                        <c:out value="${notificacion.mensaje}"/>
+                                    </div>
                                     <c:if test="${!notificacion.leida}">
-                                        <span class="badge bg-secondary float-end">Nuevo</span>
-                                        <button class="btn btn-sm btn-outline-success ms-2 marcar-leida-btn float-end">Marcar como leída</button>
+                                        <span class="badge bg-secondary">Nuevo</span>
+                                        <button class="btn btn-sm btn-outline-success marcar-leida-btn">
+                                            Marcar como leída
+                                        </button>
                                     </c:if>
-                                    <br>
-                                    <small class="text-muted">
-                                        <% java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                                           entidades.Notificacion notif = (entidades.Notificacion) pageContext.getAttribute("notificacion");
-                                           out.print(notif.getFechaCreacion().format(formatter)); %>
+                                    <small class="text-muted notificacion-fecha">
+                                            ${notificacion.fechaFormateada}
                                     </small>
                                 </li>
                             </c:forEach>
@@ -313,38 +401,54 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary"
+                        data-bs-dismiss="modal"><i class="fas fa-check me-1"></i>Cerrar
+                </button>
             </div>
         </div>
     </div>
 </div>
-<script>
-// Lógica para marcar como leída visualmente y por backend
-setTimeout(function() {
-    document.querySelectorAll('.marcar-leida-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
+<script>    // Lógica para marcar como leída visualmente y por backend
+setTimeout(function () {
+    document.querySelectorAll('.marcar-leida-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
             var li = btn.closest('.notificacion-item');
             var id = li.getAttribute('data-id');
+
+            // Envío de request al servidor
             fetch('notificaciones/leida?id=' + id, {
                 method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            // Engaño visual: ocultar botón y badge, marcar como leída visualmente
-            btn.style.display = 'none';
-            var badge = li.querySelector('.badge');
-            if (badge) badge.style.display = 'none';
-            li.setAttribute('data-leida', 'true');
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Animación suave para ocultar elementos
+                        btn.style.opacity = '0';
+                        var badge = li.querySelector('.badge');
+                        if (badge) badge.style.opacity = '0';
+
+                        // Después de la animación, ocultarlos completamente
+                        setTimeout(() => {
+                            btn.style.display = 'none';
+                            if (badge) badge.style.display = 'none';
+                            li.setAttribute('data-leida', 'true');
+                            li.classList.add('bg-light');
+                        }, 300);
+                    }
+                })
+                .catch(error => console.error('Error al marcar como leída:', error));
         });
     });
 }, 100);
 </script>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const seccionRecomendados = document.getElementById('seccionRecomendados');
-        const tieneRecomendados = ${not empty restaurantesRecomendados};
+        const tieneRecomendados = ${ not empty restaurantesRecomendados };
 
         if (seccionRecomendados && tieneRecomendados) {
             // Forzar repintado del componente
@@ -507,43 +611,48 @@ setTimeout(function() {
     });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
-    var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
-    if (modalVotoConfirmado) {
-        modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
-            // Cierra cualquier modal de menú abierto
-            document.querySelectorAll('.modal.show').forEach(function(modal) {
-                if (modal.id.startsWith('menuModal')) {
-                    var bsModal = bootstrap.Modal.getInstance(modal);
-                    if (bsModal) {
-                        bsModal.hide();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Cuando se cierra el modal de voto confirmado, cierra cualquier modal de menú abierto
+        var modalVotoConfirmado = document.getElementById('modalVotoConfirmado');
+        if (modalVotoConfirmado) {
+            modalVotoConfirmado.addEventListener('hidden.bs.modal', function () {
+                // Cierra cualquier modal de menú abierto
+                document.querySelectorAll('.modal.show').forEach(function (modal) {
+                    if (modal.id.startsWith('menuModal')) {
+                        var bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
                     }
-                }
+                });
             });
-        });
-    }
-});
+        }
+    });
 </script>
 <!-- Modal de voto confirmado -->
-<div class="modal fade" id="modalVotoConfirmado" tabindex="-1" aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="modalVotoConfirmadoLabel">
-          <i class="fas fa-check-circle me-2"></i>Voto confirmado
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center">
-        ¡Tu voto ha sido registrado correctamente!
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-      </div>
+<div class="modal fade" id="modalVotoConfirmado" tabindex="-1"
+     aria-labelledby="modalVotoConfirmadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalVotoConfirmadoLabel">
+                    <i class="fas fa-check-circle me-2"></i>Voto confirmado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                ¡Tu voto ha sido registrado correctamente!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success"
+                        data-bs-dismiss="modal">Aceptar
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 </body>
+
 </html>

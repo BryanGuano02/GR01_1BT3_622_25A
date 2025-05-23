@@ -1,6 +1,6 @@
 package servicios;
 
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.MenuDelDia;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
@@ -8,14 +8,14 @@ import jakarta.persistence.Persistence;
 
 public class MenuDelDiaService {
 
-    private final UsuarioDAOImpl usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
 
     public MenuDelDiaService() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("UFood_PU");
-        this.usuarioDAO = new UsuarioDAOImpl(emf);
+        this.usuarioDAO = new UsuarioDAO(emf);
     }
 
-    public MenuDelDiaService( UsuarioDAOImpl usuarioDAO ) {
+    public MenuDelDiaService( UsuarioDAO usuarioDAO ) {
         this.usuarioDAO = usuarioDAO ;
     }
 

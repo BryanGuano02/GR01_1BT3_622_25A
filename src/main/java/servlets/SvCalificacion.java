@@ -1,7 +1,7 @@
 package servlets;
 
 import DAO.CalificacionDAO;
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.Calificacion;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManager;
@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servicios.CalificacionService;
-import servicios.RestauranteService;
+import DAO.RestauranteDAO;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -24,13 +24,13 @@ import java.util.Map;
 @WebServlet(name = "calificar", value = "/calificar")
 public class SvCalificacion extends HttpServlet {
     private EntityManagerFactory emf;
-    private RestauranteService restauranteService;
+    private RestauranteDAO restauranteDAO;
     private CalificacionService calificacionService;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        UsuarioDAOImpl usuarioDAO = new UsuarioDAOImpl(emf);
+        UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
 
         CalificacionDAO calificacionDAO = new CalificacionDAO() {
             @Override
@@ -62,7 +62,7 @@ public class SvCalificacion extends HttpServlet {
             }
         };
 
-        this.restauranteService = new RestauranteService(usuarioDAO);
+        this.restauranteDAO = new RestauranteDAO(usuarioDAO);
         this.calificacionService = new CalificacionService(calificacionDAO, usuarioDAO);
     }
 
@@ -76,7 +76,7 @@ public class SvCalificacion extends HttpServlet {
             return;
         }
 
-        Restaurante restauranteAPresentar = restauranteService.obtenerRestaurantePorId(idRestaurante);
+        Restaurante restauranteAPresentar = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
 
         if (restauranteAPresentar == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Restaurante no encontrado");

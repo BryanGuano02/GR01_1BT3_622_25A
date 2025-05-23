@@ -1,8 +1,9 @@
-<%@ page import="DAO.UsuarioDAOImpl" %>
+<%@ page import="DAO.UsuarioDAO" %>
 <%@ page import="jakarta.persistence.EntityManagerFactory" %>
 <%@ page import="jakarta.persistence.Persistence" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
+<%@ page import="entidades.Historia" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -59,11 +60,11 @@
 
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Precio Promedio</label> 
+                    <label class="form-label">Precio Promedio</label>
                     <div class="view-content"><%= restauranteUsuario.getPrecio() %> </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Distancia de Universidad</label> 
+                    <label class="form-label">Distancia de Universidad</label>
                     <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() %></div>
                 </div>
                 <div class="mb-3">
@@ -81,14 +82,14 @@
                     <label class="form-label">Calidad (1-5)</label>
                     <div class="view-content"><%= restauranteUsuario.getCalidad() %></div>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label class="form-label">Precio (1-5)</label>
                     <div class="view-content"><%= restauranteUsuario.getPrecio() %></div>
-                </div>
-                <div class="mb-3">
+                </div> -->
+                <!-- <div class="mb-3">
                     <label class="form-label">Distancia a la Universidad (km)</label>
                     <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "N/A" %></div>
-                </div>
+                </div> -->
                 <button id="btnEditar" class="btn btn-primary">
                     <i class="fas fa-edit me-2"></i> Editar Información
                 </button>
@@ -141,14 +142,14 @@
                         <label for="calidad" class="form-label">Calidad (1-5)</label>
                         <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" value="<%= restauranteUsuario.getCalidad() %>">
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="precio" class="form-label">Precio (1-5)</label>
                         <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" value="<%= restauranteUsuario.getPrecio() %>">
-                    </div>
-                    <div class="mb-3">
+                    </div> -->
+                    <!-- <div class="mb-3">
                         <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
                         <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" value="<%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "" %>">
-                    </div>
+                    </div> -->
                     <div class="d-flex justify-content-between">
                         <button type="button" id="btnCancelarEdicion" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i> Cancelar
@@ -180,8 +181,8 @@
                     <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
                 </select>
                 <div class="mb-3">
-                    <input type="number" class="form-control"  name="precio" id="precio" required placeholder="Ej: 10.00">
                     <label for="precio" class="form-label">Precio Promedio</label>
+                    <input type="number" class="form-control"  name="precio" id="precio" required placeholder="Ej: 10.00">
                 </div>
                 <div class="mb-3">
                     <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
@@ -217,14 +218,14 @@
                     <label for="calidad" class="form-label">Calidad (1-5)</label>
                     <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" placeholder="Ej: 4">
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="precio" class="form-label">Precio (1-5)</label>
                     <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" placeholder="Ej: 3">
-                </div>
-                <div class="mb-3">
+                </div> -->
+                <!-- <div class="mb-3">
                     <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
                     <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" placeholder="Ej: 1.5">
-                </div>
+                </div> -->
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     <i class="fas fa-save me-2"></i> Registrar Restaurante
                 </button>
@@ -240,10 +241,10 @@
             <% if (!restauranteUsuario.getHistorias().isEmpty()) { %>
             <div class="mb-4">
                 <h5>Menús Registrados</h5>
-                <% for (String menu : restauranteUsuario.getHistorias()) { %>
+                <% for (Historia historia : restauranteUsuario.getHistorias()) { %>
                 <div class="card mb-2">
                     <div class="card-body">
-                        <%= menu %>
+                        <%= historia.getContenido() %>
                     </div>
                 </div>
                 <% } %>
@@ -265,7 +266,7 @@
             <p class="text-muted">No hay menú del día registrado aún.</p>
             <% } %>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMenu" data-accion="agregarHistoria">
-                <i class="fas fa-plus me-2"></i> Agregar Nuevo Menú
+                <i class="fas fa-plus me-2"></i> Agregar Nueva Historia
             </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMenu" data-accion="agregarMenuDelDia">
                 <i class="fas fa-utensils me-2"></i>

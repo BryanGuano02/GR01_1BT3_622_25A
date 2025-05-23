@@ -1,8 +1,7 @@
 package servicios;
 
-import DAO.CalificacionDAO;
 import DAO.PlanificacionDAO;
-import DAO.UsuarioDAOImpl;
+import DAO.UsuarioDAO;
 import entidades.Comensal;
 import entidades.Planificacion;
 import entidades.Restaurante;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
-    private final UsuarioDAOImpl usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
 
     private final NotificacionServiceInterface notificacionService;
 
@@ -32,7 +31,7 @@ public class PlanificacionService {
         }
         this.planificacionDAO = planificacionDAO;
 
-        this.usuarioDAO = new UsuarioDAOImpl(emf);
+        this.usuarioDAO = new UsuarioDAO(emf);
         notificacionService = null;
 
     }

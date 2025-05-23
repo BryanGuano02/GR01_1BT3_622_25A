@@ -22,10 +22,8 @@ public class Restaurante extends Usuario {
     private int calidad;
     private int tiempoEspera;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "restaurante_historias", joinColumns = @JoinColumn(name = "restaurante_id"), foreignKey = @ForeignKey(name = "fk_restaurante_historias"))
-    @Column(name = "historia", length = 1000)
-    private List<String> historias = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Historia> historias = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
     private List<Calificacion> calificaciones;
@@ -133,19 +131,20 @@ public class Restaurante extends Usuario {
         this.tiempoEspera = tiempoEspera;
     }
 
-    public List<String> getHistorias() {
+    public List<Historia> getHistorias() {
         if (this.historias == null) {
             this.historias = new ArrayList<>();
         }
         return this.historias;
     }
 
-    public void setHistorias(List<String> historias) {
+    public void setHistorias(List<Historia> historias) {
         this.historias = historias;
     }
 
-    public void agregarHistoria(String historia) {
+    public void agregarHistoria(Historia historia) {
         this.historias.add(historia);
+        historia.setRestaurante(this);
     }
 
     public List<Suscripcion> getSuscripciones() {
