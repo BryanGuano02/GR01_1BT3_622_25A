@@ -1,7 +1,9 @@
 package servicios;
 
+import DAO.DueñoRestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
+import entidades.DueñoRestaurante;
 import entidades.Restaurante;
 import entidades.Usuario;
 import exceptions.ServiceException;
@@ -12,9 +14,11 @@ import java.util.List;
 
 public class AuthService {
     private final UsuarioDAO usuarioDAO;
+    private final DueñoRestauranteDAO dueñoRestauranteDAO;
 
-    public AuthService(UsuarioDAO usuarioDAO) {
+    public AuthService(UsuarioDAO usuarioDAO, DueñoRestauranteDAO dueñoDAO) {
         this.usuarioDAO = usuarioDAO;
+        this.dueñoRestauranteDAO = dueñoDAO;
     }
 
     public List<Restaurante> obtenerTodosRestaurantes() {
@@ -40,7 +44,14 @@ public class AuthService {
         return usuario;
     }
 
-    public void registrarUsuarioRestaurante(Usuario usuario) throws ServiceException {
+    public void registrarDueñoRestaurante(DueñoRestaurante dueño) throws ServiceException {
+        if (usuarioDAO.findByNombreUsuario(dueño.getNombreUsuario()) != null) {
+            throw new ServiceException("El nombre de usuario ya existe");
+        }
+        dueñoRestauranteDAO.save(dueño);
+    }
+
+    /*public void registrarUsuarioRestaurante(Usuario usuario) throws ServiceException {
         if (usuarioDAO.findByNombreUsuario(usuario.getNombreUsuario()) != null) {
             throw new ServiceException("El nombre de usuario ya existe");
         }
@@ -52,7 +63,7 @@ public class AuthService {
         restaurante.setTipoUsuario("RESTAURANTE");
 
         usuarioDAO.save(restaurante);
-    }
+    }*/
 
     public void registrarComensal(Usuario usuario, String tipoComidaFavorita) throws ServiceException {
         if (usuarioDAO.findByNombreUsuario(usuario.getNombreUsuario()) != null) {

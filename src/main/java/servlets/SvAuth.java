@@ -1,7 +1,9 @@
 package servlets;
 
+import DAO.DueñoRestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
+import entidades.DueñoRestaurante;
 import entidades.Restaurante;
 import entidades.Usuario;
 import exceptions.ServiceException;
@@ -21,7 +23,8 @@ import java.util.List;
 public class SvAuth extends HttpServlet {
     private AuthService authService;
     private static EntityManagerFactory emf;
-    UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO;
+    private DueñoRestauranteDAO dueñoRestauranteDAO;
 
     @Override
     public void init() throws ServletException {
@@ -30,7 +33,8 @@ public class SvAuth extends HttpServlet {
                 emf = Persistence.createEntityManagerFactory("UFood_PU");
             }
             this.usuarioDAO = new UsuarioDAO(emf);
-            this.authService = new AuthService(usuarioDAO);
+            this.dueñoRestauranteDAO = new DueñoRestauranteDAO(emf);
+            this.authService = new AuthService(usuarioDAO, dueñoRestauranteDAO);
         } catch (Exception e) {
             throw new ServletException("Error al inicializar JPA", e);
         }
@@ -78,7 +82,9 @@ public class SvAuth extends HttpServlet {
                 Comensal comensal = (Comensal) usuario;
                 session.setAttribute("notificaciones", comensal.getNotificaciones());
                 response.sendRedirect("inicio");
-            } else if ("RESTAURANTE".equals(usuario.getTipoUsuario())) {
+            } else if (usuario instanceof DueñoRestaurante) {
+                DueñoRestaurante dueño = (DueñoRestaurante) usuario;
+                session.setAttribute("restaurante", dueño.getRestaurante());
                 response.sendRedirect("crearRestaurante.jsp");
             }
         } catch (ServiceException e) {
@@ -90,14 +96,19 @@ public class SvAuth extends HttpServlet {
     private void handleRestauranteRegistration(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Crear instancia de Restaurante en lugar de Usuario
-            Restaurante restaurante = new Restaurante();
-            restaurante.setNombreUsuario(request.getParameter("nombreUsuario"));
-            restaurante.setContrasena(request.getParameter("contrasena"));
-            restaurante.setEmail(request.getParameter("email"));
-            restaurante.setTipoUsuario("RESTAURANTE");
+            DueñoRestaurante dueño = new DueñoRestaurante(
+                    request.getParameter("nombreUsuario"),
+                    request.getParameter("contrasena"),
+                    request.getParameter("email")
+            );
 
-            authService.registrarUsuarioRestaurante(restaurante);
+            // Crear restaurante asociado con datos básicos
+            Restaurante restaurante = new Restaurante();
+            restaurante.setNombre(request.getParameter("nombre")); // Nuevo campo en el formulario
+            restaurante.setTipoComida(request.getParameter("tipoComida")); // Nuevo campo en el formulario
+            dueño.setRestaurante(restaurante);
+
+            authService.registrarDueñoRestaurante(dueño);
             response.sendRedirect("login.jsp?registroExitoso=true");
         } catch (ServiceException e) {
             request.setAttribute("error", e.getMessage());
@@ -134,13 +145,21 @@ public class SvAuth extends HttpServlet {
             int numeroRestaurantes = 6;
 
             crearComensales(numeroComensales);
-            crearRestaurantes(numeroRestaurantes);
+            crearDueñosRestaurantes(numeroRestaurantes);
         } catch (ServiceException e) {
             System.out.println("Error al crear usuarios: " + e.getMessage());
         }
     }
 
-    private void crearRestaurantes(int numeroRestaurantes) throws ServiceException {
+    private void crearDueñosRestaurantes(int numeroRestaurantes) throws ServiceException {
+        List<String> nombresRestaurantes = Arrays.asList(
+                "Burger Place", "Comida Casera Doña Marta", "Pescados y Mariscos del Pacífico",
+                "Restaurante Gourmet La Mesa", "Pizza Rápida", "El Buen Sabor");
+
+        List<String> tiposComida = Arrays.asList(
+                "Comida Rápida", "Comida Casera", "Comida Costeña",
+                "Platos a la Carta", "Comida Rápida", "Comida Casera");
+
         for (int i = 1; i <= numeroRestaurantes; i++) {
             String nombreUsuario = "r" + i;
             String contrasena = "r" + i;
@@ -150,13 +169,14 @@ public class SvAuth extends HttpServlet {
                 continue;
             }
 
+            DueñoRestaurante dueño = new DueñoRestaurante(nombreUsuario, contrasena, email);
             Restaurante restaurante = new Restaurante();
-            restaurante.setNombreUsuario(nombreUsuario);
-            restaurante.setContrasena(contrasena);
-            restaurante.setEmail(email);
+            restaurante.setNombre(nombresRestaurantes.get(i-1));
+            restaurante.setTipoComida(tiposComida.get(i-1));
+            dueño.setRestaurante(restaurante);
 
-            authService.registrarUsuarioRestaurante(restaurante);
-            registrarRestaurantesQuemados(numeroRestaurantes);
+            authService.registrarDueñoRestaurante(dueño);
+            registrarRestaurantesQuemados(dueño);
         }
     }
 
@@ -181,19 +201,11 @@ public class SvAuth extends HttpServlet {
         }
     }
 
-    private void registrarRestaurantesQuemados(int numeroRestaurantes) {
-        List<String> nombres = Arrays.asList(
-                "Burger Place", "Comida Casera Doña Marta", "Pescados y Mariscos del Pacífico",
-                "Restaurante Gourmet La Mesa", "Pizza Rápida", "El Buen Sabor");
-
+    private void registrarRestaurantesQuemados(DueñoRestaurante dueño) {
         List<String> descripciones = Arrays.asList(
                 "Las mejores hamburguesas de la ciudad", "Comida casera como la de mamá",
                 "Los mejores mariscos frescos", "Ambiente elegante y platos selectos",
                 "Pizza rápida y deliciosa", "Sabores tradicionales");
-
-        List<String> tiposComida = Arrays.asList(
-                "Comida Rápida", "Comida Casera", "Comida Costeña",
-                "Platos a la Carta", "Comida Rápida", "Comida Casera");
 
         List<String> horasApertura = Arrays.asList(
                 "10:00", "08:00", "11:00", "12:00", "11:00", "07:30");
@@ -213,36 +225,23 @@ public class SvAuth extends HttpServlet {
         List<Integer> calidades = Arrays.asList(
                 3, 4, 4, 5, 3, 4);
 
-        for (int i = 0; i < 6; i++) {
-            try {
-                String nombreUsuario = "r" + (i + 1);
-                if (!authService.usuarioExiste(nombreUsuario)) {
-                    continue;
-                }
+        try {
+            Restaurante restaurante = dueño.getRestaurante();
+            int index = Integer.parseInt(dueño.getNombreUsuario().substring(1)) - 1;
 
-                Usuario usuario = authService.findByNombreUsuario(nombreUsuario);
-                if (!(usuario instanceof Restaurante)) {
-                    continue;
-                }
+            restaurante.setDescripcion(descripciones.get(index));
+            restaurante.setHoraApertura(LocalTime.parse(horasApertura.get(index)));
+            restaurante.setHoraCierre(LocalTime.parse(horasCierre.get(index)));
+            restaurante.setDistanciaUniversidad(distanciasUniversidad.get(index));
+            restaurante.setPrecio(precios.get(index));
+            restaurante.setTiempoEspera(tiemposEspera.get(index));
+            restaurante.setCalidad(calidades.get(index));
 
-                Restaurante restaurante = (Restaurante) usuario;
+            dueñoRestauranteDAO.save(dueño);
+            System.out.println("Restaurante actualizado: " + dueño.getNombreUsuario() + " - " + restaurante.getNombre());
 
-                restaurante.setNombre(nombres.get(i));
-                restaurante.setDescripcion(descripciones.get(i));
-                restaurante.setTipoComida(tiposComida.get(i));
-                restaurante.setHoraApertura(LocalTime.parse(horasApertura.get(i)));
-                restaurante.setHoraCierre(LocalTime.parse(horasCierre.get(i)));
-                restaurante.setDistanciaUniversidad(distanciasUniversidad.get(i));
-                restaurante.setPrecio(precios.get(i));
-                restaurante.setTiempoEspera(tiemposEspera.get(i));
-                restaurante.setCalidad(calidades.get(i));
-
-                usuarioDAO.save(restaurante);
-                System.out.println("Restaurante actualizado: " + nombreUsuario + " - " + nombres.get(i));
-
-            } catch (Exception e) {
-                System.out.println("Error al actualizar restaurante: " + e.getMessage());
-            }
+        } catch (Exception e) {
+            System.out.println("Error al actualizar restaurante: " + e.getMessage());
         }
     }
 

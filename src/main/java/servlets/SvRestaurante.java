@@ -248,7 +248,7 @@ public class SvRestaurante extends HttpServlet {
     }
 
     private void procesarActualizarRestaurante(HttpServletRequest req, HttpServletResponse resp,
-            Restaurante restauranteUsuario) throws IOException {
+                                               Restaurante restauranteUsuario) throws IOException {
         try {
             // Actualizar los datos del restaurante con los parámetros recibidos
             String nombre = req.getParameter("nombre");
@@ -256,14 +256,8 @@ public class SvRestaurante extends HttpServlet {
             String tipoComida = req.getParameter("tipoComida");
             String horaApertura = req.getParameter("horaApertura");
             String horaCierre = req.getParameter("horaCierre");
-
-            String tiempoEspera = req.getParameter("tiempoEspera");
-            String calidad = req.getParameter("calidad");
-            String precio = req.getParameter("precio");
-            String distanciaUniversidad = req.getParameter("distanciaUniversidad");
             Double distanciaUniversidad = Double.parseDouble(req.getParameter("distanciaUniversidad"));
             int precio = Integer.parseInt(req.getParameter("precio"));
-
 
             if (nombre != null)
                 restauranteUsuario.setNombre(nombre);
@@ -281,17 +275,6 @@ public class SvRestaurante extends HttpServlet {
                 restauranteUsuario.setPrecio(precio);
 
             // Procesar nuevos campos
-
-            if (tiempoEspera != null && !tiempoEspera.isEmpty())
-                restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
-            if (calidad != null && !calidad.isEmpty())
-                restauranteUsuario.setCalidad(Integer.parseInt(calidad));
-            if (precio != null && !precio.isEmpty())
-                restauranteUsuario.setPrecio(Integer.parseInt(precio));
-            if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-                restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
-
-
             // if (tiempoEspera != null && !tiempoEspera.isEmpty())
             // restauranteUsuario.setTiempoEspera(Integer.parseInt(tiempoEspera));
             // if (calidad != null && !calidad.isEmpty())
@@ -299,10 +282,6 @@ public class SvRestaurante extends HttpServlet {
             // if (precio != null && !precio.isEmpty())
             // restauranteUsuario.setPrecio(Integer.parseInt(precio));
             // if (distanciaUniversidad != null && !distanciaUniversidad.isEmpty())
-
-            //     restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
-
-
             // restauranteUsuario.setDistanciaUniversidad(Double.parseDouble(distanciaUniversidad));
             // 1
             // 2
@@ -319,7 +298,6 @@ public class SvRestaurante extends HttpServlet {
             // 12
             // 13
             // 14
-
             // Guardar en la base de datos
             usuarioDAO.save(restauranteUsuario);
 
