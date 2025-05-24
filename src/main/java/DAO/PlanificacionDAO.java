@@ -6,9 +6,11 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class PlanificacionDAO {
     private static final Logger LOGGER = Logger.getLogger(CalificacionDAO.class.getName());
@@ -52,9 +54,7 @@ public class PlanificacionDAO {
                 em.close();
             }
         }
-    }
-
-    public List<Planificacion> obtenerPlanificacionesPorId(Long idComensalPlanificador) {
+    }    public List<Planificacion> obtenerPlanificacionesPorId(Long idComensalPlanificador) {
         EntityManager em = emf.createEntityManager();
         try {
             return em
@@ -68,5 +68,29 @@ public class PlanificacionDAO {
                 em.close();
             }
         }
+    }
+    
+    public List<Planificacion> obtenerPlanificacionesPorParticipacion(Long comensalId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT p FROM Planificacion p JOIN p.comensales c WHERE c.id = :comensalId",
+                    Planificacion.class)
+                    .setParameter("comensalId", comensalId)
+                    .getResultList();
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+    
+    public List<Planificacion> obtenerTodasPlanificacionesComensal(Long comensalId) {
+        List<Planificacion> resultado = new ArrayList<>();
+        resultado.addAll(obtenerPlanificacionesPorId(comensalId)); // Planificaciones creadas
+        resultado.addAll(obtenerPlanificacionesPorParticipacion(comensalId)); // Planificaciones donde participa
+        
+        // Eliminar duplicados (en caso de que el planificador también esté en la lista de comensales)
+        return resultado.stream().distinct().collect(Collectors.toList());
     }
 }

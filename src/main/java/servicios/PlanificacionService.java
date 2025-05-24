@@ -2,9 +2,11 @@ package servicios;
 
 import DAO.PlanificacionDAO;
 import DAO.UsuarioDAO;
+import DAO.VotoDAO;
 import entidades.Comensal;
 import entidades.Planificacion;
 import entidades.Restaurante;
+import entidades.Voto;
 import jakarta.persistence.*;
 
 import java.time.Duration;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
     private final UsuarioDAO usuarioDAO;
+    private VotoDAO votoDAO;
 
     private final NotificacionService notificacionService;
 
@@ -30,16 +33,16 @@ public class PlanificacionService {
             this.emf = Persistence.createEntityManagerFactory("UFood_PU");
         }
         this.planificacionDAO = planificacionDAO;
-
         this.usuarioDAO = new UsuarioDAO(emf);
+        this.votoDAO = new VotoDAO(emf);
         notificacionService = null;
-
     }
+
     // Para el test
     public PlanificacionService(NotificacionService notificacionService) {
         this.planificacionDAO = null;
-        //this.calificacionDAO = null;
         this.usuarioDAO = null;
+        this.votoDAO = null;
         this.notificacionService = notificacionService;
     }
 
@@ -153,4 +156,103 @@ public class PlanificacionService {
         }
     }
 
+    // Nuevos métodos para votación
+    public void iniciarVotacion(Long planificacionId) {
+        Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+        planificacion.iniciarVotacion();
+        planificacionDAO.save(planificacion);
+
+        // Notificar a todos los comensales que ha iniciado la votación
+        List<Comensal> comensales = planificacion.getComensales();
+        if (notificacionService != null && comensales != null) {
+            for (Comensal comensal : comensales) {
+                notificacionService.notificarRestauranteElegido(comensal,
+                    "Se ha iniciado la votación para la planificación: " + planificacion.getNombre());
+            }
+        }
+    }
+
+    public void terminarVotacion(Long planificacionId) {
+        Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+
+        // Contar votos y determinar restaurante ganador
+        Map<Restaurante, Integer> conteoVotos = votoDAO.contarVotosPorRestaurante(planificacionId);
+        if (conteoVotos != null && !conteoVotos.isEmpty()) {
+            Restaurante restauranteGanador = resolverEmpateEnVotacion(conteoVotos);
+            planificacion.setRestauranteGanador(restauranteGanador);
+
+            // Para compatibilidad con código existente
+            planificacion.setRestaurante(restauranteGanador);
+
+            // Notificar a todos los comensales del resultado
+            if (notificacionService != null && planificacion.getComensales() != null) {
+                for (Comensal comensal : planificacion.getComensales()) {
+                    notificacionService.notificarRestauranteElegido(comensal,
+                        "El restaurante ganador para la planificación " +
+                        planificacion.getNombre() + " es: " + restauranteGanador.getNombre());
+                }
+            }
+        }
+
+        planificacion.terminarVotacion();
+        planificacionDAO.save(planificacion);
+    }
+
+    public void registrarVoto(Long planificacionId, Long comensalId, Long restauranteId) {
+        Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+        Comensal comensal = usuarioDAO.obtenerComensalPorId(comensalId);
+        Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
+
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+
+        if (comensal == null) {
+            throw new EntityNotFoundException("Comensal no encontrado con ID: " + comensalId);
+        }
+
+        if (restaurante == null) {
+            throw new EntityNotFoundException("Restaurante no encontrado con ID: " + restauranteId);
+        }
+
+        if (!planificacion.puedeVotar(comensal)) {
+            throw new IllegalStateException("El comensal no puede votar en esta planificación");
+        }
+
+        // Verificar si el restaurante está en la lista de opciones
+        if (!planificacion.getRestaurantes().contains(restaurante)) {
+            throw new IllegalArgumentException("El restaurante no es una opción válida para esta planificación");
+        }
+
+        // Verificar si el comensal ya votó y eliminar el voto anterior si existe
+        Voto votoExistente = votoDAO.obtenerVotoComensal(planificacionId, comensalId);
+        if (votoExistente != null) {
+            votoDAO.delete(votoExistente);
+        }
+
+        // Crear y guardar el nuevo voto
+        Voto voto = new Voto(planificacion, comensal, restaurante);
+        votoDAO.save(voto);
+    }
+
+    public Map<Restaurante, Integer> obtenerResultadosVotacion(Long planificacionId) {
+        // Verificar que la planificación existe
+        Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+        if (planificacion == null) {
+            throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
+        }
+
+        return votoDAO.contarVotosPorRestaurante(planificacionId);
+    }
+
+    public Restaurante obtenerVotoComensal(Long planificacionId, Long comensalId) {
+        Voto voto = votoDAO.obtenerVotoComensal(planificacionId, comensalId);
+        return voto != null ? voto.getRestaurante() : null;
+    }
 }

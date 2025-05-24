@@ -10,6 +10,7 @@ public class Planificacion {
     public String nombre;
     public String hora;
     public String estado;
+    public String estadoVotacion; // "No iniciada", "En progreso", "Terminada"
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +34,11 @@ public class Planificacion {
     @JoinColumn(name = "restaurante_id")
     private Restaurante restaurante;
 
+    // Restaurant with the highest number of votes
+    @ManyToOne
+    @JoinColumn(name = "restaurante_ganador_id")
+    private Restaurante restauranteGanador;
+
     public Planificacion() {
     }
 
@@ -40,6 +46,7 @@ public class Planificacion {
         this.nombre = nombre;
         this.hora = hora;
         estado = "Activa";
+        estadoVotacion = "No iniciada";
     }
 
     public Long getId() {
@@ -133,4 +140,50 @@ public class Planificacion {
         this.comensalPlanificador = comensalPlanificador;
     }
 
+    // Nuevos métodos para votación
+    public String getEstadoVotacion() {
+        return estadoVotacion;
+    }
+
+    public void setEstadoVotacion(String estadoVotacion) {
+        this.estadoVotacion = estadoVotacion;
+    }
+
+    public void iniciarVotacion() {
+        if (!"Activa".equals(this.estado)) {
+            throw new IllegalStateException("Solo se puede iniciar votación en una planificación activa");
+        }
+        if (this.restaurantes == null || this.restaurantes.isEmpty()) {
+            throw new IllegalStateException("La planificación debe tener al menos un restaurante para iniciar votación");
+        }
+        this.estadoVotacion = "En progreso";
+    }
+
+    public void terminarVotacion() {
+        if (!"En progreso".equals(this.estadoVotacion)) {
+            throw new IllegalStateException("No hay votación en progreso para terminar");
+        }
+        this.estadoVotacion = "Terminada";
+    }
+
+    public Restaurante getRestauranteGanador() {
+        return restauranteGanador;
+    }
+
+    public void setRestauranteGanador(Restaurante restauranteGanador) {
+        this.restauranteGanador = restauranteGanador;
+    }
+
+    public boolean esComensalPlanificador(Comensal comensal) {
+        if (comensal == null || this.comensalPlanificador == null) {
+            return false;
+        }
+        return comensal.getId().equals(this.comensalPlanificador.getId());
+    }    public boolean puedeVotar(Comensal comensal) {
+        // Allow either comensales in the list or the planificador to vote
+        boolean esParticipante = this.comensales != null && this.comensales.contains(comensal);
+        boolean esPlanificador = esComensalPlanificador(comensal);
+
+        return "En progreso".equals(this.estadoVotacion) && (esParticipante || esPlanificador);
+    }
 }

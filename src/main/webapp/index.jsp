@@ -52,10 +52,13 @@
                         <a href="${pageContext.request.contextPath}/filtrarRestaurantes.jsp"
                            class="btn btn-info">
                             <i class="fas fa-filter me-2"></i>Filtrar
-                        </a>
-                        <a href="${pageContext.request.contextPath}/planificar"
+                        </a>                        <a href="${pageContext.request.contextPath}/planificar"
                            class="btn btn-success">
                             <i class="fas fa-calendar-plus me-2"></i>Crear Planificación
+                        </a>
+                        <a href="${pageContext.request.contextPath}/misPlanificaciones"
+                           class="btn btn-primary">
+                            <i class="fas fa-calendar-alt me-2"></i>Mis Planificaciones
                         </a>
                     </c:if>
                     <button type="button" class="btn btn-secondary"
