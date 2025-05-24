@@ -32,18 +32,8 @@
                             <p><strong>Hora:</strong> ${planificacion.hora}</p>
                             <p><strong>Estado:</strong> ${planificacion.estado}</p>
                             <p><strong>Planificador:</strong> ${planificacion.comensalPlanificador.nombreUsuario}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <c:if test="${not empty planificacion.restaurante}">
-                                <div class="mb-3">
-                                    <h5>Restaurante Seleccionado</h5>
-                                    <div class="alert alert-info">
-                                        <p><strong>Nombre:</strong> ${planificacion.restaurante.nombre}</p>
-                                        <p><strong>Tipo de comida:</strong> ${planificacion.restaurante.tipoComida}</p>
-                                        <p><strong>Puntaje promedio:</strong> ${planificacion.restaurante.puntajePromedio} ★</p>
-                                    </div>
-                                </div>
-                            </c:if>
+                        </div>                        <div class="col-md-6">
+                            <!-- Removed principal restaurant display -->
                         </div>
                     </div>
                 </div>
@@ -125,26 +115,47 @@
                     </div>
 
                     <!-- Pestaña de Restaurantes -->
-                    <div class="tab-pane fade p-3" id="restaurantes" role="tabpanel" aria-labelledby="restaurantes-tab">
-                        <!-- Mostrar el restaurante actual si existe -->
-                        <c:if test="${not empty planificacion.restaurante}">
-                            <h4 class="mt-3 mb-3">Restaurante actual</h4>
-                            <div class="alert alert-info">
-                                <p><strong>Nombre:</strong> ${planificacion.restaurante.nombre}</p>
-                                <p><strong>Tipo de comida:</strong> ${planificacion.restaurante.tipoComida}</p>
-                                <p><strong>Puntaje promedio:</strong> ${planificacion.restaurante.puntajePromedio} ★</p>
-                                <c:if test="${not empty planificacion.restaurante.descripcion}">
-                                    <p><strong>Descripción:</strong> ${planificacion.restaurante.descripcion}</p>
-                                </c:if>
-                                <c:if test="${not empty planificacion.restaurante.horaApertura && not empty planificacion.restaurante.horaCierre}">
-                                    <p><strong>Horario:</strong> ${planificacion.restaurante.horaApertura} - ${planificacion.restaurante.horaCierre}</p>
-                                </c:if>
-                            </div>
-                        </c:if>
+                    <div class="tab-pane fade p-3" id="restaurantes" role="tabpanel" aria-labelledby="restaurantes-tab">                        <!-- Mostrar todos los restaurantes de la planificación -->
+                        <h4 class="mt-3 mb-3">Restaurantes considerados</h4>
 
-                        <!-- Formulario para seleccionar un restaurante -->
+                        <c:choose>
+                            <c:when test="${empty planificacion.restaurantes}">
+                                <div class="alert alert-warning">No hay restaurantes añadidos a esta planificación.</div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle">
+                                        <thead class="table-light">
+                                            <tr>                                                <th>Nombre</th>
+                                                <th>Tipo de comida</th>
+                                                <th>Puntaje</th>
+                                                <th>Horario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="restaurante" items="${planificacion.restaurantes}">
+                                                <tr>
+                                                    <td>${restaurante.nombre}</td>
+                                                    <td>${restaurante.tipoComida}</td>
+                                                    <td>${restaurante.puntajePromedio} ★</td>                                                    <td>
+                                                        <c:if test="${not empty restaurante.horaApertura && not empty restaurante.horaCierre}">
+                                                            ${restaurante.horaApertura} - ${restaurante.horaCierre}
+                                                        </c:if>
+                                                        <c:if test="${empty restaurante.horaApertura || empty restaurante.horaCierre}">
+                                                            No especificado
+                                                        </c:if>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+
+                        <!-- Formulario para añadir un nuevo restaurante -->
                         <c:if test="${planificacion.estado == 'Activa'}">
-                            <h4 class="mt-4 mb-3">Seleccionar restaurante</h4>
+                            <h4 class="mt-4 mb-3">Añadir nuevo restaurante</h4>
                             <form action="${pageContext.request.contextPath}/agregarRestaurante" method="POST">
                                 <input type="hidden" name="planificacionId" value="${planificacion.id}">
 
