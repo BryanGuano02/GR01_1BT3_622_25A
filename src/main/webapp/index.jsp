@@ -125,41 +125,40 @@
                                         <div class="restaurant-img-placeholder">
                                             <i class="fas fa-utensils fa-3x"></i>
                                             <!-- Mostrar posición según puntaje -->
-                                            <div class="position-badge">#${status.index
-                                                    + 1}</div>
+                                            <div class="position-badge">#${status.index + 1}</div>
                                         </div>
                                         <div class="card-body">
                                             <h5 class="card-title">
-                                                <c:out
-                                                        value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                                <a href="${pageContext.request.contextPath}/detalleRestaurante?id=${restaurante.id}" class="text-decoration-none text-dark">
+                                                    <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                                </a>
                                             </h5>
                                             <p class="restaurant-type mb-2">
                                                 <i class="fas fa-utensils me-1"></i>
-                                                <c:out
-                                                        value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                                <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
                                             </p>
 
                                             <div class="mb-2">
                                                 <!-- Mostrar siempre las 5 estrellas -->
                                                 <c:forEach begin="1" end="5" var="i">
-                                                    <i
-                                                            class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
+                                                    <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
                                                 </c:forEach>
                                                 <span class="ms-1">
-                                                                                    (
-                                                                                    <fmt:formatNumber
-                                                                                            value="${restaurante.puntajePromedio}"
-                                                                                            pattern="#.##"/>)
+                                                    (<fmt:formatNumber value="${restaurante.puntajePromedio}" pattern="#.##"/>)
                                                     <!-- Debug visible solo para desarrolladores -->
-                                                                                    <span style="display: none;">ID:
-                                                                                            ${restaurante.id}</span>
-                                                                                </span>
+                                                    <span style="display: none;">ID: ${restaurante.id}</span>
+                                                </span>
                                             </div>
 
                                             <p class="card-text">
-                                                <c:out
-                                                        value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                                <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
                                             </p>
+
+                                            <div class="d-grid mt-3">
+                                                <a href="${pageContext.request.contextPath}/detalleRestaurante?id=${restaurante.id}" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-info-circle me-1"></i>Ver detalles
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -210,25 +209,25 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <c:out
-                                            value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                    <a href="${pageContext.request.contextPath}/detalleRestaurante?id=${restaurante.id}" class="text-decoration-none text-dark">
+                                        <c:out value="${not empty restaurante.nombre ? restaurante.nombre : 'Sin nombre'}"/>
+                                    </a>
                                 </h5>
                                 <p class="restaurant-type mb-2">
                                     <i class="fas fa-utensils me-1"></i>
-                                    <c:out
-                                            value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
+                                    <c:out value="${not empty restaurante.tipoComida ? restaurante.tipoComida : 'No especificado'}"/>
                                 </p>
 
                                 <div class="mb-2">
                                     <c:choose>
                                         <c:when test="${restaurante.puntajePromedio > 0}">
                                             <c:forEach begin="1" end="5" var="i">
-                                                <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'rating-stars' : 'text-secondary'}"></i>
+                                                <i class="fas fa-star ${i <= restaurante.puntajePromedio ? 'text-warning' : 'text-secondary'}"></i>
                                             </c:forEach>
                                             <span class="ms-1">(
                                                 <fmt:formatNumber value="${restaurante.puntajePromedio}"
                                                                   pattern="#.##"/>)
-                                                                            </span>
+                                            </span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted">Sin calificaciones</span>
@@ -237,13 +236,17 @@
                                 </div>
 
                                 <p class="card-text">
-                                    <c:out
-                                            value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
+                                    <c:out value="${not empty restaurante.descripcion ? restaurante.descripcion : 'Sin descripción'}"/>
                                 </p>
 
                                 <div class="restaurant-actions">
-                                    <c:if
-                                            test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                                    <!-- Añadir botón de ver detalles -->
+                                    <a href="${pageContext.request.contextPath}/detalleRestaurante?id=${restaurante.id}"
+                                       class="btn btn-sm btn-primary me-1">
+                                        <i class="fas fa-info-circle"></i> Detalles
+                                    </a>
+
+                                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
                                         <a href="${pageContext.request.contextPath}/calificar?idRestaurante=${restaurante.id}"
                                            class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-star"></i> Calificar
@@ -448,10 +451,9 @@ setTimeout(function () {
 <!-- Bootstrap JS -->
 <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+<script>    document.addEventListener('DOMContentLoaded', function () {
         const seccionRecomendados = document.getElementById('seccionRecomendados');
-        const tieneRecomendados = ${ not empty restaurantesRecomendados };
+        const tieneRecomendados = ${not empty restaurantesRecomendados ? 'true' : 'false'};
 
         if (seccionRecomendados && tieneRecomendados) {
             // Forzar repintado del componente
