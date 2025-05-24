@@ -1,5 +1,6 @@
 package servicios;
 
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.MenuDelDia;
 import entidades.Restaurante;
@@ -16,26 +17,24 @@ public class MenuDelDiaTest {
 
     @BeforeEach
     void setUp() {
-
         restauranteMock = new Restaurante();
         restauranteMock.setId(1L);
         restauranteMock.setMenuDelDia(new MenuDelDia("Menú inicial", 0));
 
-
-        UsuarioDAO usuarioDAOMock = new UsuarioDAO(null) {
-
+        // Usamos RestauranteDAO en lugar de UsuarioDAO para las operaciones con restaurantes
+        RestauranteDAO restauranteDAOMock = new RestauranteDAO(null) {
             @Override
-            public Restaurante findById(Long id) {
+            public Restaurante obtenerRestaurantePorId(Long id) {
                 return restauranteMock;
             }
 
             @Override
-            public void save(Usuario usuario) {
-                restauranteMock = (Restaurante) usuario; // Guardamos en memoria
+            public void save(Restaurante restaurante) {
+                restauranteMock = restaurante; // Guardamos en memoria
             }
         };
 
-        menuDelDiaService = new MenuDelDiaService(usuarioDAOMock);
+        menuDelDiaService = new MenuDelDiaService(restauranteDAOMock);
     }
 
     @Test
@@ -70,7 +69,8 @@ public class MenuDelDiaTest {
 
         assertEquals(1, restauranteMock.getMenuDelDia().getCantidadVotos());
     }
-        @Test
+
+    @Test
     void givenRestauranteWithMenu_whenGuardarMenuDelDia_thenSobrescribeMenu() {
         restauranteMock.getMenuDelDia().setDescripcion("Antiguo menú");
         Restaurante actualizado = menuDelDiaService.guardarMenuDelDia("Nuevo menú", 1L);
