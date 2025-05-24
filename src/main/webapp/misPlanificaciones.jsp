@@ -49,9 +49,10 @@
                                 <tr>
                                     <td>${plan.id}</td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}" class="text-decoration-none">
-                                            ${plan.nombre}
-                                        </a>
+<%--                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}" class="text-decoration-none">--%>
+<%--                                            ${plan.nombre}--%>
+<%--                                        </a>--%>
+                                        <span>${plan.nombre}</span>
                                     </td>
                                     <td>${plan.hora}</td>
                                     <td>
@@ -79,12 +80,12 @@
                                            class="btn btn-sm btn-primary me-1">
                                             <i class="fas fa-eye"></i> Ver Detalles
                                         </a>
-                                        <c:if test="${plan.estadoVotacion == 'En progreso'}">
-                                            <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}#votacion"
-                                               class="btn btn-sm btn-warning">
-                                                <i class="fas fa-vote-yea"></i> Votar
-                                            </a>
-                                        </c:if>
+<%--                                        <c:if test="${plan.estadoVotacion == 'En progreso'}">--%>
+<%--                                            <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}#votacion"--%>
+<%--                                               class="btn btn-sm btn-warning">--%>
+<%--                                                <i class="fas fa-vote-yea"></i> Votar--%>
+<%--                                            </a>--%>
+<%--                                        </c:if>--%>
                                     </td>
                                 </tr>
                             </c:forEach>

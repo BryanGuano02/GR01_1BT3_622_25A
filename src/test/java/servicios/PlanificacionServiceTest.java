@@ -72,11 +72,17 @@ public class PlanificacionServiceTest {
         restaurante.setId(1L);
         restaurante.setNombre("La Cevichería");
 
-        planificacion.setRestaurante(restaurante);
-        Restaurante restauranteAsociado = planificacion.getRestaurante();
+        planificacion.addRestaurante(restaurante);
 
-        assertNotNull("El restaurante no debería ser null", planificacion.getRestaurante());
-        assertEquals("La Cevichería", planificacion.getRestaurante().getNombre());
+        // Verificamos que la lista no esté vacía
+        assertNotNull("La lista de restaurantes no debería ser null", planificacion.getRestaurantes());
+        assertTrue("La lista de restaurantes no debería estar vacía", !planificacion.getRestaurantes().isEmpty());
+
+        // Obtenemos el último restaurante añadido (en este caso es solo uno)
+        Restaurante restauranteAsociado = planificacion.getRestaurantes().get(planificacion.getRestaurantes().size() - 1);
+
+        assertNotNull("El restaurante no debería ser null", restauranteAsociado);
+        assertEquals("La Cevichería", restauranteAsociado.getNombre());
     }
 
     @Test

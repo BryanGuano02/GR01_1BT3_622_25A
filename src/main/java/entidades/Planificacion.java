@@ -29,11 +29,6 @@ public class Planificacion {
     @JoinTable(name = "planificacion_restaurante", joinColumns = @JoinColumn(name = "planificacion_id"), inverseJoinColumns = @JoinColumn(name = "restaurante_id"))
     private List<Restaurante> restaurantes = new ArrayList<>();
 
-    // Keep for backward compatibility
-    @ManyToOne
-    @JoinColumn(name = "restaurante_id")
-    private Restaurante restaurante;
-
     // Restaurant with the highest number of votes
     @ManyToOne
     @JoinColumn(name = "restaurante_ganador_id")
@@ -79,16 +74,6 @@ public class Planificacion {
 
     public void setComensales(List<Comensal> comensales) {
         this.comensales = comensales;
-    }
-
-    public Restaurante getRestaurante() {
-        return restaurante;
-    }    public void setRestaurante(Restaurante restaurante) {
-        // Deprecated - keeping for backward compatibility only
-        if (restaurante == null || restaurante.getNombre() == null || restaurante.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("Restaurante no válido");
-        }
-        this.restaurante = restaurante;
     }
 
     public List<Restaurante> getRestaurantes() {
@@ -154,7 +139,8 @@ public class Planificacion {
             throw new IllegalStateException("Solo se puede iniciar votación en una planificación activa");
         }
         if (this.restaurantes == null || this.restaurantes.isEmpty()) {
-            throw new IllegalStateException("La planificación debe tener al menos un restaurante para iniciar votación");
+            throw new IllegalStateException(
+                    "La planificación debe tener al menos un restaurante para iniciar votación");
         }
         this.estadoVotacion = "En progreso";
     }
@@ -179,11 +165,27 @@ public class Planificacion {
             return false;
         }
         return comensal.getId().equals(this.comensalPlanificador.getId());
-    }    public boolean puedeVotar(Comensal comensal) {
-        // Allow either comensales in the list or the planificador to vote
-        boolean esParticipante = this.comensales != null && this.comensales.contains(comensal);
-        boolean esPlanificador = esComensalPlanificador(comensal);
+    }
 
-        return "En progreso".equals(this.estadoVotacion) && (esParticipante || esPlanificador);
+    public boolean puedeVotar(Comensal comensal) {
+        if (comensal == null) {
+            System.out.println("Error: Comensal es null");
+            return false;
+        }
+
+        boolean esParticipante = false;
+        if (this.comensales != null) {
+            for (Comensal c : this.comensales) {
+                if (c.getId() != null && c.getId().equals(comensal.getId())) {
+                    esParticipante = true;
+                    break;
+                }
+            }
+        }
+
+        boolean esPlanificador = esComensalPlanificador(comensal);
+        boolean enProgresoVotacion = "En progreso".equals(this.estadoVotacion);
+
+        return enProgresoVotacion && (esParticipante || esPlanificador);
     }
 }

@@ -1,6 +1,6 @@
 package servlets;
 
-import DAO.UsuarioDAO;
+import DAO.RestauranteDAO;
 import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -15,13 +15,13 @@ import java.util.List;
 
 @WebServlet(name = "comparar", urlPatterns = {"/comparar"})
 public class SvComparar extends HttpServlet {
-    private UsuarioDAO usuarioDAO;
+    private RestauranteDAO restauranteDAO;
     private EntityManagerFactory emf;
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
-        usuarioDAO = new UsuarioDAO(emf);
+        restauranteDAO = new RestauranteDAO(emf);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SvComparar extends HttpServlet {
 
         try {
             if (accion == null || accion.equals("listar")) {
-                List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+                List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
                 request.setAttribute("restaurantes", restaurantes);
                 request.getRequestDispatcher("/compararRestaurantes.jsp")
                         .forward(request, response);
@@ -46,9 +46,9 @@ public class SvComparar extends HttpServlet {
                     return;
                 }
 
-                // Obtener restaurantes usando el DAO
-                Restaurante rest1 = (Restaurante) usuarioDAO.findById(id1);
-                Restaurante rest2 = (Restaurante) usuarioDAO.findById(id2);
+                // Obtener restaurantes usando el RestauranteDAO
+                Restaurante rest1 = restauranteDAO.obtenerRestaurantePorId(id1);
+                Restaurante rest2 = restauranteDAO.obtenerRestaurantePorId(id2);
 
                 if (rest1 == null || rest2 == null) {
                     request.setAttribute("error", "Uno o ambos restaurantes no fueron encontrados");
@@ -63,7 +63,7 @@ public class SvComparar extends HttpServlet {
             }
         } catch (Exception e) {
             request.setAttribute("error", "Ha ocurrido un error en el proceso");
-            List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+            List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
             request.setAttribute("restaurantes", restaurantes);
             request.getRequestDispatcher("/compararRestaurantes.jsp")
                     .forward(request, response);

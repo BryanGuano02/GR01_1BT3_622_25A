@@ -125,6 +125,8 @@ public class SvVotacion extends HttpServlet {
         String restauranteIdStr = request.getParameter("restauranteId");
         String mensaje;
 
+        System.out.println("planificacionIdStr: " + planificacionIdStr + ", restauranteIdStr: " + restauranteIdStr);
+
         if (planificacionIdStr == null || planificacionIdStr.isEmpty() ||
                 restauranteIdStr == null || restauranteIdStr.isEmpty()) {
             mensaje = "Error: Faltan parámetros requeridos.";

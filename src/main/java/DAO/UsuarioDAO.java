@@ -13,6 +13,17 @@ public class UsuarioDAO {
         this.emf = emf;
     }
 
+    // Método findAll para obtener todos los usuarios
+    public List<Usuario> findAll() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT u FROM Usuario u", Usuario.class)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
     public Usuario findByNombreUsuario(String nombreUsuario) {
         EntityManager em = emf.createEntityManager();
@@ -60,7 +71,7 @@ public class UsuarioDAO {
     }
 
     public void insert(Usuario usuario) {
-        this.save(usuario); // Unificamos con el método save
+        this.save(usuario);
     }
 
     public Usuario findById(Long id) {
@@ -113,9 +124,9 @@ public class UsuarioDAO {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery(
-                "SELECT c FROM Comensal c LEFT JOIN FETCH c.notificaciones WHERE c.id = :id", Comensal.class)
-                .setParameter("id", id)
-                .getSingleResult();
+                            "SELECT c FROM Comensal c LEFT JOIN FETCH c.notificaciones WHERE c.id = :id", Comensal.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
         } catch (NoResultException e) {
             return null;
         } finally {
@@ -143,5 +154,4 @@ public class UsuarioDAO {
             emf.close();
         }
     }
-
 }

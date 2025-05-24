@@ -1,5 +1,7 @@
 package servicios;
 
+import DAO.DueñoRestauranteDAO;
+import DAO.RestauranteDAO;
 import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
@@ -13,21 +15,15 @@ import java.util.logging.Logger;
 public class SuscripcionService {
     private static final Logger LOGGER = Logger.getLogger(SuscripcionService.class.getName());
     private final UsuarioDAO usuarioDAO;
+    private final RestauranteDAO restauranteDAO;
     private final SuscripcionDAO suscripcionDAO;
 
-    public SuscripcionService(UsuarioDAO usuarioDAO, SuscripcionDAO suscripcionDAO) {
+    public SuscripcionService(UsuarioDAO usuarioDAO, RestauranteDAO restauranteDAO, SuscripcionDAO suscripcionDAO) {
         this.usuarioDAO = usuarioDAO;
+        this.restauranteDAO = restauranteDAO;
         this.suscripcionDAO = suscripcionDAO;
-        // No necesitamos crear un NotificacionService aquí para esta implementación
     }
 
-    /**
-     * Suscribe un comensal a un restaurante
-     *
-     * @param idComensal    ID del comensal
-     * @param idRestaurante ID del restaurante
-     * @throws ServiceException si hay problemas al procesar la suscripción
-     */
     public void suscribir(Long idComensal, Long idRestaurante) throws ServiceException {
         try {
             // Verificar si ya existe la suscripción
@@ -36,7 +32,7 @@ public class SuscripcionService {
             }
 
             // Obtener entidades
-            Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
+            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
             Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
 
             if (restaurante == null) {
@@ -64,7 +60,7 @@ public class SuscripcionService {
             usuarioDAO.save(comensal);
 
             LOGGER.log(Level.INFO, "Suscripción creada: Comensal {0} - Restaurante {1}",
-                    new Object[] { comensal.getNombreUsuario(), restaurante.getNombre() });
+                    new Object[]{comensal.getNombreUsuario(), restaurante.getNombre()});
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
@@ -81,7 +77,7 @@ public class SuscripcionService {
             }
 
             // Obtener entidades para notificación
-            Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
+            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
             Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
 
             // Eliminar la suscripción
@@ -90,16 +86,13 @@ public class SuscripcionService {
                 throw new ServiceException("No se pudo cancelar la suscripción");
             }
 
-            System.out.println("Desuscripción exitosa: " + resultado);
-
             // Crear notificación para el comensal
-            // String mensaje = "Has cancelado tu suscripción al restaurante " +
-            // restaurante.getNombre() + ".";
-            // comensal.agregarNotificacion(mensaje);
+            String mensaje = "Has cancelado tu suscripción al restaurante " + restaurante.getNombre() + ".";
+            comensal.agregarNotificacion(mensaje);
             usuarioDAO.save(comensal);
 
             LOGGER.log(Level.INFO, "Suscripción eliminada: Comensal {0} - Restaurante {1}",
-                    new Object[] { comensal.getNombreUsuario(), restaurante.getNombre() });
+                    new Object[]{comensal.getNombreUsuario(), restaurante.getNombre()});
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
@@ -108,13 +101,6 @@ public class SuscripcionService {
         }
     }
 
-    /**
-     * Verifica si un comensal está suscrito a un restaurante
-     *
-     * @param idComensal    ID del comensal
-     * @param idRestaurante ID del restaurante
-     * @return true si está suscrito, false en caso contrario
-     */
     public boolean estaSuscrito(Long idComensal, Long idRestaurante) {
         return suscripcionDAO.existeSuscripcion(idComensal, idRestaurante);
     }
