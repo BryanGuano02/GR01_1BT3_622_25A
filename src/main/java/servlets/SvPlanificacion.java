@@ -3,7 +3,6 @@ package servlets;
 import entidades.Comensal;
 import entidades.Planificacion;
 import entidades.Restaurante;
-import entidades.Restaurante;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
@@ -18,7 +17,7 @@ import DAO.UsuarioDAO;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "planificar", urlPatterns = { "/planificar", "/agregarComensal", "/agregarRestaurante", "/terminarVotacion" })
+@WebServlet(name = "planificar", urlPatterns = { "/planificar", "/agregarComensal", "/agregarRestaurante", "/terminarVotacion", "/detallePlanificacion" })
 public class SvPlanificacion extends HttpServlet {
     private PlanificacionService planificacionService;
     private EntityManagerFactory emf;
@@ -35,14 +34,11 @@ public class SvPlanificacion extends HttpServlet {
         String servletPath = request.getServletPath();
 
         switch (servletPath) {
-            case "/agregarComensal":
-                procesarAgregarComensal(request, response);
-                break;
-            case "/agregarRestaurante":
-                procesarAgregarRestaurante(request, response);
-                break;
             case "/terminarVotacion":
                 procesarTerminarVotacion(request, response);
+                break;
+            case "/detallePlanificacion":
+                mostrarDetallePlanificacion(request, response);
                 break;
             default: // /planificar
                 mostrarPlanificaciones(request, response);
@@ -185,8 +181,8 @@ public class SvPlanificacion extends HttpServlet {
             mensaje = "Error: ID inválido.";
         }
 
-        request.setAttribute("mensaje", mensaje);
-        mostrarPlanificaciones(request, response);
+        // Redireccionar a la vista de detalle en lugar de mostrar todas las planificaciones
+        response.sendRedirect(request.getContextPath() + "/detallePlanificacion?id=" + planificacionIdStr + "&mensaje=" + mensaje);
     }
 
     private void procesarPostAgregarRestaurante(HttpServletRequest request, HttpServletResponse response)
@@ -229,20 +225,12 @@ public class SvPlanificacion extends HttpServlet {
             mensaje = "Error: ID inválido.";
         }
 
-        request.setAttribute("mensaje", mensaje);
-        mostrarPlanificaciones(request, response);
+        // Redireccionar a la vista de detalle en lugar de mostrar todas las planificaciones
+        response.sendRedirect(request.getContextPath() + "/detallePlanificacion?id=" + planificacionIdStr + "&mensaje=" + mensaje);
     }
 
     private void procesarPostTerminarVotacion(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Este método no necesita implementación adicional ya que la terminación de la votación
-        // se realiza en el método procesarTerminarVotacion del doGet
-        // Se redirige directamente a mostrar las planificaciones
-        mostrarPlanificaciones(request, response);
-    }
-
-    private void procesarAgregarComensal(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
         String planificacionIdStr = request.getParameter("id");
         String mensaje;
 
@@ -265,49 +253,14 @@ public class SvPlanificacion extends HttpServlet {
                 return;
             }
 
-            // Redirigir a una página para agregar comensales
-            request.setAttribute("planificacion", planificacion);
-            request.getRequestDispatcher("agregarComensal.jsp").forward(request, response);
+            // Actualizar el estado de la planificación a "Terminada"
+            planificacion.setEstado("Terminada");
+            planificacionDAO.save(planificacion);
 
-        } catch (NumberFormatException e) {
-            mensaje = "Error: ID de planificación inválido.";
-            request.setAttribute("mensaje", mensaje);
-            mostrarPlanificaciones(request, response);
-        }
-    }
-
-    private void procesarAgregarRestaurante(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String planificacionIdStr = request.getParameter("id");
-        String mensaje;
-
-        if (planificacionIdStr == null || planificacionIdStr.isEmpty()) {
-            mensaje = "Error: No se especificó la planificación.";
-            request.setAttribute("mensaje", mensaje);
-            mostrarPlanificaciones(request, response);
-            return;
-        }
-
-        try {
-            Long planificacionId = Long.parseLong(planificacionIdStr);
-            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
-            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
-
-            if (planificacion == null) {
-                mensaje = "Error: No se encontró la planificación.";
-                request.setAttribute("mensaje", mensaje);
-                mostrarPlanificaciones(request, response);
-                return;
-            }
-
-            // Obtener la lista de restaurantes disponibles
-            UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
-            List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
-
-            // Redirigir a una página para agregar restaurantes
-            request.setAttribute("planificacion", planificacion);
-            request.setAttribute("restaurantes", restaurantes);
-            request.getRequestDispatcher("agregarRestaurante.jsp").forward(request, response);
+            mensaje = "La votación ha sido terminada exitosamente.";
+            
+            // Redireccionar a la vista de detalle en lugar de mostrar todas las planificaciones
+            response.sendRedirect(request.getContextPath() + "/detallePlanificacion?id=" + planificacionIdStr + "&mensaje=" + mensaje);
 
         } catch (NumberFormatException e) {
             mensaje = "Error: ID de planificación inválido.";
@@ -345,10 +298,53 @@ public class SvPlanificacion extends HttpServlet {
             planificacionDAO.save(planificacion);
 
             mensaje = "La votación ha sido terminada exitosamente.";
-            request.setAttribute("mensaje", mensaje);
+            
+            // Redireccionar a la vista de detalle en lugar de mostrar todas las planificaciones
+            response.sendRedirect(request.getContextPath() + "/detallePlanificacion?id=" + planificacionIdStr + "&mensaje=" + mensaje);
 
-            // Mostrar planificaciones actualizadas
+        } catch (NumberFormatException e) {
+            mensaje = "Error: ID de planificación inválido.";
+            request.setAttribute("mensaje", mensaje);
             mostrarPlanificaciones(request, response);
+        }
+    }
+
+    private void mostrarDetallePlanificacion(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String planificacionIdStr = request.getParameter("id");
+        String mensaje = request.getParameter("mensaje");
+
+        if (planificacionIdStr == null || planificacionIdStr.isEmpty()) {
+            mensaje = "Error: No se especificó la planificación.";
+            request.setAttribute("mensaje", mensaje);
+            mostrarPlanificaciones(request, response);
+            return;
+        }
+
+        try {
+            Long planificacionId = Long.parseLong(planificacionIdStr);
+            PlanificacionDAO planificacionDAO = new PlanificacionDAO();
+            Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
+
+            if (planificacion == null) {
+                mensaje = "Error: No se encontró la planificación.";
+                request.setAttribute("mensaje", mensaje);
+                mostrarPlanificaciones(request, response);
+                return;
+            }
+
+            // Obtener la lista de restaurantes disponibles para mostrar en la pestaña de restaurantes
+            List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+
+            // Configurar atributos para la página JSP
+            if (mensaje != null) {
+                request.setAttribute("mensaje", mensaje);
+            }
+            request.setAttribute("planificacion", planificacion);
+            request.setAttribute("restaurantes", restaurantes);
+            
+            // Redirigir a la página de detalle
+            request.getRequestDispatcher("detallePlanificacion.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             mensaje = "Error: ID de planificación inválido.";

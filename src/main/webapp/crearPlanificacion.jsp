@@ -68,25 +68,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <c:forEach var="plan" items="${planificaciones}">
-                                <tr>
+                            <c:forEach var="plan" items="${planificaciones}">                                        <tr>
                                     <td>${plan.id}</td>
-                                    <td>${plan.nombre}</td>
-                                    <td>${plan.hora}</td>
-                                    <td>${plan.estado}</td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/agregarComensal?id=${plan.id}"
-                                           class="btn btn-sm btn-info me-1">
-                                            <i class="fas fa-user-plus"></i> Añadir Comensal
+                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}" class="text-decoration-none">
+                                            ${plan.nombre}
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/agregarRestaurante?id=${plan.id}"
-                                           class="btn btn-sm btn-success me-1">
-                                            <i class="fas fa-utensils"></i> Añadir Restaurante
+                                    </td>
+                                    <td>${plan.hora}</td>
+                                    <td>
+                                        <span class="badge ${plan.estado == 'Activa' ? 'bg-success' : (plan.estado == 'Terminada' ? 'bg-info' : 'bg-secondary')}">
+                                            ${plan.estado}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}"
+                                           class="btn btn-sm btn-primary me-1">
+                                            <i class="fas fa-eye"></i> Ver Detalles
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/terminarVotacion?id=${plan.id}"
-                                           class="btn btn-sm btn-warning">
-                                            <i class="fas fa-check"></i> Terminar Votación
-                                        </a>
+                                        <c:if test="${plan.estado == 'Activa'}">
+                                            <a href="${pageContext.request.contextPath}/terminarVotacion?id=${plan.id}"
+                                               class="btn btn-sm btn-warning">
+                                                <i class="fas fa-check"></i> Terminar Votación
+                                            </a>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>
