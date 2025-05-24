@@ -1,12 +1,12 @@
 package servicios;
 
 import DAO.CalificacionDAO;
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Calificacion;
 import entidades.Comensal;
 import entidades.Restaurante;
 import exceptions.ServiceException;
-import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -14,10 +14,12 @@ import java.util.Map;
 public class CalificacionService {
     private final CalificacionDAO calificacionDAO;
     private final UsuarioDAO usuarioDAO;
+    private final RestauranteDAO restauranteDAO;
 
-    public CalificacionService(CalificacionDAO calificacionDAO, UsuarioDAO usuarioDAO) {
+    public CalificacionService(CalificacionDAO calificacionDAO, UsuarioDAO usuarioDAO, RestauranteDAO restauranteDAO) {
         this.calificacionDAO = calificacionDAO;
         this.usuarioDAO = usuarioDAO;
+        this.restauranteDAO = restauranteDAO;
     }
 
     public void crearCalificacion(Calificacion calificacion) throws ServiceException {
@@ -47,21 +49,17 @@ public class CalificacionService {
             Long idRestaurante = (Long) parametrosCalificacion.get("idRestaurante");
 
             Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
-            Restaurante restaurante = (Restaurante) usuarioDAO.findById(idRestaurante);
+            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
 
             if (comensal == null || restaurante == null) {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
-            // Buscar si ya existe una calificación previa del mismo comensal para el mismo
-            // restaurante
-            Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(idComensal,
-                    idRestaurante);
+            // Buscar si ya existe una calificación previa
+            Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(
+                    idComensal, idRestaurante);
 
             if (calificacionExistente != null) {
-
-                System.out.println("Calificación id existente: " + calificacionExistente.getId() + " - comentario:"
-                        + calificacionExistente.getComentario());
                 // Actualizar la calificación existente
                 calificacionExistente.setPuntaje(puntaje);
                 calificacionExistente.setComentario(comentario);
@@ -69,9 +67,6 @@ public class CalificacionService {
                 if (!calificacionDAO.actualizar(calificacionExistente)) {
                     throw new ServiceException("No se pudo actualizar la calificación existente");
                 }
-
-                // Actualizar el promedio del restaurante
-                actualizarPuntajePromedio(restaurante);
             } else {
                 // Crear una nueva calificación
                 Calificacion nuevaCalificacion = new Calificacion();
@@ -82,6 +77,9 @@ public class CalificacionService {
 
                 crearCalificacion(nuevaCalificacion);
             }
+
+            // Actualizar el promedio del restaurante
+            actualizarPuntajePromedio(restaurante);
         } catch (Exception e) {
             throw new ServiceException("Error al procesar la calificación: " + e.getMessage(), e);
         }
@@ -90,9 +88,8 @@ public class CalificacionService {
     private void actualizarPuntajePromedio(Restaurante restaurante) {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
-            System.out.println("Nuevo promedio calculado: " + nuevoPromedio);
             restaurante.setPuntajePromedio(nuevoPromedio);
-            usuarioDAO.save(restaurante); // Usar el DAO existente para guardar
+            restauranteDAO.save(restaurante); // Usar RestauranteDAO para guardar
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }

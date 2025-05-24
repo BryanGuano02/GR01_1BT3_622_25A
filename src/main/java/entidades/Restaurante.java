@@ -7,8 +7,14 @@ import java.util.List;
 
 @Entity
 @Table(name = "restaurantes")
-@PrimaryKeyJoinColumn(name = "usuario_id")
-public class Restaurante extends Usuario {
+public class Restaurante {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "dueno_id")
+    private DueñoRestaurante dueño;
 
     // Atributos específicos del restaurante
     private String nombre;
@@ -38,14 +44,51 @@ public class Restaurante extends Usuario {
     public Restaurante() {
     }
 
-    public Restaurante(String nombreUsuario, String contrasena, String email, String nombre,
-            String tipoComida) {
-        this.setNombreUsuario(nombreUsuario);
-        this.setContrasena(contrasena);
-        this.setEmail(email);
+    // Constructor modificado (ya no recibe datos de usuario)
+    public Restaurante(String nombre, String tipoComida) {
         this.nombre = nombre;
         this.tipoComida = tipoComida;
-        this.setTipoUsuario("RESTAURANTE");
+    }
+
+    // Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public DueñoRestaurante getDueño() {
+        return dueño;
+    }
+
+    public void setDueño(DueñoRestaurante dueño) {
+        this.dueño = dueño;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getTipoComida() {
+        return tipoComida;
+    }
+
+    public void setTipoComida(String tipoComida) {
+        this.tipoComida = tipoComida;
     }
 
     public LocalTime getHoraApertura() {
@@ -64,32 +107,8 @@ public class Restaurante extends Usuario {
         this.horaCierre = horaCierre;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getTipoComida() {
-        return tipoComida;
-    }
-
-    public void setTipoComida(String tipoComida) {
-        this.tipoComida = tipoComida;
-    }
-
     public Double getPuntajePromedio() {
-        return this.puntajePromedio;
+        return puntajePromedio;
     }
 
     public void setPuntajePromedio(Double puntajePromedio) {
@@ -144,6 +163,14 @@ public class Restaurante extends Usuario {
         historia.setRestaurante(this);
     }
 
+    public List<Calificacion> getCalificaciones() {
+        return calificaciones;
+    }
+
+    public void setCalificaciones(List<Calificacion> calificaciones) {
+        this.calificaciones = calificaciones;
+    }
+
     public List<Suscripcion> getSuscripciones() {
         return suscripciones;
     }
@@ -163,13 +190,12 @@ public class Restaurante extends Usuario {
     @Override
     public String toString() {
         return "Restaurante{" +
-                "id=" + getId() + // Acceso correcto al id heredado
+                "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", tipoComida='" + tipoComida + '\'' +
                 ", horaApertura=" + horaApertura +
                 ", horaCierre=" + horaCierre +
-                ", historias=" + historias +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package servlets;
 
+import DAO.RestauranteDAO;
 import entidades.Comensal;
 import entidades.Planificacion;
 import entidades.Restaurante;
@@ -25,6 +26,7 @@ public class SvPlanificacion extends HttpServlet {
     private PlanificacionService planificacionService;
     private EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
+    private RestauranteDAO restauranteDAO;
     private VotoDAO votoDAO;
 
     @Override
@@ -33,6 +35,7 @@ public class SvPlanificacion extends HttpServlet {
         planificacionService = new PlanificacionService(new PlanificacionDAO());
         usuarioDAO = new UsuarioDAO(emf);
         votoDAO = new VotoDAO(emf);
+        restauranteDAO = new RestauranteDAO(emf);
     }
 
     @Override
@@ -210,7 +213,8 @@ public class SvPlanificacion extends HttpServlet {
 
             PlanificacionDAO planificacionDAO = new PlanificacionDAO();
             Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
-            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
+//            Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
+            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(restauranteId);
 
             if (planificacion == null || restaurante == null) {
                 mensaje = "Error: No se encontró la planificación o el restaurante.";

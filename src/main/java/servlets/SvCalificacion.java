@@ -1,6 +1,7 @@
 package servlets;
 
 import DAO.CalificacionDAO;
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Calificacion;
 import entidades.Restaurante;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servicios.CalificacionService;
-import DAO.RestauranteDAO;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -31,6 +31,7 @@ public class SvCalificacion extends HttpServlet {
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
+        restauranteDAO = new RestauranteDAO(emf);  // Pasar emf en lugar de usuarioDAO
 
         CalificacionDAO calificacionDAO = new CalificacionDAO() {
             @Override
@@ -50,20 +51,39 @@ public class SvCalificacion extends HttpServlet {
                     em.close();
                 }
             }
-            // Implementa otros métodos requeridos por la interfaz con return false
+
             @Override
             public List<Calificacion> obtenerCalificacionesPorRestaurante(Long idRestaurante) {
-                return Collections.emptyList();
+                EntityManager em = emf.createEntityManager();
+                try {
+                    return em.createQuery(
+                                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+                                    Calificacion.class)
+                            .setParameter("idRestaurante", idRestaurante)
+                            .getResultList();
+                } finally {
+                    em.close();
+                }
             }
 
             @Override
             public Double calcularPromedioCalificaciones(Long idRestaurante) {
-                return 0.0;
+                EntityManager em = emf.createEntityManager();
+                try {
+                    return em.createQuery(
+                                    "SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
+                                    Double.class)
+                            .setParameter("idRestaurante", idRestaurante)
+                            .getSingleResult();
+                } catch (Exception e) {
+                    return 0.0;
+                } finally {
+                    em.close();
+                }
             }
         };
 
-        this.restauranteDAO = new RestauranteDAO(usuarioDAO);
-        this.calificacionService = new CalificacionService(calificacionDAO, usuarioDAO);
+        this.calificacionService = new CalificacionService(calificacionDAO, usuarioDAO, restauranteDAO);
     }
 
     @Override
@@ -76,14 +96,17 @@ public class SvCalificacion extends HttpServlet {
             return;
         }
 
-        Restaurante restauranteAPresentar = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+        Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
 
-        if (restauranteAPresentar == null) {
+        if (restaurante == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Restaurante no encontrado");
             return;
         }
 
-        req.setAttribute("restaurante", restauranteAPresentar);
+        List<Calificacion> calificaciones = calificacionService.obtenerCalificacionesPorRestaurante(idRestaurante);
+
+        req.setAttribute("restaurante", restaurante);
+        req.setAttribute("calificaciones", calificaciones);
         req.getRequestDispatcher("calificarRestaurante.jsp").forward(req, resp);
     }
 
@@ -117,8 +140,6 @@ public class SvCalificacion extends HttpServlet {
         parametrosCalificacion.put("comentario", req.getParameter("comentario"));
         parametrosCalificacion.put("idComensal", Long.parseLong(req.getParameter("idComensal")));
         parametrosCalificacion.put("idRestaurante", Long.parseLong(req.getParameter("idRestaurante")));
-        // System.out.println("puntucación");
-        // System.out.println("Parametros de calificación: " + parametrosCalificacion.get("puntaje"));
         return parametrosCalificacion;
     }
 

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class SvSuscripcion extends HttpServlet {
     private EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
+    private RestauranteDAO restauranteDAO;
     private SuscripcionService suscripcionService;
     private SuscripcionDAO suscripcionDAO;
 
@@ -30,8 +31,9 @@ public class SvSuscripcion extends HttpServlet {
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         usuarioDAO = new UsuarioDAO(emf);
+        restauranteDAO = new RestauranteDAO(emf);
         suscripcionDAO = new SuscripcionDAO();
-        suscripcionService = new SuscripcionService(usuarioDAO, suscripcionDAO);
+        suscripcionService = new SuscripcionService(usuarioDAO, restauranteDAO, suscripcionDAO);
     }
 
     @Override
@@ -83,13 +85,9 @@ public class SvSuscripcion extends HttpServlet {
         } catch (NumberFormatException e) {
             return null;
         }
-    }    /**
-     * Obtiene la lista de restaurantes, indicando si el comensal está suscrito a cada uno
-     * @param comensalId ID del comensal
-     * @return Lista de DTOs de restaurantes con indicador de suscripción
-     */
+    }
+
     public List<RestauranteDTO> getRestaurantesConSuscripcion(Long comensalId) {
-        RestauranteDAO restauranteDAO = new RestauranteDAO(usuarioDAO);
         List<Restaurante> restaurantes = restauranteDAO.obtenerTodosRestaurantes();
         return restaurantes.stream().map(restaurante -> {
             boolean estaSuscrito = suscripcionDAO.existeSuscripcion(comensalId, restaurante.getId());

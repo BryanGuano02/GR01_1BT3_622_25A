@@ -1,6 +1,7 @@
 package servicios;
 
 import DAO.PlanificacionDAO;
+import DAO.RestauranteDAO;
 import DAO.UsuarioDAO;
 import DAO.VotoDAO;
 import entidades.Comensal;
@@ -18,7 +19,8 @@ import java.util.stream.Collectors;
 
 public class PlanificacionService {
     private final PlanificacionDAO planificacionDAO;
-    private final UsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO;
+    private RestauranteDAO restauranteDAO;
     private VotoDAO votoDAO;
 
     private final NotificacionService notificacionService;
@@ -35,6 +37,7 @@ public class PlanificacionService {
         this.planificacionDAO = planificacionDAO;
         this.usuarioDAO = new UsuarioDAO(emf);
         this.votoDAO = new VotoDAO(emf);
+        this.restauranteDAO = new RestauranteDAO(emf);
         notificacionService = null;
     }
 
@@ -166,13 +169,13 @@ public class PlanificacionService {
         planificacionDAO.save(planificacion);
 
         // Notificar a todos los comensales que ha iniciado la votación
-        List<Comensal> comensales = planificacion.getComensales();
-        if (notificacionService != null && comensales != null) {
-            for (Comensal comensal : comensales) {
-                notificacionService.notificarRestauranteElegido(comensal,
-                    "Se ha iniciado la votación para la planificación: " + planificacion.getNombre());
-            }
-        }
+//        List<Comensal> comensales = planificacion.getComensales();
+//        if (notificacionService != null && comensales != null) {
+//            for (Comensal comensal : comensales) {
+//                notificacionService.notificarRestauranteElegido(comensal,
+//                    "Se ha iniciado la votación para la planificación: " + planificacion.getNombre());
+//            }
+//        }
     }
 
     public void terminarVotacion(Long planificacionId) {
@@ -187,10 +190,6 @@ public class PlanificacionService {
             Restaurante restauranteGanador = resolverEmpateEnVotacion(conteoVotos);
             planificacion.setRestauranteGanador(restauranteGanador);
 
-            // Para compatibilidad con código existente
-            planificacion.setRestaurante(restauranteGanador);
-
-            // Notificar a todos los comensales del resultado
             if (notificacionService != null && planificacion.getComensales() != null) {
                 for (Comensal comensal : planificacion.getComensales()) {
                     notificacionService.notificarRestauranteElegido(comensal,
@@ -204,10 +203,12 @@ public class PlanificacionService {
         planificacionDAO.save(planificacion);
     }
 
-    public void registrarVoto(Long planificacionId, Long comensalId, Long restauranteId) {
+    public void registrarVoto(Long planificacionId, Long comensalId, Long idRestaurante) {
         Planificacion planificacion = planificacionDAO.obtenerPlanificacionPorId(planificacionId);
         Comensal comensal = usuarioDAO.obtenerComensalPorId(comensalId);
-        Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
+
+        Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+//        Restaurante restaurante = (Restaurante) usuarioDAO.findById(restauranteId);
 
         if (planificacion == null) {
             throw new EntityNotFoundException("Planificación no encontrada con ID: " + planificacionId);
@@ -218,18 +219,23 @@ public class PlanificacionService {
         }
 
         if (restaurante == null) {
-            throw new EntityNotFoundException("Restaurante no encontrado con ID: " + restauranteId);
+            throw new EntityNotFoundException("Restaurante no encontrado con ID: " + idRestaurante);
         }
 
         if (!planificacion.puedeVotar(comensal)) {
             throw new IllegalStateException("El comensal no puede votar en esta planificación");
         }
+       System.out.println("Restaurante: " + restaurante.getId());
+        System.out.println("Restaurantes dentro de la planificación: " + planificacion.getRestaurantes().size());
+        System.out.println(planificacion.getRestaurantes().contains(restaurante));
 
-        // Verificar si el restaurante está en la lista de opciones
-        if (!planificacion.getRestaurantes().contains(restaurante)) {
-            throw new IllegalArgumentException("El restaurante no es una opción válida para esta planificación");
+        // Imprimir el nombre de cada restaurante en la planificación
+        System.out.println("Lista de restaurantes en la planificación:");
+        for (Restaurante rest : planificacion.getRestaurantes()) {
+            System.out.println(" - " + rest.getNombre() + " ID: " + rest.getId());
         }
 
+        // Verificar si el restaurante está en la lista de opciones
         // Verificar si el comensal ya votó y eliminar el voto anterior si existe
         Voto votoExistente = votoDAO.obtenerVotoComensal(planificacionId, comensalId);
         if (votoExistente != null) {

@@ -38,7 +38,7 @@ public class PlanificacionRestauranteParametrizedTest {
     @Test
     public void testAsociarRestauranteAPlanificacion() {
         // Configuración
-        Planificacion planificacion = new Planificacion(hora, nombrePlanificacion);
+        Planificacion planificacion = new Planificacion(nombrePlanificacion, hora);
         Restaurante restaurante = (nombreRestaurante != null && !nombreRestaurante.isEmpty())
                 ? new Restaurante() {{ setNombre(nombreRestaurante); }}
                 : null;
@@ -46,14 +46,16 @@ public class PlanificacionRestauranteParametrizedTest {
         // Ejecución y verificación
         if (!esperadoValido) {
             try {
-                planificacion.setRestaurante(restaurante);
+                planificacion.addRestaurante(restaurante);
                 fail("Debería haber lanzado IllegalArgumentException");
             } catch (IllegalArgumentException e) {
                 assertTrue(e.getMessage().contains("Restaurante no válido"));
             }
         } else {
-            planificacion.setRestaurante(restaurante);
-            assertEquals(nombreRestaurante, planificacion.getRestaurante().getNombre());
+            planificacion.addRestaurante(restaurante);
+            // Verificar que el último restaurante añadido sea el esperado
+            Restaurante ultimoRestaurante = planificacion.getRestaurantes().get(planificacion.getRestaurantes().size() - 1);
+            assertEquals(nombreRestaurante, ultimoRestaurante.getNombre());
         }
     }
 }
