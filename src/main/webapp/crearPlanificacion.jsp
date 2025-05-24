@@ -71,9 +71,10 @@
                             <c:forEach var="plan" items="${planificaciones}">                                        <tr>
                                     <td>${plan.id}</td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}" class="text-decoration-none">
-                                            ${plan.nombre}
-                                        </a>
+<%--                                        <a href="${pageContext.request.contextPath}/detallePlanificacion?id=${plan.id}" class="text-decoration-none">--%>
+<%--                                            ${plan.nombre}--%>
+<%--                                        </a>--%>
+                                        <span>${plan.nombre}</span>
                                     </td>
                                     <td>${plan.hora}</td>
                                     <td>

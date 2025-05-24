@@ -43,7 +43,7 @@ public class SvAuth extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        crearUsuarios();
+        crearUsuarios();
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
@@ -106,10 +106,12 @@ public class SvAuth extends HttpServlet {
                     request.getParameter("email")
             );
 
-            // Crear restaurante asociado con datos básicos
-            Restaurante restaurante = new Restaurante();
-            restaurante.setNombre(request.getParameter("nombre")); // Nuevo campo en el formulario
-            restaurante.setTipoComida(request.getParameter("tipoComida")); // Nuevo campo en el formulario
+            // Crear restaurante asociado con datos básicos usando el constructor adecuado
+            String nombreRestaurante = request.getParameter("nombre");
+            String tipoComida = request.getParameter("tipoComida");
+            Restaurante restaurante = new Restaurante(nombreRestaurante, tipoComida);
+
+            // Establecer la relación bidireccional
             dueño.setRestaurante(restaurante);
 
             authService.registrarDueñoRestaurante(dueño);
@@ -174,9 +176,11 @@ public class SvAuth extends HttpServlet {
             }
 
             DueñoRestaurante dueño = new DueñoRestaurante(nombreUsuario, contrasena, email);
-            Restaurante restaurante = new Restaurante();
-            restaurante.setNombre(nombresRestaurantes.get(i-1));
-            restaurante.setTipoComida(tiposComida.get(i-1));
+
+            // Crear el restaurante asociado al dueño
+            Restaurante restaurante = new Restaurante(nombresRestaurantes.get(i-1), tiposComida.get(i-1));
+
+            // Establecer la relación bidireccional
             dueño.setRestaurante(restaurante);
 
             authService.registrarDueñoRestaurante(dueño);
@@ -231,6 +235,11 @@ public class SvAuth extends HttpServlet {
 
         try {
             Restaurante restaurante = dueño.getRestaurante();
+            if (restaurante == null) {
+                System.out.println("Error: Dueño sin restaurante asociado: " + dueño.getNombreUsuario());
+                return;
+            }
+
             int index = Integer.parseInt(dueño.getNombreUsuario().substring(1)) - 1;
 
             restaurante.setDescripcion(descripciones.get(index));

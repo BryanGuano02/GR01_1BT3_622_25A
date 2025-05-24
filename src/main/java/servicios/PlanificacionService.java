@@ -169,13 +169,13 @@ public class PlanificacionService {
         planificacionDAO.save(planificacion);
 
         // Notificar a todos los comensales que ha iniciado la votación
-        List<Comensal> comensales = planificacion.getComensales();
-        if (notificacionService != null && comensales != null) {
-            for (Comensal comensal : comensales) {
-                notificacionService.notificarRestauranteElegido(comensal,
-                    "Se ha iniciado la votación para la planificación: " + planificacion.getNombre());
-            }
-        }
+//        List<Comensal> comensales = planificacion.getComensales();
+//        if (notificacionService != null && comensales != null) {
+//            for (Comensal comensal : comensales) {
+//                notificacionService.notificarRestauranteElegido(comensal,
+//                    "Se ha iniciado la votación para la planificación: " + planificacion.getNombre());
+//            }
+//        }
     }
 
     public void terminarVotacion(Long planificacionId) {
@@ -190,10 +190,6 @@ public class PlanificacionService {
             Restaurante restauranteGanador = resolverEmpateEnVotacion(conteoVotos);
             planificacion.setRestauranteGanador(restauranteGanador);
 
-            // Para compatibilidad con código existente
-            planificacion.setRestaurante(restauranteGanador);
-
-            // Notificar a todos los comensales del resultado
             if (notificacionService != null && planificacion.getComensales() != null) {
                 for (Comensal comensal : planificacion.getComensales()) {
                     notificacionService.notificarRestauranteElegido(comensal,
@@ -229,12 +225,17 @@ public class PlanificacionService {
         if (!planificacion.puedeVotar(comensal)) {
             throw new IllegalStateException("El comensal no puede votar en esta planificación");
         }
+       System.out.println("Restaurante: " + restaurante.getId());
+        System.out.println("Restaurantes dentro de la planificación: " + planificacion.getRestaurantes().size());
+        System.out.println(planificacion.getRestaurantes().contains(restaurante));
 
-        // Verificar si el restaurante está en la lista de opciones
-        if (!planificacion.getRestaurantes().contains(restaurante)) {
-            throw new IllegalArgumentException("El restaurante no es una opción válida para esta planificación");
+        // Imprimir el nombre de cada restaurante en la planificación
+        System.out.println("Lista de restaurantes en la planificación:");
+        for (Restaurante rest : planificacion.getRestaurantes()) {
+            System.out.println(" - " + rest.getNombre() + " ID: " + rest.getId());
         }
 
+        // Verificar si el restaurante está en la lista de opciones
         // Verificar si el comensal ya votó y eliminar el voto anterior si existe
         Voto votoExistente = votoDAO.obtenerVotoComensal(planificacionId, comensalId);
         if (votoExistente != null) {
