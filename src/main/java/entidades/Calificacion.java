@@ -18,6 +18,24 @@ public class Calificacion {
     @JoinColumn(name = "idRestaurante")
     private Restaurante restaurante;
 
+    private int calidadComida;
+    private int calidadServicio;
+    private int limpieza;
+    private int ambiente;
+    private int tiempoEspera;
+    private int relacionPrecioCalidad;
+    private int variedadMenu;
+    private int accecibilidad;
+    private boolean volveria;
+
+
+
+
+
+
+
+
+
     public Calificacion() {
     }
 
@@ -66,6 +84,78 @@ public class Calificacion {
 
     public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
+    }
+
+    public int getCalidadComida() {
+        return calidadComida;
+    }
+
+    public void setCalidadComida(int calidadComida) {
+        this.calidadComida = calidadComida;
+    }
+
+    public int getCalidadServicio() {
+        return calidadServicio;
+    }
+
+    public void setCalidadServicio(int calidadServicio) {
+        this.calidadServicio = calidadServicio;
+    }
+
+    public int getLimpieza() {
+        return limpieza;
+    }
+
+    public void setLimpieza(int limpieza) {
+        this.limpieza = limpieza;
+    }
+
+    public int getAmbiente() {
+        return ambiente;
+    }
+
+    public void setAmbiente(int ambiente) {
+        this.ambiente = ambiente;
+    }
+
+    public int getTiempoEspera() {
+        return tiempoEspera;
+    }
+
+    public void setTiempoEspera(int tiempoEspera) {
+        this.tiempoEspera = tiempoEspera;
+    }
+
+    public int getRelacionPrecioCalidad() {
+        return relacionPrecioCalidad;
+    }
+
+    public void setRelacionPrecioCalidad(int relacionPrecioCalidad) {
+        this.relacionPrecioCalidad = relacionPrecioCalidad;
+    }
+
+    public int getVariedadMenu() {
+        return variedadMenu;
+    }
+
+    public void setVariedadMenu(int variedadMenu) {
+        this.variedadMenu = variedadMenu;
+    }
+
+    public int getAccecibilidad() {
+        return accecibilidad;
+    }
+
+    public void setAccecibilidad(int accecibilidad) {
+        this.accecibilidad = accecibilidad;
+    }
+
+    public boolean isVolveria() {
+        return volveria;
+    }
+
+    public void setVolveria(boolean volveria) {
+        this.volveria = volveria;
     }
 
     @Override

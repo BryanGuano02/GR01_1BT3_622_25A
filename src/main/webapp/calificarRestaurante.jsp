@@ -74,6 +74,45 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="calidadComida"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica la comida:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="calidadServicio"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica el servicio:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="limpieza"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica la limpieza:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="ambiente"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica el ambiente:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="tiempoEspera"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica el tiempo de espera:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="relacionPrecioCalidad"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica la relación Precio-Calidad:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="variedadMenu"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica la variedad del Menú:"/>
+                                        </jsp:include>
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="accesibilidad"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica la accesibilidad:"/>
+                                        </jsp:include>
 
                                         <div class="mb-4">
                                             <label for="comentario" class="form-label">Comentario:</label>
