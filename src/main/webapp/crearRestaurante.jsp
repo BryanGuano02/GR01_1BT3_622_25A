@@ -1,10 +1,21 @@
-<%@ page import="DAO.UsuarioDAO" %>
-<%@ page import="jakarta.persistence.EntityManagerFactory" %>
-<%@ page import="jakarta.persistence.Persistence" %>
+<%@ page import="entidades.DueñoRestaurante" %>
 <%@ page import="entidades.Restaurante" %>
 <%@ page import="java.util.List" %>
 <%@ page import="entidades.Historia" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Verificar autenticación y tipo de usuario
+    if (session.getAttribute("usuario") == null || !(session.getAttribute("usuario") instanceof DueñoRestaurante)) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+
+    DueñoRestaurante dueño = (DueñoRestaurante) session.getAttribute("usuario");
+    Restaurante restauranteUsuario = dueño.getRestaurante();
+    boolean tieneDatos = restauranteUsuario != null && restauranteUsuario.getNombre() != null && !restauranteUsuario.getNombre().isEmpty();
+    request.setAttribute("titulo", tieneDatos ? "Administrar Restaurante" : "Registrar Restaurante");
+    request.setAttribute("botonAtras", false);
+%>
 <html>
 <head>
     <title>U-Food | Panel Administrativo</title>
@@ -32,10 +43,6 @@
 </head>
 <body>
 <div class="container mt-5">
-    <% Restaurante restauranteUsuario = (Restaurante) session.getAttribute("usuario");
-        boolean tieneDatos = restauranteUsuario != null && restauranteUsuario.getNombre() != null && !restauranteUsuario.getNombre().isEmpty();
-        request.setAttribute("titulo", tieneDatos ? "Administrar Restaurante" : "Registrar Restaurante");
-        request.setAttribute("botonAtras", false); %>
     <%@ include file="layout/header.jsp" %>
 
     <div class="card shadow">
@@ -45,7 +52,7 @@
                 <h4 class="mb-4">Información de tu Restaurante</h4>
                 <div class="mb-3">
                     <label class="form-label">Nombre del Restaurante</label>
-                    <div class="view-content"><%= restauranteUsuario.getNombre() %></div>
+                    <div class="view-content"><%= restauranteUsuario.getNombre() != null ? restauranteUsuario.getNombre() : "N/A" %></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Descripción</label>
@@ -53,25 +60,21 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Tipo de Comida</label>
-                    <div class="view-content"><%= restauranteUsuario.getTipoComida() %></div>
-
-                </div>                
-                <div class="mb-3">
-
+                    <div class="view-content"><%= restauranteUsuario.getTipoComida() != null ? restauranteUsuario.getTipoComida() : "N/A" %></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Precio Promedio</label>
-                    <div class="view-content"><%= restauranteUsuario.getPrecio() %> </div>
+                    <div class="view-content"><%= restauranteUsuario.getPrecio() %></div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Distancia de Universidad</label>
                     <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() %></div>
                 </div>
                 <div class="mb-3">
-
                     <label class="form-label">Horario de Atención</label>
                     <div class="view-content">
-                        <%= restauranteUsuario.getHoraApertura() %> - <%= restauranteUsuario.getHoraCierre() %>
+                        <%= restauranteUsuario.getHoraApertura() != null ? restauranteUsuario.getHoraApertura() : "N/A" %> -
+                        <%= restauranteUsuario.getHoraCierre() != null ? restauranteUsuario.getHoraCierre() : "N/A" %>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -82,14 +85,6 @@
                     <label class="form-label">Calidad (1-5)</label>
                     <div class="view-content"><%= restauranteUsuario.getCalidad() %></div>
                 </div>
-                <!-- <div class="mb-3">
-                    <label class="form-label">Precio (1-5)</label>
-                    <div class="view-content"><%= restauranteUsuario.getPrecio() %></div>
-                </div> -->
-                <!-- <div class="mb-3">
-                    <label class="form-label">Distancia a la Universidad (km)</label>
-                    <div class="view-content"><%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "N/A" %></div>
-                </div> -->
                 <button id="btnEditar" class="btn btn-primary">
                     <i class="fas fa-edit me-2"></i> Editar Información
                 </button>
@@ -100,11 +95,13 @@
                     <h4 class="mb-4">Editar Restaurante</h4>
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre del Restaurante</label>
-                        <input type="text" class="form-control" name="nombre" id="nombre" required value="<%= restauranteUsuario.getNombre() %>">
+                        <input type="text" class="form-control" name="nombre" id="nombre" required
+                               value="<%= restauranteUsuario.getNombre() != null ? restauranteUsuario.getNombre() : "" %>">
                     </div>
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
-                        <input type="text" class="form-control" name="descripcion" id="descripcion" required value="<%= restauranteUsuario.getDescripcion() != null ? restauranteUsuario.getDescripcion() : "" %>">
+                        <input type="text" class="form-control" name="descripcion" id="descripcion" required
+                               value="<%= restauranteUsuario.getDescripcion() != null ? restauranteUsuario.getDescripcion() : "" %>">
                     </div>
                     <div class="mb-3">
                         <label for="tipoComida" class="form-label">Tipo de Comida</label>
@@ -114,42 +111,37 @@
                             <option value="Comida Costeña" <%= "Comida Costeña".equals(restauranteUsuario.getTipoComida()) ? "selected" : "" %>>🐟 Comida Costeña</option>
                             <option value="Platos a la Carta" <%= "Platos a la Carta".equals(restauranteUsuario.getTipoComida()) ? "selected" : "" %>>🍽️ Platos a la Carta</option>
                         </select>
-
-                    </div>                    <div class="mb-3">
                     </div>
                     <div class="mb-3">
                         <label for="precio" class="form-label">Precio Promedio</label>
-                        <input type="number" class="form-control" name="precio" id="precioPromedio" required value="<%= restauranteUsuario.getPrecio() %>">
+                        <input type="number" class="form-control" name="precio" id="precioPromedio" required
+                               value="<%= restauranteUsuario.getPrecio() %>">
                     </div>
                     <div class="mb-3">
                         <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
-                        <input type="number" class="form-control" step="0.01" name="distanciaUniversidad" id="distanciaUniversidad" required value="<%= restauranteUsuario.getDistanciaUniversidad() %>">
+                        <input type="number" class="form-control" step="0.01" name="distanciaUniversidad"
+                               id="distanciaUniversidad" required value="<%= restauranteUsuario.getDistanciaUniversidad() %>">
                     </div>
                     <div class="mb-4">
-
                         <label class="form-label">Horario de Atención</label>
                         <div class="d-flex align-items-center">
-                            <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura" required value="<%= restauranteUsuario.getHoraApertura() %>">
+                            <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura"
+                                   required value="<%= restauranteUsuario.getHoraApertura() != null ? restauranteUsuario.getHoraApertura() : "" %>">
                             <span class="mx-2">a</span>
-                            <input type="time" class="form-control ms-2" style="width: 150px;" name="horaCierre" required value="<%= restauranteUsuario.getHoraCierre() %>">
+                            <input type="time" class="form-control ms-2" style="width: 150px;" name="horaCierre"
+                                   required value="<%= restauranteUsuario.getHoraCierre() != null ? restauranteUsuario.getHoraCierre() : "" %>">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="tiempoEspera" class="form-label">Tiempo de Espera (minutos)</label>
-                        <input type="number" class="form-control" name="tiempoEspera" id="tiempoEspera" required min="0" value="<%= restauranteUsuario.getTiempoEspera() %>">
+                        <input type="number" class="form-control" name="tiempoEspera" id="tiempoEspera"
+                               required min="0" value="<%= restauranteUsuario.getTiempoEspera() %>">
                     </div>
                     <div class="mb-3">
                         <label for="calidad" class="form-label">Calidad (1-5)</label>
-                        <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" value="<%= restauranteUsuario.getCalidad() %>">
+                        <input type="number" class="form-control" name="calidad" id="calidad"
+                               required min="1" max="5" value="<%= restauranteUsuario.getCalidad() %>">
                     </div>
-                    <!-- <div class="mb-3">
-                        <label for="precio" class="form-label">Precio (1-5)</label>
-                        <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" value="<%= restauranteUsuario.getPrecio() %>">
-                    </div> -->
-                    <!-- <div class="mb-3">
-                        <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
-                        <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" value="<%= restauranteUsuario.getDistanciaUniversidad() != null ? restauranteUsuario.getDistanciaUniversidad() : "" %>">
-                    </div> -->
                     <div class="d-flex justify-content-between">
                         <button type="button" id="btnCancelarEdicion" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i> Cancelar
@@ -172,24 +164,7 @@
                     <label for="descripcion" class="form-label">Descripción</label>
                     <input type="text" class="form-control" name="descripcion" id="descripcion" required placeholder="Ej: Almuerzos ricos">
                 </div>
-                <label for="tipoComida" class="form-label">Tipo de Comida</label>
-                <select class="form-select" name="tipoComida" id="tipoComida" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    <option value="Comida Rápida">🍔 Comida Rápida</option>
-                    <option value="Comida Casera">🍲 Comida Casera</option>
-                    <option value="Comida Costeña">🐟 Comida Costeña</option>
-                    <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
-                </select>
                 <div class="mb-3">
-                    <label for="precio" class="form-label">Precio Promedio</label>
-                    <input type="number" class="form-control"  name="precio" id="precio" required placeholder="Ej: 10.00">
-                </div>
-                <div class="mb-3">
-                    <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
-                    <input type="number" class="form-control" step="0.01" name="distanciaUniversidad" id="distanciaUniversidad" required placeholder="Ej: 5.0">
-                </div>
-                <div class="mb-3">
-
                     <label for="tipoComida" class="form-label">Tipo de Comida</label>
                     <select class="form-select" name="tipoComida" id="tipoComida" required>
                         <option value="" disabled selected>Seleccione una opción</option>
@@ -198,11 +173,16 @@
                         <option value="Comida Costeña">🐟 Comida Costeña</option>
                         <option value="Platos a la Carta">🍽️ Platos a la Carta</option>
                     </select>
-                </div>                <div class="mb-4">
-
+                </div>
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio Promedio</label>
+                    <input type="number" class="form-control" name="precio" id="precio" required placeholder="Ej: 10.00">
+                </div>
+                <div class="mb-3">
+                    <label for="distanciaUniversidad" class="form-label">Distancia de Universidad</label>
+                    <input type="number" class="form-control" step="0.01" name="distanciaUniversidad" id="distanciaUniversidad" required placeholder="Ej: 5.0">
                 </div>
                 <div class="mb-4">
-
                     <label class="form-label">Horario de Atención</label>
                     <div class="d-flex align-items-center">
                         <input type="time" class="form-control me-2" style="width: 150px;" name="horaApertura" required>
@@ -218,14 +198,6 @@
                     <label for="calidad" class="form-label">Calidad (1-5)</label>
                     <input type="number" class="form-control" name="calidad" id="calidad" required min="1" max="5" placeholder="Ej: 4">
                 </div>
-                <!-- <div class="mb-3">
-                    <label for="precio" class="form-label">Precio (1-5)</label>
-                    <input type="number" class="form-control" name="precio" id="precio" required min="1" max="5" placeholder="Ej: 3">
-                </div> -->
-                <!-- <div class="mb-3">
-                    <label for="distanciaUniversidad" class="form-label">Distancia a la Universidad (km)</label>
-                    <input type="number" class="form-control" name="distanciaUniversidad" id="distanciaUniversidad" required step="0.1" min="0" placeholder="Ej: 1.5">
-                </div> -->
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     <i class="fas fa-save me-2"></i> Registrar Restaurante
                 </button>
@@ -238,7 +210,7 @@
     <div class="card shadow mt-4">
         <div class="card-body">
             <h4 class="mb-4">Gestión de Menús</h4>
-            <% if (!restauranteUsuario.getHistorias().isEmpty()) { %>
+            <% if (restauranteUsuario.getHistorias() != null && !restauranteUsuario.getHistorias().isEmpty()) { %>
             <div class="mb-4">
                 <h5>Menús Registrados</h5>
                 <% for (Historia historia : restauranteUsuario.getHistorias()) { %>
@@ -252,7 +224,7 @@
             <% } else { %>
             <p class="text-muted">No hay menús registrados aún.</p>
             <% } %>
-            <% if (restauranteUsuario.getMenuDelDia() != null ) { %>
+            <% if (restauranteUsuario.getMenuDelDia() != null) { %>
             <div class="mb-4">
                 <h5>Menú del Día Registrado</h5>
                 <div class="card mb-2">
@@ -338,7 +310,7 @@
         });
     });
 </script>
-<% String contenidoMenuDelDia = restauranteUsuario.getMenuDelDia() != null ? restauranteUsuario.getMenuDelDia().getDescripcion() : ""; %>
+<% String contenidoMenuDelDia = restauranteUsuario != null && restauranteUsuario.getMenuDelDia() != null ? restauranteUsuario.getMenuDelDia().getDescripcion() : ""; %>
 <script>
     const contenidoMenuDelDia = `<%= contenidoMenuDelDia != null ? contenidoMenuDelDia.replace("\"", "\\\"").replace("\n", "\\n") : "" %>`;
 </script>

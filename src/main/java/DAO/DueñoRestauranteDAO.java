@@ -14,9 +14,9 @@ public class DueñoRestauranteDAO {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery(
-                            "SELECT d FROM DueñoRestaurante d WHERE d.nombreUsuario = :nombreUsuario",
-                            DueñoRestaurante.class
-                    ).setParameter("nombreUsuario", nombreUsuario)
+                            "SELECT d FROM DueñoRestaurante d LEFT JOIN FETCH d.restaurante WHERE d.nombreUsuario = :nombreUsuario",
+                            DueñoRestaurante.class)
+                    .setParameter("nombreUsuario", nombreUsuario)
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
@@ -33,10 +33,13 @@ public class DueñoRestauranteDAO {
             if (dueño.getId() == null) {
                 em.persist(dueño);
                 if (dueño.getRestaurante() != null) {
-                    em.persist(dueño.getRestaurante());  // Guarda en cascada
+                    em.persist(dueño.getRestaurante());
                 }
             } else {
                 em.merge(dueño);
+                if (dueño.getRestaurante() != null) {
+                    em.merge(dueño.getRestaurante());
+                }
             }
             tx.commit();
         } catch (Exception e) {

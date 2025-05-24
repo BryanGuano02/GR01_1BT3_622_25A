@@ -43,7 +43,7 @@ public class SvAuth extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        crearUsuarios();
+//        crearUsuarios();
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
@@ -84,6 +84,10 @@ public class SvAuth extends HttpServlet {
                 response.sendRedirect("inicio");
             } else if (usuario instanceof DueñoRestaurante) {
                 DueñoRestaurante dueño = (DueñoRestaurante) usuario;
+                // Asegurarnos de cargar el restaurante asociado
+                if(dueño.getRestaurante() == null) {
+                    dueño.setRestaurante(new Restaurante());
+                }
                 session.setAttribute("restaurante", dueño.getRestaurante());
                 response.sendRedirect("crearRestaurante.jsp");
             }
