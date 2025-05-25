@@ -34,7 +34,6 @@ public class SvVotarCalificacion extends HttpServlet {
         if (redirectUrl == null) {
             redirectUrl = request.getContextPath() + "/detalleRestaurante";
         }
-//        try {
             Long idCalificacion = Long.parseLong(idCalificacionStr);
             Long idComensal = Long.parseLong(idComensalStr);
             Calificacion calificacion = calificacionDAO.obtenerPorId(idCalificacion);
@@ -43,9 +42,6 @@ public class SvVotarCalificacion extends HttpServlet {
                 votacionService.votarCalificacion(comensal, calificacion);
                 calificacionDAO.actualizar(calificacion);
             }
-//        } catch (Exception e) {
-            // Manejo de error opcional
-//        }
         response.sendRedirect(redirectUrl);
     }
 }
