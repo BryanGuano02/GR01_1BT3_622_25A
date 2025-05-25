@@ -4,6 +4,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html lang="es">
 
 <head>
@@ -49,40 +50,70 @@
             font-weight: 500;
             margin-bottom: 0.25rem;
             color: #6c757d;
-        }        .calificacion-card {
+        }
+
+        .calificacion-card {
             background: #fff;
             border-radius: 0.5rem;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem 0.75rem 1.25rem;
+            margin-bottom: 1rem;
             border-left: 4px solid #0d6efd;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            box-shadow: 0 0.08rem 0.18rem rgba(0, 0, 0, 0.06);
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+
+        .calificacion-card:hover {
+            box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.10);
         }
 
         .calificacion-fecha {
             font-size: 0.85rem;
             color: #6c757d;
-        }
-
-        .calificacion-comentario {
-            margin-top: 0.75rem;
-            line-height: 1.5;
+            margin-left: 1rem;
+            white-space: nowrap;
         }
 
         .calificacion-usuario {
-            margin-top: 0.75rem;
-            margin-bottom: 0.75rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
             color: #333;
+            font-size: 1.05rem;
         }
 
-        .no-calificaciones {
-            text-align: center;
-            padding: 2rem 0;
+        .calificacion-comentario {
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            font-size: 1.01rem;
+            color: #444;
         }
 
-        .actions-container {
+        .calificacion-actions {
             display: flex;
+            align-items: center;
             gap: 0.5rem;
-            margin-top: 1rem;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+        }
+
+        .calificacion-card .btn-link {
+            padding: 0.2rem 0.5rem;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .calificacion-card .badge {
+            font-size: 0.85em;
+            margin-left: 0.2rem;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-3 {
+            margin-bottom: 0.5rem !important;
         }
     </style>
 </head>
@@ -207,7 +238,8 @@
             <div class="card-body">
                 <c:choose>
                     <c:when test="${not empty calificaciones}">
-                        <c:forEach items="${calificaciones}" var="calificacion">                            <div class="calificacion-card">
+                        <c:forEach items="${calificaciones}" var="calificacion">
+                            <div class="calificacion-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div class="rating-stars">
                                         <c:forEach begin="1" end="5" var="i">
@@ -225,7 +257,31 @@
                                         <i class="far fa-calendar-alt me-1"></i>
                                         ${calificacion.fechaFormateada}
                                     </div>
-                                </div><div class="calificacion-usuario d-flex align-items-center">
+                                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                                        <form action="${pageContext.request.contextPath}/votarCalificacion" method="POST" style="display:inline;">
+                                            <input type="hidden" name="idCalificacion" value="${calificacion.id}" />
+                                            <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}" />
+                                            <c:set var="yaVoto" value="false" />
+                                            <c:forEach var="voto" items="${calificacion.votos}">
+                                                <c:if test="${voto.comensal.id == sessionScope.usuario.id}">
+                                                    <c:set var="yaVoto" value="true" />
+                                                </c:if>
+                                            </c:forEach>
+                                            <button type="submit"
+                                                class="btn btn-link ${yaVoto ? 'text-danger' : 'text-success'} d-flex align-items-center"
+                                                title="${yaVoto ? 'Quitar mi voto' : 'Votar esta calificación'}">
+                                                <i class="fas ${yaVoto ? 'fa-thumbs-down' : 'fa-thumbs-up'} fa-lg me-1"></i>
+                                                <span style="font-size:0.95em;">
+                                                    ${yaVoto ? 'Quitar voto' : 'Votar'}
+                                                </span>
+                                                <span class="badge bg-secondary ms-2" title="Total de votos">
+                                                    <c:out value="${fn:length(calificacion.votos)}"/>
+                                                </span>
+                                            </button>
+                                        </form>
+                                    </c:if>
+                                </div>
+                                <div class="calificacion-usuario d-flex align-items-center">
                                     <i class="fas fa-user me-2 text-primary"></i>
                                     <span class="fw-bold">${calificacion.comensal.nombreUsuario}</span>
                                 </div>

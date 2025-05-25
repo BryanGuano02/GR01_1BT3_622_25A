@@ -1,6 +1,5 @@
 package servicios;
 
-import entidades.VotoCalificacion;
 import org.junit.Test;
 
 import entidades.Calificacion;
@@ -9,7 +8,7 @@ import entidades.Comensal;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class VotacionCalificacionServiceTest {
+public class VotacionCalificacionTest {
 
     @Test
     public void givenComensalCalificacion_whenVotar_thenVotoRegistradoConExito() {

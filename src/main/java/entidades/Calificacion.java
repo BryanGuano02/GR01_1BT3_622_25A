@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Calificacion {
@@ -21,6 +23,7 @@ public class Calificacion {
     @ManyToOne
     @JoinColumn(name = "idComensal")
     private Comensal comensal;
+
     @ManyToOne
     @JoinColumn(name = "idRestaurante")
     private Restaurante restaurante;
@@ -34,6 +37,9 @@ public class Calificacion {
     private int variedadMenu;
     private int accesibilidad;
     private int volveria;
+
+    @OneToMany(mappedBy = "calificacion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotoCalificacion> votos = new ArrayList<>();
 
     public Calificacion() {
         // Establecer la fecha de creación automáticamente al crear una nueva instancia
@@ -188,6 +194,10 @@ public class Calificacion {
 
     public String getFechaFormateada() {
         return this.fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+    }
+
+    public List<VotoCalificacion> getVotos() {
+        return votos;
     }
 
     @Override

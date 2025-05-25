@@ -13,8 +13,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class NotificacionServiceParametrizedTest {
     @Parameterized.Parameters
-    public static Collection<Object[]> datosDePrueba() {
-        return Arrays.asList(new Object[][] {
+    public static Collection<Object[]> datosDePrueba() { return Arrays.asList(new Object[][] {
                 // mensaje, leidaInicial, esperadoValido
                 { "Notificacion 1", false, true },   // no leída, debe devolver true
                 { "Notificacion 2", true, false },   // ya leída, debe devolver false
