@@ -25,8 +25,8 @@ public class Calificacion {
     private int tiempoEspera;
     private int relacionPrecioCalidad;
     private int variedadMenu;
-    private int accecibilidad;
-    private boolean volveria;
+    private int accesibilidad;
+    private int volveria;
 
 
 
@@ -39,11 +39,27 @@ public class Calificacion {
     public Calificacion() {
     }
 
-    public Calificacion(Double puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
-        this.puntaje = puntaje;
+//    public Calificacion(Double puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
+//        this.puntaje = puntaje;
+//        this.comentario = comentario;
+//        this.comensal = comensal;
+//        this.restaurante = restaurante;
+//    }
+
+
+    public Calificacion(String comentario, Comensal comensal, Restaurante restaurante, int calidadComida, int calidadServicio, int limpieza, int ambiente, int tiempoEspera, int relacionPrecioCalidad, int variedadMenu, int accesibilidad, int volveria) {
         this.comentario = comentario;
         this.comensal = comensal;
         this.restaurante = restaurante;
+        this.calidadComida = calidadComida;
+        this.calidadServicio = calidadServicio;
+        this.limpieza = limpieza;
+        this.ambiente = ambiente;
+        this.tiempoEspera = tiempoEspera;
+        this.relacionPrecioCalidad = relacionPrecioCalidad;
+        this.variedadMenu = variedadMenu;
+        this.accesibilidad = accesibilidad;
+        this.volveria = volveria;
     }
 
     public Long getId() {
@@ -142,19 +158,19 @@ public class Calificacion {
         this.variedadMenu = variedadMenu;
     }
 
-    public int getAccecibilidad() {
-        return accecibilidad;
+    public int getAccesibilidad() {
+        return accesibilidad;
     }
 
-    public void setAccecibilidad(int accecibilidad) {
-        this.accecibilidad = accecibilidad;
+    public void setAccesibilidad(int accesibilidad) {
+        this.accesibilidad = accesibilidad;
     }
 
-    public boolean isVolveria() {
+    public int getVolveria() {
         return volveria;
     }
 
-    public void setVolveria(boolean volveria) {
+    public void setVolveria(int volveria) {
         this.volveria = volveria;
     }
 

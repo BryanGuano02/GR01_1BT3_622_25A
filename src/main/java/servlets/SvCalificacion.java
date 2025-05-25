@@ -124,6 +124,7 @@ public class SvCalificacion extends HttpServlet {
 
     private Long obtenerIdRestaurante(HttpServletRequest req) {
         String idRestauranteString = req.getParameter("idRestaurante");
+        System.out.println(idRestauranteString);
         if (idRestauranteString == null || idRestauranteString.isEmpty()) {
             return null;
         }
@@ -136,10 +137,20 @@ public class SvCalificacion extends HttpServlet {
 
     private Map<String, Object> extraerParametrosCalificacion(HttpServletRequest req) {
         Map<String, Object> parametrosCalificacion = new HashMap<>();
-        parametrosCalificacion.put("puntaje", Double.parseDouble(req.getParameter("puntaje")));
+        //parametrosCalificacion.put("puntaje", Double.parseDouble(req.getParameter("puntaje")));
         parametrosCalificacion.put("comentario", req.getParameter("comentario"));
         parametrosCalificacion.put("idComensal", Long.parseLong(req.getParameter("idComensal")));
         parametrosCalificacion.put("idRestaurante", Long.parseLong(req.getParameter("idRestaurante")));
+        parametrosCalificacion.put("calidadComida", Integer.parseInt(req.getParameter("calidadComida")));
+        parametrosCalificacion.put("calidadServicio", Integer.parseInt(req.getParameter("calidadServicio")));
+        parametrosCalificacion.put("limpieza", Integer.parseInt(req.getParameter("limpieza")));
+        parametrosCalificacion.put("ambiente", Integer.parseInt(req.getParameter("ambiente")));
+        parametrosCalificacion.put("tiempoEspera", Integer.parseInt(req.getParameter("tiempoEspera")));
+        parametrosCalificacion.put("relacionPrecioCalidad", Integer.parseInt(req.getParameter("relacionPrecioCalidad")));
+        parametrosCalificacion.put("variedadMenu", Integer.parseInt(req.getParameter("variedadMenu")));
+        parametrosCalificacion.put("accesibilidad", Integer.parseInt(req.getParameter("accesibilidad")));
+        parametrosCalificacion.put("volveria", Integer.parseInt(req.getParameter("volveria")));
+
         return parametrosCalificacion;
     }
 

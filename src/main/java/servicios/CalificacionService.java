@@ -27,6 +27,7 @@ public class CalificacionService {
             if (!calificacionDAO.crear(calificacion)) {
                 throw new ServiceException("No se pudo crear la calificación");
             }
+            calcularPuntajeCalificacion(calificacion);
             actualizarPuntajePromedio(calificacion.getRestaurante());
         } catch (Exception e) {
             throw new ServiceException("Error al crear calificación: " + e.getMessage(), e);
@@ -43,7 +44,16 @@ public class CalificacionService {
 
     public void calificar(Map<String, Object> parametrosCalificacion) throws ServiceException {
         try {
-            Double puntaje = (Double) parametrosCalificacion.get("puntaje");
+            //Double puntaje = (Double) parametrosCalificacion.get("puntaje");
+            int calidadComida = (Integer) parametrosCalificacion.get("calidadComida");
+            int calidadServicio = (Integer) parametrosCalificacion.get("calidadServicio");
+            int limpieza = (Integer) parametrosCalificacion.get("limpieza");
+            int ambiente = (Integer) parametrosCalificacion.get("ambiente");
+            int tiempoEspera = (Integer) parametrosCalificacion.get("tiempoEspera");
+            int relacionPrecioCalidad = (Integer) parametrosCalificacion.get("relacionPrecioCalidad");
+            int variedadMenu = (Integer) parametrosCalificacion.get("variedadMenu");
+            int accesibilidad = (Integer) parametrosCalificacion.get("accesibilidad");
+            int volveria = (Integer) parametrosCalificacion.get("volveria");
             String comentario = (String) parametrosCalificacion.get("comentario");
             Long idComensal = (Long) parametrosCalificacion.get("idComensal");
             Long idRestaurante = (Long) parametrosCalificacion.get("idRestaurante");
@@ -61,19 +71,30 @@ public class CalificacionService {
 
             if (calificacionExistente != null) {
                 // Actualizar la calificación existente
-                calificacionExistente.setPuntaje(puntaje);
+                //calificacionExistente.setPuntaje(puntaje);
+                calificacionExistente.setCalidadComida(calidadComida);
+                calificacionExistente.setCalidadServicio(calidadServicio);
+                calificacionExistente.setLimpieza(limpieza);
+                calificacionExistente.setAmbiente(ambiente);
+                calificacionExistente.setTiempoEspera(tiempoEspera);
+                calificacionExistente.setRelacionPrecioCalidad(relacionPrecioCalidad);
+                calificacionExistente.setVariedadMenu(variedadMenu);
+                calificacionExistente.setAccesibilidad(accesibilidad);
+                calificacionExistente.setVolveria(volveria);
                 calificacionExistente.setComentario(comentario);
+                calcularPuntajeCalificacion(calificacionExistente);
 
                 if (!calificacionDAO.actualizar(calificacionExistente)) {
                     throw new ServiceException("No se pudo actualizar la calificación existente");
                 }
             } else {
                 // Crear una nueva calificación
-                Calificacion nuevaCalificacion = new Calificacion();
-                nuevaCalificacion.setPuntaje(puntaje);
-                nuevaCalificacion.setComentario(comentario);
-                nuevaCalificacion.setComensal(comensal);
-                nuevaCalificacion.setRestaurante(restaurante);
+                Calificacion nuevaCalificacion = new Calificacion( comentario, comensal, restaurante, calidadComida, calidadServicio, limpieza, ambiente, tiempoEspera, relacionPrecioCalidad, variedadMenu, accesibilidad, volveria );
+                //TODO Mandar por constructor
+                //nuevaCalificacion.setPuntaje(puntaje);
+                //nuevaCalificacion.setComentario(comentario);
+                //nuevaCalificacion.setComensal(comensal);
+                //nuevaCalificacion.setRestaurante(restaurante);
 
                 crearCalificacion(nuevaCalificacion);
             }
@@ -83,6 +104,24 @@ public class CalificacionService {
         } catch (Exception e) {
             throw new ServiceException("Error al procesar la calificación: " + e.getMessage(), e);
         }
+    }
+
+    private double calcularPuntajeCalificacion(Calificacion calificacion) {
+        int suma = 0;
+        int cantidad = 0;
+
+        suma += calificacion.getCalidadComida(); cantidad++;
+        suma += calificacion.getCalidadServicio(); cantidad++;
+        suma += calificacion.getLimpieza(); cantidad++;
+        suma += calificacion.getAmbiente(); cantidad++;
+        suma += calificacion.getTiempoEspera(); cantidad++;
+        suma += calificacion.getRelacionPrecioCalidad(); cantidad++;
+        suma += calificacion.getVariedadMenu(); cantidad++;
+        suma += calificacion.getAccesibilidad(); cantidad++;
+        suma += calificacion.getVolveria(); cantidad++;
+
+        calificacion.setPuntaje( (double) suma / cantidad );
+        return (double) suma / cantidad;
     }
 
     private void actualizarPuntajePromedio(Restaurante restaurante) {

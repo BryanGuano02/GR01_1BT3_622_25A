@@ -49,31 +49,24 @@
                                             value="<%= restaurante != null ? restaurante.getId() : "" %>">
                                         <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}">
                                         <!-- Puntaje -->
-                                        <div class="mb-3">
-                                            <label class="form-label">Puntaje:</label>
-                                            <div class="d-flex justify-content-between mb-3">
-                                                <div class="rating-option">
-                                                    <input type="radio" id="puntaje1" name="puntaje" value="1" required>
-                                                    <label for="puntaje1">★</label>
-                                                </div>
-                                                <div class="rating-option">
-                                                    <input type="radio" id="puntaje2" name="puntaje" value="2">
-                                                    <label for="puntaje2">★★</label>
-                                                </div>
-                                                <div class="rating-option">
-                                                    <input type="radio" id="puntaje3" name="puntaje" value="3">
-                                                    <label for="puntaje3">★★★</label>
-                                                </div>
-                                                <div class="rating-option">
-                                                    <input type="radio" id="puntaje4" name="puntaje" value="4">
-                                                    <label for="puntaje4">★★★★</label>
-                                                </div>
-                                                <div class="rating-option">
-                                                    <input type="radio" id="puntaje5" name="puntaje" value="5">
-                                                    <label for="puntaje5">★★★★★</label>
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                        <%
+                                            String[] opcionesDeRetorno = {
+                                                    "Nunca",
+                                                    "No creo",
+                                                    "Tal vez",
+                                                    "Puede que si",
+                                                    "Seguro" };
+                                            String[] opcionesDeTiempoEspera = {
+                                                    "más de 40 min",
+                                                    "menos de 30 min",
+                                                    "menos de 20 min",
+                                                    "menos de 10 min",
+                                                    "menos de 5 min" };
+                                            request.setAttribute("opcionesDeRetorno", opcionesDeRetorno);
+                                            request.setAttribute("opcionesTiempoEspera", opcionesDeTiempoEspera);
+                                        %>
+
                                         <jsp:include page="components/calificarComponent.jsp">
                                             <jsp:param name="name" value="calidadComida"/>
                                             <jsp:param name="tituloCalificacion" value="Califica la comida:"/>
@@ -114,6 +107,13 @@
                                             <jsp:param name="tituloCalificacion" value="Califica la accesibilidad:"/>
                                         </jsp:include>
 
+
+
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="volveria"/>
+                                            <jsp:param name="tituloCalificacion" value="Regresaría a este restaurante?"/>
+                                        </jsp:include>
+
                                         <div class="mb-4">
                                             <label for="comentario" class="form-label">Comentario:</label>
                                             <textarea class="form-control" id="comentario" name="comentario"
@@ -127,8 +127,68 @@
                                 </div>
                             </div>
                 </div>
+
+
+                <c:if test="${param.success == 'true'}">
+                    <script>
+                        window.addEventListener("DOMContentLoaded", () => {
+                            const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+                            modal.show();
+                        });
+                    </script>
+                </c:if>
                 <!-- Bootstrap JS -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                <script>
+                    document.querySelector("form").addEventListener("submit", function (e) {
+                        const requiredRadios = document.querySelectorAll("input[type=radio]:checked");
+                        const comentario = document.getElementById("comentario").value.trim();
+
+                        // Requiere 9 radios (uno por cada grupo de calificación) y comentario no vacío
+                        if (requiredRadios.length < 9 || comentario === "") {
+                            e.preventDefault(); // Evita que se envíe
+                            const modal = new bootstrap.Modal(document.getElementById('modalError'));
+                            modal.show();
+                        }
+                    });
+                </script>
+                <!-- Modal de Error -->
+                <div class="modal fade" id="modalError" tabindex="-1" aria-labelledby="modalErrorLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content border-danger">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="modalErrorLabel">Formulario incompleto</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                Por favor, completa todas las calificaciones y el comentario antes de enviar.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Éxito -->
+                <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content border-success">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title" id="modalExitoLabel">¡Éxito!</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                ¡Tu calificación se registró correctamente!
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </body>
 
             </html>
