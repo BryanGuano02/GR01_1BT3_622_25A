@@ -31,11 +31,11 @@ public class Notificacion {
 
     }
 
+    // No borrar, es utilizado por detalleCalificacion.jsp
     public String getFechaFormateada() {
         return this.fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
