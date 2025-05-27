@@ -130,13 +130,13 @@ public class CalificacionService {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
-            restauranteDAO.save(restaurante); // Usar RestauranteDAO para guardar
+            restauranteDAO.save(restaurante);
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
     }
 
-    public List<Calificacion> obtenerCalificacionesOrdenadasPorVotos(List<Calificacion> calificaciones) {
+    public List<Calificacion> ordenarCalificacionesPorVotos(List<Calificacion> calificaciones) {
         if (calificaciones == null) {
             throw new IllegalArgumentException("La lista de calificaciones no puede ser nula");
         }
@@ -144,12 +144,6 @@ public class CalificacionService {
         return calificaciones.stream()
                 .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
                 .collect(Collectors.toList());
-    }
-
-    // Sobrecarga para mantener compatibilidad con el código existente
-    public List<Calificacion> obtenerCalificacionesOrdenadasPorVotos(Long idRestaurante) {
-        List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
-        return obtenerCalificacionesOrdenadasPorVotos(calificaciones);
     }
 
 

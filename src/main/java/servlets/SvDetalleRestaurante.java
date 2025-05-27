@@ -220,9 +220,11 @@ public class SvDetalleRestaurante extends HttpServlet {
 
     private void cargarYEnviarCalificaciones(HttpServletRequest req, Long idRestaurante) {
         String orden = req.getParameter("orden");
-        List<Calificacion> calificaciones = "relevancia".equalsIgnoreCase(orden)
-                ? calificacionService.obtenerCalificacionesOrdenadasPorVotos(idRestaurante)
-                : calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
+        List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
+
+        if ("relevancia".equalsIgnoreCase(orden)) {
+            calificaciones = calificacionService.ordenarCalificacionesPorVotos(calificaciones);
+        }
 
         req.setAttribute("calificaciones", calificaciones);
         req.setAttribute("orden", orden);

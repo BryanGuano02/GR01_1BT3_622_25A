@@ -25,8 +25,9 @@ public class CalificacionOrdenTest {
                 crearCalificacionConVotos(2L, 1),
                 crearCalificacionConVotos(3L, 2)
         );
-        List<Calificacion> ordenadas = service.obtenerCalificacionesOrdenadasPorVotos(entrada);
+        List<Calificacion> ordenadas = service.ordenarCalificacionesPorVotos(entrada);
         assertEquals(Arrays.asList(1L, 3L, 2L), ids(ordenadas));
+
     }
 
     @Test
@@ -36,7 +37,7 @@ public class CalificacionOrdenTest {
                 crearCalificacionConVotos(2L, 2),
                 crearCalificacionConVotos(3L, 1)
         );
-        List<Calificacion> ordenadas = service.obtenerCalificacionesOrdenadasPorVotos(entrada);
+        List<Calificacion> ordenadas = service.ordenarCalificacionesPorVotos(entrada);
         assertEquals(3L, ordenadas.get(2).getId());
         assertEquals(2, ordenadas.get(0).getVotos().size());
     }
@@ -44,7 +45,7 @@ public class CalificacionOrdenTest {
     @ParameterizedTest
     @MethodSource("proveedorEscenarios")
     public void testOrdenParametrizado(List<Calificacion> entrada, List<Long> esperado) {
-        List<Calificacion> resultado = service.obtenerCalificacionesOrdenadasPorVotos(entrada);
+        List<Calificacion> resultado = service.ordenarCalificacionesPorVotos(entrada);
         List<Long> idsOrdenados = resultado.stream().map(Calificacion::getId).collect(Collectors.toList());
         assertEquals(esperado, idsOrdenados);
     }
