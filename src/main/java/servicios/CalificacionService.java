@@ -106,7 +106,7 @@ public class CalificacionService {
         }
     }
 
-    private double calcularPuntajeCalificacion(Calificacion calificacion) {
+    public double calcularPuntajeCalificacion(Calificacion calificacion) {
         int suma = 0;
         int cantidad = 0;
 
@@ -133,4 +133,6 @@ public class CalificacionService {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
     }
+
+
 }

@@ -21,27 +21,27 @@
     }
 %>
 <div class="mb-3">
-    <label class="form-label">${param.tituloCalificacion}</label>
+    <h6><label class="form-label">${param.tituloCalificacion}</label></h6>
     <div class="d-flex justify-content-between mb-3">
         <div class="rating-option">
             <input type="radio" id="puntaje1" name="${param.name}" value="1" >
-            <label for="puntaje1">★  <%=opciones[0]%> </label>
+            <label for="puntaje1">★<div class="rating-text"><%=opciones[0]%></div>   </label>
         </div>
         <div class="rating-option">
             <input type="radio" id="puntaje2" name="${param.name}" value="2">
-            <label for="puntaje2">★★ <%=opciones[1]%></label>
+            <label for="puntaje2">★★ <div class="rating-text"><%=opciones[1]%></div></label>
         </div>
         <div class="rating-option">
             <input type="radio" id="puntaje3" name="${param.name}" value="3">
-            <label for="puntaje3">★★★ <%=opciones[2]%></label>
+            <label for="puntaje3">★★★ <div class="rating-text"><%=opciones[2]%></div></label>
         </div>
         <div class="rating-option">
             <input type="radio" id="puntaje4" name="${param.name}" value="4">
-            <label for="puntaje4">★★★★ <%=opciones[3]%></label>
+            <label for="puntaje4">★★★★ <div class="rating-text"><%=opciones[3]%></div></label>
         </div>
         <div class="rating-option">
             <input type="radio" id="puntaje5" name="${param.name}" value="5">
-            <label for="puntaje5">★★★★★ <%=opciones[4]%></label>
+            <label for="puntaje5">★★★★★ <div class="rating-text"><%=opciones[4]%></div></label>
         </div>
     </div>
 </div>

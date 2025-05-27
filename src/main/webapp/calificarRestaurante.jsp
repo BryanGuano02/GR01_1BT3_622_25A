@@ -88,11 +88,6 @@
                                         </jsp:include>
 
                                         <jsp:include page="components/calificarComponent.jsp">
-                                            <jsp:param name="name" value="tiempoEspera"/>
-                                            <jsp:param name="tituloCalificacion" value="Califica el tiempo de espera:"/>
-                                        </jsp:include>
-
-                                        <jsp:include page="components/calificarComponent.jsp">
                                             <jsp:param name="name" value="relacionPrecioCalidad"/>
                                             <jsp:param name="tituloCalificacion" value="Califica la relación Precio-Calidad:"/>
                                         </jsp:include>
@@ -107,7 +102,10 @@
                                             <jsp:param name="tituloCalificacion" value="Califica la accesibilidad:"/>
                                         </jsp:include>
 
-
+                                        <jsp:include page="components/calificarComponent.jsp">
+                                            <jsp:param name="name" value="tiempoEspera"/>
+                                            <jsp:param name="tituloCalificacion" value="Califica el tiempo de espera:"/>
+                                        </jsp:include>
 
                                         <jsp:include page="components/calificarComponent.jsp">
                                             <jsp:param name="name" value="volveria"/>
@@ -115,7 +113,7 @@
                                         </jsp:include>
 
                                         <div class="mb-4">
-                                            <label for="comentario" class="form-label">Comentario:</label>
+                                            <h6><label for="comentario" class="form-label">Comentario:</label></h6>
                                             <textarea class="form-control" id="comentario" name="comentario"
                                                 placeholder="Describe tu experiencia..." rows="4" required></textarea>
                                         </div>
@@ -149,6 +147,9 @@
                         if (requiredRadios.length < 9 || comentario === "") {
                             e.preventDefault(); // Evita que se envíe
                             const modal = new bootstrap.Modal(document.getElementById('modalError'));
+                            modal.show();
+                        } else {
+                            const modal = new bootstrap.Modal(document.getElementById('modalExito'));
                             modal.show();
                         }
                     });
