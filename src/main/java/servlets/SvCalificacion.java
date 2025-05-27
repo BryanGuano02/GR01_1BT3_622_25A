@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import servicios.CalificacionService;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +55,7 @@ public class SvCalificacion extends HttpServlet {
             public List<Calificacion> obtenerCalificacionesPorRestaurante(Long idRestaurante) {
                 EntityManager em = emf.createEntityManager();
                 try {
-                    return em.createQuery(
-                                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
-                                    Calificacion.class)
-                            .setParameter("idRestaurante", idRestaurante)
-                            .getResultList();
+                    return em.createQuery("SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante", Calificacion.class).setParameter("idRestaurante", idRestaurante).getResultList();
                 } finally {
                     em.close();
                 }
@@ -70,11 +65,7 @@ public class SvCalificacion extends HttpServlet {
             public Double calcularPromedioCalificaciones(Long idRestaurante) {
                 EntityManager em = emf.createEntityManager();
                 try {
-                    return em.createQuery(
-                                    "SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante",
-                                    Double.class)
-                            .setParameter("idRestaurante", idRestaurante)
-                            .getSingleResult();
+                    return em.createQuery("SELECT AVG(c.puntaje) FROM Calificacion c WHERE c.restaurante.id = :idRestaurante", Double.class).setParameter("idRestaurante", idRestaurante).getSingleResult();
                 } catch (Exception e) {
                     return 0.0;
                 } finally {
@@ -87,8 +78,7 @@ public class SvCalificacion extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long idRestaurante = obtenerIdRestaurante(req);
 
         if (idRestaurante == null) {
@@ -111,11 +101,15 @@ public class SvCalificacion extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Map<String, Object> parametrosCalificacion = extraerParametrosCalificacion(req);
             calificacionService.calificar(parametrosCalificacion);
+            try {
+                Thread.sleep(2000); // 3000 milisegundos = 3 segundos
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
         } catch (Exception e) {
             resp.sendRedirect(req.getContextPath() + "/calificar?error=" + e.getMessage());

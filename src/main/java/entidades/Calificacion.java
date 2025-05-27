@@ -2,6 +2,11 @@ package entidades;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Calificacion {
 
@@ -11,9 +16,14 @@ public class Calificacion {
 
     private Double puntaje;
     private String comentario;
+
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
+
     @ManyToOne
     @JoinColumn(name = "idComensal")
     private Comensal comensal;
+
     @ManyToOne
     @JoinColumn(name = "idRestaurante")
     private Restaurante restaurante;
@@ -28,26 +38,25 @@ public class Calificacion {
     private int accesibilidad;
     private int volveria;
 
-
-
-
-
-
-
-
+    @OneToMany(mappedBy = "calificacion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VotoCalificacion> votos = new ArrayList<>();
 
     public Calificacion() {
+        // Establecer la fecha de creación automáticamente al crear una nueva instancia
+        this.fechaCreacion = LocalDateTime.now();
     }
 
-//    public Calificacion(Double puntaje, String comentario, Comensal comensal, Restaurante restaurante) {
-//        this.puntaje = puntaje;
-//        this.comentario = comentario;
-//        this.comensal = comensal;
-//        this.restaurante = restaurante;
-//    }
+    // public Calificacion(Double puntaje, String comentario, Comensal comensal,
+    // Restaurante restaurante) {
+    // this.puntaje = puntaje;
+    // this.comentario = comentario;
+    // this.comensal = comensal;
+    // this.restaurante = restaurante;
+    // }
 
-
-    public Calificacion(String comentario, Comensal comensal, Restaurante restaurante, int calidadComida, int calidadServicio, int limpieza, int ambiente, int tiempoEspera, int relacionPrecioCalidad, int variedadMenu, int accesibilidad, int volveria) {
+    public Calificacion(String comentario, Comensal comensal, Restaurante restaurante, int calidadComida,
+            int calidadServicio, int limpieza, int ambiente, int tiempoEspera, int relacionPrecioCalidad,
+            int variedadMenu, int accesibilidad, int volveria) {
         this.comentario = comentario;
         this.comensal = comensal;
         this.restaurante = restaurante;
@@ -60,6 +69,7 @@ public class Calificacion {
         this.variedadMenu = variedadMenu;
         this.accesibilidad = accesibilidad;
         this.volveria = volveria;
+        this.fechaCreacion = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -174,14 +184,25 @@ public class Calificacion {
         this.volveria = volveria;
     }
 
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getFechaFormateada() {
+        return this.fechaCreacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+    }
+
+    public List<VotoCalificacion> getVotos() {
+        return votos;
+    }
+
     @Override
     public String toString() {
-        return "Calificacion{" +
-                "id=" + id +
-                ", puntaje=" + puntaje +
-                ", comentario='" + comentario + '\'' +
-                ", comensal=" + comensal +
-                ", restaurante=" + restaurante +
-                '}';
+        return "Calificacion{" + "id=" + id + ", puntaje=" + puntaje + ", comentario='" + comentario + '\''
+                + ", fechaCreacion=" + fechaCreacion + ", comensal=" + comensal + ", restaurante=" + restaurante + '}';
     }
 }
