@@ -223,7 +223,7 @@ public class SvDetalleRestaurante extends HttpServlet {
         List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
 
         if ("relevancia".equalsIgnoreCase(orden)) {
-            calificaciones = calificacionService.ordenarCalificacionesPorVotos(calificaciones);
+//            calificaciones = calificacionService.ordenarCalificacionesPorVotos(calificaciones);
         }
 
         req.setAttribute("calificaciones", calificaciones);
