@@ -8,11 +8,14 @@ import entidades.Planificacion;
 import entidades.Restaurante;
 import exceptions.ServiceException;
 import org.mockito.Mockito;
+
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -84,7 +87,7 @@ public class CalificacionServiceTest {
         }
 
         @Test
-        public void givenValidCalificacion_whenUpdateCalificacion_thenTrue() throws ServiceException {
+        public void givenValidCalificacion_whenUpdateCalificacion_thenVerify() throws ServiceException {
             // Datos de entrada
             Long comensalId = 1L;
             Long restauranteId = 2L;
@@ -134,5 +137,31 @@ public class CalificacionServiceTest {
                     c.getCalidadComida() == 4 &&
                             c.getComentario().equals("Muy bueno")
             ));
+    }
+
+    @Test
+    public void testActualizarPuntajePromedio() {
+
+        CalificacionDAO calificacionDAO = mock(CalificacionDAO.class);
+        RestauranteDAO restauranteDAO = mock(RestauranteDAO.class);
+        CalificacionService calificacionService = new CalificacionService(calificacionDAO, null, restauranteDAO);
+
+        // Arrange
+        Restaurante restaurante = new Restaurante();
+        restaurante.setId(1L);
+
+        when(calificacionDAO.calcularPromedioCalificaciones(1L)).thenReturn(4.5);
+
+        // Act (usando reflexión si sigue siendo private)
+        try {
+            Method metodo = CalificacionService.class.getDeclaredMethod("actualizarPuntajePromedio", Restaurante.class);
+            metodo.setAccessible(true); // Permite invocar private
+            metodo.invoke(calificacionService, restaurante);
+        } catch (Exception e) {
+            fail("No se pudo invocar el método: " + e.getMessage());
+        }
+        // Assert
+        assertEquals((Double) 4.5, restaurante.getPuntajePromedio());
+        verify(restauranteDAO).save(restaurante);
     }
 }

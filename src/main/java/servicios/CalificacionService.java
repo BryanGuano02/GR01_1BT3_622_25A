@@ -110,7 +110,7 @@ public class CalificacionService {
         return (double) suma / cantidad;
     }
 
-    private void actualizarPuntajePromedio(Restaurante restaurante) {
+    public void actualizarPuntajePromedio(Restaurante restaurante) {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
@@ -156,5 +156,5 @@ public class CalificacionService {
             );
         }
 
-    
+
 }
