@@ -300,7 +300,7 @@
                                                 title="${yaVoto ? 'Quitar mi voto' : 'Votar esta calificación'}">
                                             <i class="fas ${yaVoto ? 'fa-thumbs-down' : 'fa-thumbs-up'} fa-lg me-1"></i>
                                             <span style="font-size:0.95em;">
-                                                    ${yaVoto ? 'Quitar voto' : 'Votar'}
+                                                    ${yaVoto ? 'Quitar voto útil' : 'Agregar voto útil'}
                                             </span>
                                             <span class="badge bg-secondary ms-2" title="Total de votos">
                                                     <c:out value="${fn:length(calificacion.votos)}"/>
