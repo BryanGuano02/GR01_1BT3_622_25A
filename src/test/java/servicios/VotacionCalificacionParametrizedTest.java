@@ -43,13 +43,13 @@ public class VotacionCalificacionParametrizedTest {
 
     @Test
     public void testConteoVotos() {
-        VotacionService votacionService = new VotacionService();
+        CalificacionService calificacionService = new CalificacionService(null, null, null);
         Calificacion calificacion = new Calificacion();
 
         for (Long idComensal : listaIdsComensales) {
             Comensal comensal = new Comensal();
             comensal.setId(idComensal);
-            votacionService.votarCalificacion(comensal, calificacion);
+            calificacionService.votarCalificacion(comensal, calificacion);
         }
 
         assertEquals(descripcion, resultadoEsperado, calificacion.getVotos().size());
