@@ -107,7 +107,6 @@ public class CalificacionService {
                 // nuevaCalificacion.setComentario(comentario);
                 // nuevaCalificacion.setComensal(comensal);
                 // nuevaCalificacion.setRestaurante(restaurante);
-
                 crearCalificacion(nuevaCalificacion);
             }
 
