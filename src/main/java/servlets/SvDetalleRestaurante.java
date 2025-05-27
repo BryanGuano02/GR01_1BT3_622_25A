@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import servicios.CalificacionService;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,12 +27,15 @@ public class SvDetalleRestaurante extends HttpServlet {
     private EntityManagerFactory emf;
     private RestauranteDAO restauranteDAO;
     private CalificacionDAO calificacionDAO;
+    private CalificacionService calificacionService;
+
 
     @Override
     public void init() {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         restauranteDAO = new RestauranteDAO(emf);
-        
+
+
         // Implementar CalificacionDAO igual que en SvCalificacion
         calificacionDAO = new CalificacionDAO() {
             @Override
@@ -58,7 +62,7 @@ public class SvDetalleRestaurante extends HttpServlet {
                 jakarta.persistence.EntityManager em = emf.createEntityManager();
                 try {
                     return em.createQuery(
-                                    "SELECT c FROM Calificacion c WHERE c.restaurante.id = :idRestaurante ORDER BY c.fechaCreacion DESC",
+                                    "SELECT DISTINCT c FROM Calificacion c LEFT JOIN FETCH c.votos WHERE c.restaurante.id = :idRestaurante",
                                     Calificacion.class)
                             .setParameter("idRestaurante", idRestaurante)
                             .getResultList();
@@ -102,57 +106,130 @@ public class SvDetalleRestaurante extends HttpServlet {
                 }
             }
         };
+        calificacionService = new CalificacionService(calificacionDAO, new UsuarioDAO(emf), restauranteDAO);
     }
 
     @Override
+//    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        try {
+//            // Obtener el ID del restaurante de la URL
+//            String idRestauranteStr = req.getParameter("id");
+//            if (idRestauranteStr == null || idRestauranteStr.isEmpty()) {
+//                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante no especificado");
+//                return;
+//            }
+//
+//            Long idRestaurante = Long.parseLong(idRestauranteStr);
+//            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+//
+//            if (restaurante == null) {
+//                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Restaurante no encontrado");
+//                return;
+//            }
+//
+//            // Verificar si el usuario está suscrito
+//            HttpSession session = req.getSession(false);
+//            boolean estaSuscrito = false;
+//
+//            if (session != null && session.getAttribute("usuario") instanceof Comensal) {
+//                Comensal comensal = (Comensal) session.getAttribute("usuario");
+//                SuscripcionDAO suscripcionDAO = new SuscripcionDAO();
+//                estaSuscrito = suscripcionDAO.existeSuscripcion(comensal.getId(), restaurante.getId());
+//
+//                // Crear DTO con información de suscripción
+//                RestauranteDTO restauranteDTO = new RestauranteDTO(restaurante, estaSuscrito);
+//                req.setAttribute("restaurante", restauranteDTO);
+//            } else {
+//                // Si no hay usuario logueado, usar objeto Restaurante directamente
+//                req.setAttribute("restaurante", restaurante);
+//            }
+//
+//            // Obtener calificaciones del restaurante
+//            String orden = req.getParameter("orden");
+//            List<Calificacion> calificaciones;
+//
+//            if ("relevancia".equalsIgnoreCase(orden)) {
+//                calificaciones = calificacionService.obtenerCalificacionesOrdenadasPorVotos(idRestaurante);
+//            } else {
+//                calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante); // orden por defecto: reciente
+//            }
+//
+//            req.setAttribute("calificaciones", calificaciones);
+//            req.setAttribute("orden", orden);
+//
+//
+//            // Redirigir a la página de detalle
+//            req.getRequestDispatcher("/detalleRestaurante.jsp").forward(req, resp);
+//
+//        } catch (NumberFormatException e) {
+//            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante inválido");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al procesar la solicitud");
+//        }
+//    }
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            // Obtener el ID del restaurante de la URL
-            String idRestauranteStr = req.getParameter("id");
-            if (idRestauranteStr == null || idRestauranteStr.isEmpty()) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante no especificado");
-                return;
-            }
+            Long idRestaurante = obtenerIdRestaurante(req, resp);
+            if (idRestaurante == null) return;
 
-            Long idRestaurante = Long.parseLong(idRestauranteStr);
             Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
-
             if (restaurante == null) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Restaurante no encontrado");
                 return;
             }
 
-            // Verificar si el usuario está suscrito
-            HttpSession session = req.getSession(false);
-            boolean estaSuscrito = false;
+            procesarSuscripcion(req, restaurante);
+            cargarYEnviarCalificaciones(req, idRestaurante);
 
-            if (session != null && session.getAttribute("usuario") instanceof Comensal) {
-                Comensal comensal = (Comensal) session.getAttribute("usuario");
-                SuscripcionDAO suscripcionDAO = new SuscripcionDAO();
-                estaSuscrito = suscripcionDAO.existeSuscripcion(comensal.getId(), restaurante.getId());
-                
-                // Crear DTO con información de suscripción
-                RestauranteDTO restauranteDTO = new RestauranteDTO(restaurante, estaSuscrito);
-                req.setAttribute("restaurante", restauranteDTO);
-            } else {
-                // Si no hay usuario logueado, usar objeto Restaurante directamente
-                req.setAttribute("restaurante", restaurante);
-            }
-            
-            // Obtener calificaciones del restaurante
-            List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
-            req.setAttribute("calificaciones", calificaciones);
-
-            // Redirigir a la página de detalle
             req.getRequestDispatcher("/detalleRestaurante.jsp").forward(req, resp);
 
-        } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante inválido");
         } catch (Exception e) {
             e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al procesar la solicitud");
         }
     }
+
+    private Long obtenerIdRestaurante(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idStr = req.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante no especificado");
+            return null;
+        }
+
+        try {
+            return Long.parseLong(idStr);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de restaurante inválido");
+            return null;
+        }
+    }
+
+    private void procesarSuscripcion(HttpServletRequest req, Restaurante restaurante) {
+        HttpSession session = req.getSession(false);
+        if (session != null && session.getAttribute("usuario") instanceof Comensal) {
+            Comensal comensal = (Comensal) session.getAttribute("usuario");
+            SuscripcionDAO suscripcionDAO = new SuscripcionDAO();
+            boolean estaSuscrito = suscripcionDAO.existeSuscripcion(comensal.getId(), restaurante.getId());
+            req.setAttribute("restaurante", new RestauranteDTO(restaurante, estaSuscrito));
+        } else {
+            req.setAttribute("restaurante", restaurante);
+        }
+    }
+
+
+    private void cargarYEnviarCalificaciones(HttpServletRequest req, Long idRestaurante) {
+        String orden = req.getParameter("orden");
+        List<Calificacion> calificaciones = "relevancia".equalsIgnoreCase(orden)
+                ? calificacionService.obtenerCalificacionesOrdenadasPorVotos(idRestaurante)
+                : calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
+
+        req.setAttribute("calificaciones", calificaciones);
+        req.setAttribute("orden", orden);
+    }
+
+
+
 
     @Override
     public void destroy() {
