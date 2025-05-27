@@ -258,7 +258,7 @@
                 <input type="hidden" name="id" value="${restaurante.id}" />
                 <input type="hidden" name="orden" value="relevancia" />
                 <button type="submit" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-sort-amount-down-alt me-1"></i> Ordenar por relevancia
+                    <i class="fas fa-sort-amount-down-alt me-1"></i> Por relevancia
                 </button>
             </form>
         </div>
