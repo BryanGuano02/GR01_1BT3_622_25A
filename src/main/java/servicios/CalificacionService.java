@@ -8,8 +8,10 @@ import entidades.Comensal;
 import entidades.Restaurante;
 import exceptions.ServiceException;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CalificacionService {
     private final CalificacionDAO calificacionDAO;
@@ -133,4 +135,23 @@ public class CalificacionService {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
     }
+
+    public List<Calificacion> obtenerCalificacionesOrdenadasPorVotos(Long idRestaurante) {
+        List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
+        System.out.println("ORDEN POR RELEVANCIA:");
+        for (Calificacion c : calificaciones) {
+            System.out.println("Calificación ID: " + c.getId() + " - Votos: " + c.getVotos().size());
+        }
+        return calificaciones.stream()
+                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
+                .collect(Collectors.toList());
+
+    }
+
+    public List<Calificacion> ordenarPorVotos(List<Calificacion> calificaciones) {
+        return calificaciones.stream()
+                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
+                .collect(Collectors.toList());
+    }
+
 }
