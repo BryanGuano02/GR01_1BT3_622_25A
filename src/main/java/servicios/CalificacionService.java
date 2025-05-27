@@ -136,22 +136,22 @@ public class CalificacionService {
         }
     }
 
+    public List<Calificacion> obtenerCalificacionesOrdenadasPorVotos(List<Calificacion> calificaciones) {
+        if (calificaciones == null) {
+            throw new IllegalArgumentException("La lista de calificaciones no puede ser nula");
+        }
+
+        return calificaciones.stream()
+                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
+                .collect(Collectors.toList());
+    }
+
+    // Sobrecarga para mantener compatibilidad con el código existente
     public List<Calificacion> obtenerCalificacionesOrdenadasPorVotos(Long idRestaurante) {
         List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
-        System.out.println("ORDEN POR RELEVANCIA:");
-        for (Calificacion c : calificaciones) {
-            System.out.println("Calificación ID: " + c.getId() + " - Votos: " + c.getVotos().size());
-        }
-        return calificaciones.stream()
-                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
-                .collect(Collectors.toList());
-
+        return obtenerCalificacionesOrdenadasPorVotos(calificaciones);
     }
 
-    public List<Calificacion> ordenarPorVotos(List<Calificacion> calificaciones) {
-        return calificaciones.stream()
-                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
-                .collect(Collectors.toList());
-    }
+
 
 }
