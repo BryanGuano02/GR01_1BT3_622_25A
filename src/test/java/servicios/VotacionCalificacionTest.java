@@ -19,8 +19,8 @@ public class VotacionCalificacionTest {
         comensal.setId(idComensal);
         calificacion.setId(idCalificacion);
 
-        VotacionService votacionService = new VotacionService();
-        votacionService.votarCalificacion(comensal, calificacion);
+        CalificacionService calificacionService = new CalificacionService(null, null, null);
+        calificacionService.votarCalificacion(comensal, calificacion);
 
         assertTrue(calificacion.getVotos().get(0).getComensal().getId().equals(idComensal));
     }
@@ -34,9 +34,9 @@ public class VotacionCalificacionTest {
         comensal.setId(idComensal);
         calificacion.setId(idCalificacion);
 
-        VotacionService votacionService = new VotacionService();
-        Boolean resultadoPrimerVoto = votacionService.votarCalificacion(comensal, calificacion);
-        Boolean resultadoSegundoVoto = votacionService.votarCalificacion(comensal, calificacion);
+        CalificacionService calificacionService = new CalificacionService(null, null, null);
+        Boolean resultadoPrimerVoto = calificacionService.votarCalificacion(comensal, calificacion);
+        Boolean resultadoSegundoVoto = calificacionService.votarCalificacion(comensal, calificacion);
 
         assertTrue(resultadoPrimerVoto);
         assertFalse(resultadoSegundoVoto);
