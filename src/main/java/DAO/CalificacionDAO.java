@@ -74,7 +74,7 @@ public class CalificacionDAO {
             query.setParameter("idRestaurante", idRestaurante);
             return query.getResultList();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones para el restaurante ID: " + idRestaurante, e);
+            LOGGER.log(Level.SEVERE, "Errr al obtener calificaciones para el restaurante ID: " + idRestaurante, e);
             return new ArrayList<>();
         } finally {
             if (em != null && em.isOpen()) {
@@ -215,6 +215,29 @@ public class CalificacionDAO {
     public void cerrar() {
         if (emf != null && emf.isOpen()) {
             emf.close();
+        }
+    }
+
+    public List<Calificacion> obtenerCalificacionesPorRestauranteOrdenadoPorVotos(Long idRestaurante) {
+        EntityManager em = null;
+        try {
+            em = emf.createEntityManager();
+            TypedQuery<Calificacion> query = em.createQuery(
+                "SELECT c FROM Calificacion c " +
+                "WHERE c.restaurante.id = :idRestaurante " +
+                "ORDER BY SIZE(c.votos) DESC, c.id DESC",
+                Calificacion.class
+            );
+            query.setParameter("idRestaurante", idRestaurante);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones ordenadas por votos para el restaurante ID: "
+                    + idRestaurante, e);
+            return new ArrayList<>();
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
         }
     }
 }
