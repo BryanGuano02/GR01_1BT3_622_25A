@@ -38,7 +38,7 @@ public class CalificacionServiceTest {
     }
 
     @Test
-    public void givenValidInputs_whenCalificar_thenCalificacionRegistradaConExito() throws ServiceException {
+    public void givenEntradasValidas_whenCalificar_thenCalificacionRegistradaConExito() throws ServiceException {
 
         Long idComensal = 1L;
         Long idRestaurante = 2L;
@@ -76,7 +76,7 @@ public class CalificacionServiceTest {
     }
 
     @Test
-    void calcularPuntajeCalificacion_debeCalcularPromedioCorrecto() {
+    void givenCalificacion_whenCalcularPuntaje_thenPuntajeCorrecto() {
 
         Calificacion calificacion = new Calificacion();
         calificacion.setCalidadComida(4);
@@ -118,7 +118,7 @@ public class CalificacionServiceTest {
     };
 
     @Test
-    public void testCrearCalificacionExitosa() {
+    public void givenCalificacion_whenCrearCalificacion_thenNotThrowAndPuntajeCorrecto() throws ServiceException {
 
         Calificacion calificacion = new Calificacion();
         calificacion.setCalidadComida(4);
@@ -141,7 +141,7 @@ public class CalificacionServiceTest {
 
 
         @Test
-        public void givenValidHashMap_whenExtraerParametrosCalificacion_thenParametrosExtraidosCorrectamente() {
+        public void givenHashMapValido_whenExtraerParametrosCalificacion_thenParametrosExtraidosCorrectamente() {
             // Arrange
             CalificacionService service = new CalificacionService(null, null, null);
             HashMap<String, Object> parametros = new HashMap<>();
@@ -178,7 +178,7 @@ public class CalificacionServiceTest {
         }
 
         @Test
-        public void givenValidCalificacion_whenUpdateCalificacion_thenVerify() throws ServiceException {
+        public void givenCalificacionValida_whenActualizarCalificacion_thenVerifica() throws ServiceException {
             // Datos de entrada
             Long comensalId = 1L;
             Long restauranteId = 2L;
@@ -231,7 +231,7 @@ public class CalificacionServiceTest {
     }
 
     @Test
-    public void testActualizarPuntajePromedio() {
+    public void givenCalificacionExistente_whenActualizarPuntajePromedio_thenPromedioActualizadoCorrectamente() {
 
         CalificacionDAO calificacionDAO = mock(CalificacionDAO.class);
         RestauranteDAO restauranteDAO = mock(RestauranteDAO.class);

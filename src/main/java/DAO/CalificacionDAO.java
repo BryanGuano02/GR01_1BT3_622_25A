@@ -218,20 +218,20 @@ public class CalificacionDAO {
         }
     }
 
-    public List<Calificacion> obtenerCalificacionesPorRestauranteOrdenadoPorVotos(Long idRestaurante) {
+    public List<Calificacion> obtenerCalificacionesPorRestaurantesOrdenadoPorPuntuacion(Long idRestaurante) {
         EntityManager em = null;
         try {
             em = emf.createEntityManager();
             TypedQuery<Calificacion> query = em.createQuery(
                 "SELECT c FROM Calificacion c " +
                 "WHERE c.restaurante.id = :idRestaurante " +
-                "ORDER BY SIZE(c.votos) DESC, c.id DESC",
+                "ORDER BY c.puntaje DESC, c.id DESC",
                 Calificacion.class
             );
             query.setParameter("idRestaurante", idRestaurante);
             return query.getResultList();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones ordenadas por votos para el restaurante ID: "
+            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones ordenadas por puntaje para el restaurante ID: "
                     + idRestaurante, e);
             return new ArrayList<>();
         } finally {

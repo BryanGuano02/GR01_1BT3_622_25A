@@ -140,7 +140,7 @@ public class SvDetalleRestaurante extends HttpServlet {
             }
             
             // Obtener calificaciones del restaurante
-            List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestauranteOrdenadoPorVotos(idRestaurante);
+            List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
             req.setAttribute("calificaciones", calificaciones);
 
             // Redirigir a la página de detalle
