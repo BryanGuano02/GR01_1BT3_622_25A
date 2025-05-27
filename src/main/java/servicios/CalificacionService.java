@@ -54,60 +54,82 @@ public class CalificacionService {
 
     public void calificar(Map<String, Object> parametrosCalificacion) throws ServiceException {
         try {
-            // Double puntaje = (Double) parametrosCalificacion.get("puntaje");
-            int calidadComida = (Integer) parametrosCalificacion.get("calidadComida");
-            int calidadServicio = (Integer) parametrosCalificacion.get("calidadServicio");
-            int limpieza = (Integer) parametrosCalificacion.get("limpieza");
-            int ambiente = (Integer) parametrosCalificacion.get("ambiente");
-            int tiempoEspera = (Integer) parametrosCalificacion.get("tiempoEspera");
-            int relacionPrecioCalidad = (Integer) parametrosCalificacion.get("relacionPrecioCalidad");
-            int variedadMenu = (Integer) parametrosCalificacion.get("variedadMenu");
-            int accesibilidad = (Integer) parametrosCalificacion.get("accesibilidad");
-            int volveria = (Integer) parametrosCalificacion.get("volveria");
-            String comentario = (String) parametrosCalificacion.get("comentario");
-            Long idComensal = (Long) parametrosCalificacion.get("idComensal");
-            Long idRestaurante = (Long) parametrosCalificacion.get("idRestaurante");
+            //Refactorizacion
 
-            Comensal comensal = usuarioDAO.obtenerComensalPorId(idComensal);
-            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(idRestaurante);
+//            // Double puntaje = (Double) parametrosCalificacion.get("puntaje");
+//            int calidadComida = (Integer) parametrosCalificacion.get("calidadComida");
+//            int calidadServicio = (Integer) parametrosCalificacion.get("calidadServicio");
+//            int limpieza = (Integer) parametrosCalificacion.get("limpieza");
+//            int ambiente = (Integer) parametrosCalificacion.get("ambiente");
+//            int tiempoEspera = (Integer) parametrosCalificacion.get("tiempoEspera");
+//            int relacionPrecioCalidad = (Integer) parametrosCalificacion.get("relacionPrecioCalidad");
+//            int variedadMenu = (Integer) parametrosCalificacion.get("variedadMenu");
+//            int accesibilidad = (Integer) parametrosCalificacion.get("accesibilidad");
+//            int volveria = (Integer) parametrosCalificacion.get("volveria");
+//            String comentario = (String) parametrosCalificacion.get("comentario");
+//            Long idComensal = (Long) parametrosCalificacion.get("idComensal");
+//            Long idRestaurante = (Long) parametrosCalificacion.get("idRestaurante");
 
-            if (comensal == null || restaurante == null) {
+            Calificacion calificacion = extraerParametrosCalificacion(parametrosCalificacion);
+
+            // Obtener comensal y restaurante reales desde la base de datos
+            Comensal comensal = usuarioDAO.obtenerComensalPorId(calificacion.getComensal().getId());
+            Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(calificacion.getRestaurante().getId());
+
+            if (calificacion.getComensal() == null || calificacion.getRestaurante() == null) {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
+            // Actualizar las referencias por las reales
+            calificacion.setComensal(comensal);
+            calificacion.setRestaurante(restaurante);
+
             // Buscar si ya existe una calificación previa
-            Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(idComensal,
-                    idRestaurante);
+             Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(
+                     comensal.getId(), restaurante.getId());
 
             if (calificacionExistente != null) {
-                // Actualizar la calificación existente
-                // calificacionExistente.setPuntaje(puntaje);
-                calificacionExistente.setCalidadComida(calidadComida);
-                calificacionExistente.setCalidadServicio(calidadServicio);
-                calificacionExistente.setLimpieza(limpieza);
-                calificacionExistente.setAmbiente(ambiente);
-                calificacionExistente.setTiempoEspera(tiempoEspera);
-                calificacionExistente.setRelacionPrecioCalidad(relacionPrecioCalidad);
-                calificacionExistente.setVariedadMenu(variedadMenu);
-                calificacionExistente.setAccesibilidad(accesibilidad);
-                calificacionExistente.setVolveria(volveria);
-                calificacionExistente.setComentario(comentario);
+
+//                // Actualizar la calificación existente
+//                // calificacionExistente.setPuntaje(puntaje);
+//                calificacionExistente.setCalidadComida(calidadComida);
+//                calificacionExistente.setCalidadServicio(calidadServicio);
+//                calificacionExistente.setLimpieza(limpieza);
+//                calificacionExistente.setAmbiente(ambiente);
+//                calificacionExistente.setTiempoEspera(tiempoEspera);
+//                calificacionExistente.setRelacionPrecioCalidad(relacionPrecioCalidad);
+//                calificacionExistente.setVariedadMenu(variedadMenu);
+//                calificacionExistente.setAccesibilidad(accesibilidad);
+//                calificacionExistente.setVolveria(volveria);
+//                calificacionExistente.setComentario(comentario);
+                // Actualizar la calificación existente con los nuevos valores
+                calificacionExistente.setCalidadComida(calificacion.getCalidadComida());
+                calificacionExistente.setCalidadServicio(calificacion.getCalidadServicio());
+                calificacionExistente.setLimpieza(calificacion.getLimpieza());
+                calificacionExistente.setAmbiente(calificacion.getAmbiente());
+                calificacionExistente.setTiempoEspera(calificacion.getTiempoEspera());
+                calificacionExistente.setRelacionPrecioCalidad(calificacion.getRelacionPrecioCalidad());
+                calificacionExistente.setVariedadMenu(calificacion.getVariedadMenu());
+                calificacionExistente.setAccesibilidad(calificacion.getAccesibilidad());
+                calificacionExistente.setVolveria(calificacion.getVolveria());
+                calificacionExistente.setComentario(calificacion.getComentario());
                 calcularPuntajeCalificacion(calificacionExistente);
 
                 if (!calificacionDAO.actualizar(calificacionExistente)) {
                     throw new ServiceException("No se pudo actualizar la calificación existente");
                 }
             } else {
-                // Crear una nueva calificación
-                Calificacion nuevaCalificacion = new Calificacion(comentario, comensal, restaurante, calidadComida,
-                        calidadServicio, limpieza, ambiente, tiempoEspera, relacionPrecioCalidad, variedadMenu,
-                        accesibilidad, volveria);
-                // TODO Mandar por constructor
-                // nuevaCalificacion.setPuntaje(puntaje);
-                // nuevaCalificacion.setComentario(comentario);
-                // nuevaCalificacion.setComensal(comensal);
-                // nuevaCalificacion.setRestaurante(restaurante);
-                crearCalificacion(nuevaCalificacion);
+//                // Crear una nueva calificación
+//                Calificacion nuevaCalificacion = new Calificacion(comentario, comensal, restaurante, calidadComida,
+//                        calidadServicio, limpieza, ambiente, tiempoEspera, relacionPrecioCalidad, variedadMenu,
+//                        accesibilidad, volveria);
+//                // TODO Mandar por constructor
+//                // nuevaCalificacion.setPuntaje(puntaje);
+//                // nuevaCalificacion.setComentario(comentario);
+//                // nuevaCalificacion.setComensal(comensal);
+//                // nuevaCalificacion.setRestaurante(restaurante);
+//                crearCalificacion(nuevaCalificacion);
+                crearCalificacion(calificacion);
             }
 
             // Actualizar el promedio del restaurante
@@ -144,7 +166,7 @@ public class CalificacionService {
         return (double) suma / cantidad;
     }
 
-    private void actualizarPuntajePromedio(Restaurante restaurante) {
+    public void actualizarPuntajePromedio(Restaurante restaurante) {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
@@ -153,4 +175,72 @@ public class CalificacionService {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
     }
+
+    // 1. Move method (de Votacionservice a CalificacionService)
+    public Boolean votarCalificacion(Comensal comensal, Calificacion calificacion) {
+        List<VotoCalificacion> votos = calificacion.getVotos();
+        // 3. Extract method
+        Optional<VotoCalificacion> votoExistente = encontrarVotoExistente(votos, comensal);
+
+        // 2. Replace Nested Conditional with Guard Clauses
+        if (votoExistente.isPresent()) {
+            votos.remove(votoExistente.get());
+            return false;
+        }
+
+        // 3. Extract method
+        agregarNuevoVoto(votos, comensal, calificacion);
+        return true;
+    }
+
+    // 3. Extract method
+    private Optional<VotoCalificacion> encontrarVotoExistente(List<VotoCalificacion> votos, Comensal comensal) {
+        return votos.stream().filter(v -> v.getComensal().getId().equals(comensal.getId())).findFirst();
+    }
+
+    // 3. Extract method
+    private void agregarNuevoVoto(List<VotoCalificacion> votos, Comensal comensal, Calificacion calificacion) {
+        VotoCalificacion nuevoVoto = new VotoCalificacion();
+        nuevoVoto.setCalificacion(calificacion);
+        nuevoVoto.setComensal(comensal);
+        votos.add(nuevoVoto);
+    }
+
+        public Calificacion extraerParametrosCalificacion(Map<String, Object> parametros) {
+            String comentario = (String) parametros.get("comentario");
+            Long idComensal = (Long) parametros.get("idComensal");
+            Long idRestaurante = (Long) parametros.get("idRestaurante");
+            int calidadComida = (Integer) parametros.get("calidadComida");
+            int calidadServicio = (Integer) parametros.get("calidadServicio");
+            int limpieza = (Integer) parametros.get("limpieza");
+            int ambiente = (Integer) parametros.get("ambiente");
+            int tiempoEspera = (Integer) parametros.get("tiempoEspera");
+            int relacionPrecioCalidad = (Integer) parametros.get("relacionPrecioCalidad");
+            int variedadMenu = (Integer) parametros.get("variedadMenu");
+            int accesibilidad = (Integer) parametros.get("accesibilidad");
+            int volveria = (Integer) parametros.get("volveria");
+
+            Comensal comensal = new Comensal();
+            comensal.setId(idComensal);
+
+            Restaurante restaurante = new Restaurante();
+            restaurante.setId(idRestaurante);
+
+            return new Calificacion(
+                comentario,
+                comensal,
+                restaurante,
+                calidadComida,
+                calidadServicio,
+                limpieza,
+                ambiente,
+                tiempoEspera,
+                relacionPrecioCalidad,
+                variedadMenu,
+                accesibilidad,
+                volveria
+            );
+        }
+
+
 }
