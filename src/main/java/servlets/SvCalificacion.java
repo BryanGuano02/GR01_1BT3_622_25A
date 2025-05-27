@@ -105,6 +105,11 @@ public class SvCalificacion extends HttpServlet {
         try {
             Map<String, Object> parametrosCalificacion = extraerParametrosCalificacion(req);
             calificacionService.calificar(parametrosCalificacion);
+            try {
+                Thread.sleep(2000); // 3000 milisegundos = 3 segundos
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             resp.sendRedirect(req.getContextPath() + "/inicio?success=true");
         } catch (Exception e) {
             resp.sendRedirect(req.getContextPath() + "/calificar?error=" + e.getMessage());
