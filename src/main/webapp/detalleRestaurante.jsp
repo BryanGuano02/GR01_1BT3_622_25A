@@ -150,8 +150,8 @@
                             <div class="rating-stars me-2">
                                 <c:choose>
                                     <c:when test="${restaurante.puntajePromedio > 0}">
-                                        <fmt:formatNumber value="${restaurante.puntajePromedio}" maxFractionDigits="1"
-                                                          var="puntaje"/>
+                                        <fmt:formatNumber value="${restaurante.puntajePromedio}" maxFractionDigits="1" var="puntajeString"/>
+                                        <fmt:parseNumber value="${puntajeString}" var="puntaje"/>
                                         <c:forEach begin="1" end="5" var="i">
                                             <c:choose>
                                                 <c:when test="${i <= puntaje}">
