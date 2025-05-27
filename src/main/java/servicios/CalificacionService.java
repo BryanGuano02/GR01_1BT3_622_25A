@@ -11,9 +11,9 @@ import exceptions.ServiceException;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class CalificacionService {
     private final CalificacionDAO calificacionDAO;
@@ -148,39 +148,9 @@ public class CalificacionService {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
-            restauranteDAO.save(restaurante); // Usar RestauranteDAO para guardar
+            restauranteDAO.save(restaurante);
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
-    }
-
-    // 1. Move method (de Votacionservice a CalificacionService)
-    public Boolean votarCalificacion(Comensal comensal, Calificacion calificacion) {
-        List<VotoCalificacion> votos = calificacion.getVotos();
-        // 3. Extract method
-        Optional<VotoCalificacion> votoExistente = encontrarVotoExistente(votos, comensal);
-
-        // 2. Replace Nested Conditional with Guard Clauses
-        if (votoExistente.isPresent()) {
-            votos.remove(votoExistente.get());
-            return false;
-        }
-
-        // 3. Extract method
-        agregarNuevoVoto(votos, comensal, calificacion);
-        return true;
-    }
-
-    // 3. Extract method
-    private Optional<VotoCalificacion> encontrarVotoExistente(List<VotoCalificacion> votos, Comensal comensal) {
-        return votos.stream().filter(v -> v.getComensal().getId().equals(comensal.getId())).findFirst();
-    }
-
-    // 3. Extract method
-    private void agregarNuevoVoto(List<VotoCalificacion> votos, Comensal comensal, Calificacion calificacion) {
-        VotoCalificacion nuevoVoto = new VotoCalificacion();
-        nuevoVoto.setCalificacion(calificacion);
-        nuevoVoto.setComensal(comensal);
-        votos.add(nuevoVoto);
     }
 }
