@@ -86,14 +86,14 @@ public class SvDetalleRestaurante extends HttpServlet {
                     em.close();
                 }
             }
-            
+
             @Override
             public Calificacion obtenerCalificacionPorComensalYRestaurante(Long idComensal, Long idRestaurante) {
                 EntityManager em = emf.createEntityManager();
                 try {
                     List<Calificacion> resultados = em.createQuery(
-                            "SELECT c FROM Calificacion c WHERE c.comensal.id = :idComensal AND c.restaurante.id = :idRestaurante",
-                            Calificacion.class)
+                                    "SELECT c FROM Calificacion c WHERE c.comensal.id = :idComensal AND c.restaurante.id = :idRestaurante",
+                                    Calificacion.class)
                             .setParameter("idComensal", idComensal)
                             .setParameter("idRestaurante", idRestaurante)
                             .getResultList();
@@ -223,7 +223,7 @@ public class SvDetalleRestaurante extends HttpServlet {
         List<Calificacion> calificaciones = calificacionDAO.obtenerCalificacionesPorRestaurante(idRestaurante);
 
         if ("relevancia".equalsIgnoreCase(orden)) {
-//            calificaciones = calificacionService.ordenarCalificacionesPorVotos(calificaciones);
+            calificaciones = calificacionService.ordenarCalificacionesPorVotos(calificaciones);
         }
 
         req.setAttribute("calificaciones", calificaciones);

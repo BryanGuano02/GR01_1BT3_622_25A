@@ -14,6 +14,8 @@ import jakarta.persistence.Persistence;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CalificacionService {
     private final CalificacionDAO calificacionDAO;
@@ -41,14 +43,6 @@ public class CalificacionService {
             actualizarPuntajePromedio(calificacion.getRestaurante());
         } catch (Exception e) {
             throw new ServiceException("Error al crear calificación: " + e.getMessage(), e);
-        }
-    }
-
-    public List<Calificacion> obtenerCalificacionesPorRestaurante(Long restauranteId) {
-        try {
-            return calificacionDAO.obtenerCalificacionesPorRestaurante(restauranteId);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al obtener calificaciones", e);
         }
     }
 
@@ -241,6 +235,20 @@ public class CalificacionService {
                 volveria
             );
         }
+    public List<Calificacion> ordenarCalificacionesPorVotos(List<Calificacion> calificaciones) {
+        if (calificaciones == null) {
+            throw new IllegalArgumentException("La lista de calificaciones no puede ser nula");
+        }
 
-
+        return calificaciones.stream()
+                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
+                .collect(Collectors.toList());
+    }
+public List<Calificacion> obtenerCalificacionesPorRestaurante(Long restauranteId) {
+        try {
+            return calificacionDAO.obtenerCalificacionesPorRestaurante(restauranteId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener calificaciones", e);
+        }
+    }
 }
