@@ -7,7 +7,8 @@ import org.mockito.Mockito;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import static org.mockito.Mockito.*;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PlanificacionRestauranteMocked {
 

@@ -1,6 +1,7 @@
 package servicios;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import entidades.Calificacion;
 import entidades.Comensal;
