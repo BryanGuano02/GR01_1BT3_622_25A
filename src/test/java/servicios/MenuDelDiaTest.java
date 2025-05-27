@@ -1,10 +1,8 @@
 package servicios;
 
 import DAO.RestauranteDAO;
-import DAO.UsuarioDAO;
 import entidades.MenuDelDia;
 import entidades.Restaurante;
-import entidades.Usuario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

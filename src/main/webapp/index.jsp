@@ -69,6 +69,9 @@
                        class="btn btn-warning">
                         <i class="fas fa-balance-scale me-2"></i>Comparar
                     </a>
+                    <!-- <a href="${pageContext.request.contextPath}/ranking" class="btn btn-dark">
+                        <i class="fas fa-sort-amount-down me-2"></i>Ranking
+                    </a> -->
                 </div>
             </div>
         </div>
