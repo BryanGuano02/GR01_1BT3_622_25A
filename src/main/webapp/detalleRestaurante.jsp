@@ -176,6 +176,47 @@
             color: #64748b;
             margin-bottom: 1.5rem;
         }
+        /* Estilos para cada tarjeta de calificación */
+        .calificacion-card {
+            background: #fff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            border-left: 4px solid #4f46e5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calificacion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .calificacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .calificacion-fecha {
+            font-size: 0.85rem;
+            color: #718096;
+            display: flex;
+            align-items: center;
+        }
+
+        .calificacion-fecha i {
+            margin-right: 0.5rem;
+        }
     </style>
 </head>
 
