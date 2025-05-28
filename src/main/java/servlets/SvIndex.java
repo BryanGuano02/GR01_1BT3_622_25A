@@ -42,21 +42,18 @@ public class SvIndex extends HttpServlet {
                 Comensal comensal = (Comensal) session.getAttribute("usuario");
 
                 if (comensal != null) {
-                    // Obtener todos los restaurantes con sus promedios actualizados
-//                    List<Restaurante> restaurantes = usuarioDAO.obtenerTodosRestaurantes();
+
                     SvRestaurante svRestaurante = new SvRestaurante();
                     List<RestauranteDTO> restauranteDTOs = svRestaurante.getRestaurantesConSuscripcion(comensal.getId());
 
                     // Obtener recomendaciones ya ordenadas
                     List<Restaurante> recomendados = recomendacionService.obtenerRecomendaciones(comensal);
 
-                    // Debug
-//                    System.out.println("Restaurantes recomendados ordenados:");
+
                     recomendados.forEach(r ->
                             System.out.println(r.getNombre() + " - " + r.getPuntajePromedio()));
 
                     req.setAttribute("restaurantesRecomendados", recomendados);
-                    // req.setAttribute("restaurantes", restaurantes);
                     req.setAttribute("restaurantes", restauranteDTOs);
                 }
             }
