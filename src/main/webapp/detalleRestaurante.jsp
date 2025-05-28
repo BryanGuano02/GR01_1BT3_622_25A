@@ -252,6 +252,52 @@
             border-radius: 0.5rem;
             border-left: 3px solid #e2e8f0;
         }
+        /* Estilos para las acciones de votación */
+        .calificacion-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .votos-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .voto-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            color: #64748b;
+        }
+
+        .voto-btn:hover {
+            background-color: #f8fafc;
+        }
+
+        .voto-btn i {
+            font-size: 1rem;
+            margin-right: 0.25rem;
+        }
+
+        .voto-btn.active {
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        .votos-count {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 
