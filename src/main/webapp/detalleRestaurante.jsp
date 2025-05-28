@@ -127,6 +127,55 @@
             display: flex;
             gap: 1rem;
         }
+        /* Estilos generales para la sección de calificaciones */
+        .calificaciones-container {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .calificaciones-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .calificaciones-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+        }
+
+        .calificaciones-title i {
+            margin-right: 0.75rem;
+            color: #4f46e5;
+        }
+
+        /* Estilos para el mensaje cuando no hay calificaciones */
+        .no-calificaciones {
+            text-align: center;
+            padding: 2rem;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+        }
+
+        .no-calificaciones i {
+            font-size: 3rem;
+            color: #cbd5e0;
+            margin-bottom: 1rem;
+        }
+
+        .no-calificaciones p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 
