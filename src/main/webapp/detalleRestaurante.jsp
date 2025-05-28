@@ -153,6 +153,7 @@
                                         <!-- <fmt:formatNumber value="${restaurante.puntajePromedio}" maxFractionDigits="1"
                                                           var="puntaje"/> -->
 <fmt:formatNumber value="${restaurante.puntajePromedio}" maxFractionDigits="1" var="puntajeString"/>
+                                        <!-- <fmt:formatNumber value="${restaurante.puntajePromedio}" maxFractionDigits="1" var="puntajeString"/> -->
                                         <fmt:parseNumber value="${puntajeString}" var="puntaje"/>
                                         <c:forEach begin="1" end="5" var="i">
                                             <c:choose>
@@ -251,8 +252,15 @@
 
     <!-- Sección de calificaciones -->
     <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Calificaciones</h5>
+            <form method="get" action="${pageContext.request.contextPath}/detalleRestaurante" class="m-0 p-0">
+                <input type="hidden" name="id" value="${restaurante.id}" />
+                <input type="hidden" name="orden" value="relevancia" />
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-sort-amount-down-alt me-1"></i> Por relevancia
+                </button>
+            </form>
         </div>
         <div class="card-body">
             <c:choose>
@@ -292,7 +300,7 @@
                                                 title="${yaVoto ? 'Quitar mi voto' : 'Votar esta calificación'}">
                                             <i class="fas ${yaVoto ? 'fa-thumbs-down' : 'fa-thumbs-up'} fa-lg me-1"></i>
                                             <span style="font-size:0.95em;">
-                                                    ${yaVoto ? 'Quitar voto' : 'Votar'}
+                                                    ${yaVoto ? 'Quitar voto útil' : 'Agregar voto útil'}
                                             </span>
                                             <span class="badge bg-secondary ms-2" title="Total de votos">
                                                     <c:out value="${fn:length(calificacion.votos)}"/>

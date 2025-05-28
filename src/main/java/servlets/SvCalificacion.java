@@ -24,6 +24,7 @@ import java.util.Map;
 public class SvCalificacion extends HttpServlet {
     private EntityManagerFactory emf;
     private RestauranteDAO restauranteDAO;
+    private CalificacionDAO calificacionDAO;
     private CalificacionService calificacionService;
 
     @Override
@@ -31,6 +32,7 @@ public class SvCalificacion extends HttpServlet {
         emf = Persistence.createEntityManagerFactory("UFood_PU");
         UsuarioDAO usuarioDAO = new UsuarioDAO(emf);
         restauranteDAO = new RestauranteDAO(emf);  // Pasar emf en lugar de usuarioDAO
+        calificacionDAO = new CalificacionDAO(emf);  // Pasar emf en lugar de usuarioDAO
 
         CalificacionDAO calificacionDAO = new CalificacionDAO() {
             @Override

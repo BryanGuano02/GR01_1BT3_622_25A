@@ -11,9 +11,11 @@ import exceptions.ServiceException;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CalificacionService {
     private final CalificacionDAO calificacionDAO;
@@ -44,14 +46,6 @@ public class CalificacionService {
         }
     }
 
-    public List<Calificacion> obtenerCalificacionesPorRestaurante(Long restauranteId) {
-        try {
-            return calificacionDAO.obtenerCalificacionesPorRestaurante(restauranteId);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al obtener calificaciones", e);
-        }
-    }
-
     public void calificar(Map<String, Object> parametrosCalificacion) throws ServiceException {
         try {
             //Refactorizacion
@@ -72,7 +66,6 @@ public class CalificacionService {
 
             Calificacion calificacion = extraerParametrosCalificacion(parametrosCalificacion);
 
-            // Obtener comensal y restaurante reales desde la base de datos
             Comensal comensal = usuarioDAO.obtenerComensalPorId(calificacion.getComensal().getId());
             Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(calificacion.getRestaurante().getId());
 
@@ -80,11 +73,9 @@ public class CalificacionService {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
-            // Actualizar las referencias por las reales
             calificacion.setComensal(comensal);
             calificacion.setRestaurante(restaurante);
 
-            // Buscar si ya existe una calificación previa
              Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(
                      comensal.getId(), restaurante.getId());
 
@@ -170,7 +161,7 @@ public class CalificacionService {
         try {
             Double nuevoPromedio = calificacionDAO.calcularPromedioCalificaciones(restaurante.getId());
             restaurante.setPuntajePromedio(nuevoPromedio);
-            restauranteDAO.save(restaurante); // Usar RestauranteDAO para guardar
+            restauranteDAO.save(restaurante);
         } catch (Exception e) {
             throw new RuntimeException("Error al actualizar promedio", e);
         }
@@ -241,6 +232,20 @@ public class CalificacionService {
                 volveria
             );
         }
+    public List<Calificacion> ordenarCalificacionesPorVotos(List<Calificacion> calificaciones) {
+        if (calificaciones == null) {
+            throw new IllegalArgumentException("La lista de calificaciones no puede ser nula");
+        }
 
-
+        return calificaciones.stream()
+                .sorted(Comparator.comparingInt((Calificacion c) -> c.getVotos().size()).reversed())
+                .collect(Collectors.toList());
+    }
+public List<Calificacion> obtenerCalificacionesPorRestaurante(Long restauranteId) {
+        try {
+            return calificacionDAO.obtenerCalificacionesPorRestaurante(restauranteId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener calificaciones", e);
+        }
+    }
 }

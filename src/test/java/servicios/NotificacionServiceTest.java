@@ -1,21 +1,31 @@
 package servicios;
 
 import entidades.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Collections;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class NotificacionServiceTest {
+    private static Stream<Arguments> provideNotificationTestCases() {
+        return Stream.of(Arguments.of(new Notificacion("Notificación de prueba"), true), Arguments.of(null, false), Arguments.of(createReadNotification(), false));
+    }
 
-    // mock
+    private static Notificacion createReadNotification() {
+        Notificacion notificacion = new Notificacion("Notificación leída");
+        notificacion.setLeida(true);
+        return notificacion;
+    }
+
     @Test
-    public void given_diner_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_sent_successfully() {
+    void givenDinerSubscribedToRestaurant_whenNewMenuNotificationSent_thenNotificationIsSentSuccessfully() {
+        // Configuración
         NotificacionService notificacionService = mock(NotificacionService.class);
         Historia historia = new Historia("Menú del día: Pollo al horno");
 
@@ -29,16 +39,20 @@ public class NotificacionServiceTest {
         restaurante.setSuscripciones(Collections.singletonList(new Suscripcion(comensal, restaurante)));
         restaurante.agregarHistoria(historia);
 
+        // Mock del comportamiento esperado
         when(notificacionService.notificarComensalesMenuDia(restaurante, historia)).thenReturn(true);
 
+        // Ejecución
         boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante, historia);
 
-        assertTrue("Debe notificar si hay comensales", resultado);
+        // Verificación
+        assertTrue(resultado, "Debe notificar si hay comensales suscritos");
+        verify(notificacionService).notificarComensalesMenuDia(restaurante, historia);
     }
 
     @Test
-    public void given_diner_is_not_subscribed_to_restaurant_when_new_menu_notification_sent_then_notification_is_not_sent() {
-        // Mock de NotificacionService
+    void givenDinerNotSubscribedToRestaurant_whenNewMenuNotificationSent_thenNotificationIsNotSent() {
+        // Configuración
         NotificacionService notificacionService = mock(NotificacionService.class);
         Restaurante restaurante = new Restaurante();
         Historia historia = new Historia("Menú del día: Pollo al horno");
@@ -47,30 +61,27 @@ public class NotificacionServiceTest {
         restaurante.setNombre("restaurante2");
         restaurante.agregarHistoria(historia);
 
-        // Mockea el comportamiento para este caso
+        // Mock del comportamiento esperado
         when(notificacionService.notificarComensalesMenuDia(restaurante, historia)).thenReturn(false);
 
+        // Ejecución
         boolean resultado = notificacionService.notificarComensalesMenuDia(restaurante, historia);
-        assertFalse("No debe notificar si no hay comensales siguiendo", resultado);
+
+        // Verificación
+        assertFalse(resultado, "No debe notificar si no hay comensales suscritos");
+        verify(notificacionService).notificarComensalesMenuDia(restaurante, historia);
     }
 
-    @Test
-    public void given_unread_notifications_when_mark_as_read_then_notification_should_change_leida_boolean() {
-        Boolean esperadoValido = true;
-        String mensaje = "Notificación de prueba";
-
-        Notificacion notificacion = new Notificacion(mensaje);
+    @ParameterizedTest
+    @MethodSource("provideNotificationTestCases")
+    void testMarcarComoLeida(Notificacion notificacion, boolean expectedResult) {
+        // Configuración
         NotificacionService notificacionService = new NotificacionService(null, null);
-        Boolean leida = notificacionService.marcarComoLeida(notificacion);
 
-        assertEquals(esperadoValido, leida);
+        // Ejecución
+        boolean resultado = notificacionService.marcarComoLeida(notificacion);
+
+        // Verificación
+        assertEquals(expectedResult, resultado);
     }
-
-    @Test
-    public void given_null_notification_when_mark_as_read_then_return_false() {
-        NotificacionService notificacionService = new NotificacionService(null, null);
-        boolean resultado = notificacionService.marcarComoLeida(null);
-        assertFalse("Debe devolver false si la notificación es null", resultado);
-    }
-
 }
