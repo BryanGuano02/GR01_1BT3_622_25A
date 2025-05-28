@@ -17,7 +17,7 @@ public class SvMenuDelDia extends HttpServlet {
         System.out.println("SvMenuDelDia");
         HttpSession session = req.getSession(false);
 
-        // Validar sesión
+
         if (session == null || session.getAttribute("usuario") == null) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
