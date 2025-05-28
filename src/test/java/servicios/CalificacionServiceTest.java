@@ -142,24 +142,10 @@ public class CalificacionServiceTest {
         public void givenHashMapValido_whenExtraerParametrosCalificacion_thenParametrosExtraidosCorrectamente() {
             // Arrange
             CalificacionService service = new CalificacionService(null, null, null);
-            HashMap<String, Object> parametros = new HashMap<>();
-            parametros.put("calidadComida", 4);
-            parametros.put("calidadServicio", 5);
-            parametros.put("limpieza", 4);
-            parametros.put("ambiente", 3);
-            parametros.put("tiempoEspera", 5);
-            parametros.put("relacionPrecioCalidad", 3);
-            parametros.put("variedadMenu", 4);
-            parametros.put("accesibilidad", 3);
-            parametros.put("volveria", 1);
-            parametros.put("comentario", "Buen servicio y comida rica");
-            parametros.put("idComensal", 10L);
-            parametros.put("idRestaurante", 1L);
+            HashMap<String, Object> parametros = crearParametros(10L, 1L, "Buen servicio y comida rica");
 
-            // Act
             Calificacion calificacion = service.extraerParametrosCalificacion(parametros);
 
-            // Assert
             assertEquals(4, calificacion.getCalidadComida());
             assertEquals(5, calificacion.getCalidadServicio());
             assertEquals(4, calificacion.getLimpieza());
@@ -172,56 +158,35 @@ public class CalificacionServiceTest {
             assertEquals("Buen servicio y comida rica", calificacion.getComentario());
             assertEquals(Long.valueOf(10), calificacion.getComensal().getId());
             assertEquals(Long.valueOf(1), calificacion.getRestaurante().getId());
-
         }
 
         @Test
         public void givenCalificacionValida_whenActualizarCalificacion_thenVerifica() throws ServiceException {
-            // Datos de entrada
             Long comensalId = 1L;
             Long restauranteId = 2L;
+            HashMap<String, Object> parametros = crearParametros(comensalId, restauranteId, "Muy bueno");
 
-            HashMap<String, Object> parametros = new HashMap<>();
+            UsuarioDAO usuarioDAO = mock(UsuarioDAO.class);
+            RestauranteDAO restauranteDAO = mock(RestauranteDAO.class);
+            CalificacionDAO calificacionDAO = mock(CalificacionDAO.class);
 
-            UsuarioDAO usuarioDAO = Mockito.mock(UsuarioDAO.class);
-            RestauranteDAO restauranteDAO = Mockito.mock(RestauranteDAO.class);
-            CalificacionDAO calificacionDAO = Mockito.mock(CalificacionDAO.class);
 
-            parametros.put("idComensal", comensalId);
-            parametros.put("idRestaurante", restauranteId);
-            parametros.put("calidadComida", 4);
-            parametros.put("calidadServicio", 5);
-            parametros.put("limpieza", 4);
-            parametros.put("ambiente", 3);
-            parametros.put("tiempoEspera", 4);
-            parametros.put("relacionPrecioCalidad", 5);
-            parametros.put("variedadMenu", 3);
-            parametros.put("accesibilidad", 4);
-            parametros.put("volveria", 1);
-            parametros.put("comentario", "Muy bueno");
 
-            // Objetos simulados
-            Comensal comensal = new Comensal();
-            comensal.setId(comensalId);
-
-            Restaurante restaurante = new Restaurante();
-            restaurante.setId(restauranteId);
+            Comensal comensal = crearComensal(comensalId);
+            Restaurante restaurante = crearRestaurante(restauranteId);
 
             Calificacion existente = new Calificacion();
             existente.setComensal(comensal);
             existente.setRestaurante(restaurante);
 
-            // Mocks
             when(usuarioDAO.obtenerComensalPorId(anyLong())).thenReturn(comensal);
             when(restauranteDAO.obtenerRestaurantePorId(anyLong())).thenReturn(restaurante);
             when(calificacionDAO.obtenerCalificacionPorComensalYRestaurante(comensalId, restauranteId)).thenReturn(existente);
             when(calificacionDAO.actualizar(any(Calificacion.class))).thenReturn(true);
 
-            // Ejecutar
-            CalificacionService calificacionService = new CalificacionService(calificacionDAO, usuarioDAO, restauranteDAO);
-            calificacionService.calificar(parametros);
+            CalificacionService service = new CalificacionService(calificacionDAO, usuarioDAO, restauranteDAO);
+            service.calificar(parametros);
 
-            // Verificaciones
             verify(calificacionDAO).actualizar(argThat(c ->
                     c.getCalidadComida() == 4 &&
                             c.getComentario().equals("Muy bueno")
@@ -252,6 +217,34 @@ public class CalificacionServiceTest {
         // Assert
         assertEquals((Double) 4.5, restaurante.getPuntajePromedio());
         verify(restauranteDAO).save(restaurante);
+    }
+
+    private HashMap<String, Object> crearParametros(Long comensalId, Long restauranteId, String comentario) {
+        HashMap<String, Object> parametros = new HashMap<>();
+        parametros.put("calidadComida", 4);
+        parametros.put("calidadServicio", 5);
+        parametros.put("limpieza", 4);
+        parametros.put("ambiente", 3);
+        parametros.put("tiempoEspera", 5);
+        parametros.put("relacionPrecioCalidad", 3);
+        parametros.put("variedadMenu", 4);
+        parametros.put("accesibilidad", 3);
+        parametros.put("volveria", 1);
+        parametros.put("comentario", comentario);
+        parametros.put("idComensal", comensalId);
+        parametros.put("idRestaurante", restauranteId);
+        return parametros;
+    }
+    private Comensal crearComensal(Long id) {
+        Comensal comensal = new Comensal();
+        comensal.setId(id);
+        return comensal;
+    }
+
+    private Restaurante crearRestaurante(Long id) {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setId(id);
+        return restaurante;
     }
 }
 
