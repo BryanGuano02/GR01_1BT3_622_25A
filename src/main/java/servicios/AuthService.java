@@ -16,7 +16,7 @@ import java.util.List;
 public class AuthService {
     private final UsuarioDAO usuarioDAO;
     private final DueñoRestauranteDAO dueñoRestauranteDAO;
-    private static final int SALT_LENGTH = 16; // 16 bytes = 128 bits
+    private static final int SALT_LENGTH = 16; // 16 bytes
 
     public AuthService(UsuarioDAO usuarioDAO, DueñoRestauranteDAO dueñoDAO) {
         this.usuarioDAO = usuarioDAO;
