@@ -11,10 +11,7 @@ import exceptions.ServiceException;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CalificacionService {
@@ -40,7 +37,7 @@ public class CalificacionService {
             if (!calificacionDAO.crear(calificacion)) {
                 throw new ServiceException("No se pudo crear la calificación");
             }
-            actualizarPuntajePromedio(calificacion.getRestaurante());
+//            actualizarPuntajePromedio(calificacion.getRestaurante());
         } catch (Exception e) {
             throw new ServiceException("Error al crear calificación: " + e.getMessage(), e);
         }
@@ -49,6 +46,7 @@ public class CalificacionService {
     public void calificar(Map<String, Object> parametrosCalificacion) throws ServiceException {
         try {
             //Refactorizacion
+            // Extract Method
 
 //            // Double puntaje = (Double) parametrosCalificacion.get("puntaje");
 //            int calidadComida = (Integer) parametrosCalificacion.get("calidadComida");
@@ -66,7 +64,6 @@ public class CalificacionService {
 
             Calificacion calificacion = extraerParametrosCalificacion(parametrosCalificacion);
 
-            // Obtener comensal y restaurante reales desde la base de datos
             Comensal comensal = usuarioDAO.obtenerComensalPorId(calificacion.getComensal().getId());
             Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(calificacion.getRestaurante().getId());
 
@@ -74,11 +71,9 @@ public class CalificacionService {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
-            // Actualizar las referencias por las reales
             calificacion.setComensal(comensal);
             calificacion.setRestaurante(restaurante);
 
-            // Buscar si ya existe una calificación previa
              Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(
                      comensal.getId(), restaurante.getId());
 
@@ -133,31 +128,42 @@ public class CalificacionService {
         }
     }
 
+
+    // Refactorizacion
+    // Substitute algorithm
+//    public double calcularPuntajeCalificacion(Calificacion calificacion) {
+//        int suma = 0;
+//        int cantidad = 0;
+//
+//        suma += calificacion.getCalidadComida();
+//        cantidad++;
+//        suma += calificacion.getCalidadServicio();
+//        cantidad++;
+//        suma += calificacion.getLimpieza();
+//        cantidad++;
+//        suma += calificacion.getAmbiente();
+//        cantidad++;
+//        suma += calificacion.getTiempoEspera();
+//        cantidad++;
+//        suma += calificacion.getRelacionPrecioCalidad();
+//        cantidad++;
+//        suma += calificacion.getVariedadMenu();
+//        cantidad++;
+//        suma += calificacion.getAccesibilidad();
+//        cantidad++;
+//        suma += calificacion.getVolveria();
+//        cantidad++;
+//
+//        calificacion.setPuntaje((double) suma / cantidad);
+//        return (double) suma / cantidad;
+//    }
+
     public double calcularPuntajeCalificacion(Calificacion calificacion) {
-        int suma = 0;
-        int cantidad = 0;
-
-        suma += calificacion.getCalidadComida();
-        cantidad++;
-        suma += calificacion.getCalidadServicio();
-        cantidad++;
-        suma += calificacion.getLimpieza();
-        cantidad++;
-        suma += calificacion.getAmbiente();
-        cantidad++;
-        suma += calificacion.getTiempoEspera();
-        cantidad++;
-        suma += calificacion.getRelacionPrecioCalidad();
-        cantidad++;
-        suma += calificacion.getVariedadMenu();
-        cantidad++;
-        suma += calificacion.getAccesibilidad();
-        cantidad++;
-        suma += calificacion.getVolveria();
-        cantidad++;
-
-        calificacion.setPuntaje((double) suma / cantidad);
-        return (double) suma / cantidad;
+        int[] puntajes = calificacion.obtenerPuntajes();
+        int suma = Arrays.stream(puntajes).sum();
+        double promedio = (double) suma / puntajes.length;
+        calificacion.setPuntaje(promedio);
+        return promedio;
     }
 
     public void actualizarPuntajePromedio(Restaurante restaurante) {
