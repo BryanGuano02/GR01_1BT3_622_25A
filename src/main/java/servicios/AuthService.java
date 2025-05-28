@@ -125,12 +125,12 @@ public class AuthService {
         usuarioDAO.save(comensal);
     }
 
-    // Verifica si un usuario existe
+
     public boolean usuarioExiste(String nombreUsuario) {
         return usuarioDAO.findByNombreUsuario(nombreUsuario) != null;
     }
 
-    // Busca un usuario por nombre de usuario
+
     public Usuario findByNombreUsuario(String nombreUsuario) {
         return usuarioDAO.findByNombreUsuario(nombreUsuario);
     }
