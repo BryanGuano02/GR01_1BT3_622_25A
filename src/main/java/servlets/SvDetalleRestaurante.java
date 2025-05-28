@@ -109,7 +109,6 @@ public class SvDetalleRestaurante extends HttpServlet {
         calificacionService = new CalificacionService(calificacionDAO, new UsuarioDAO(emf), restauranteDAO);
     }
 
-    @Override
 //    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        try {
 //            // Obtener el ID del restaurante de la URL
@@ -168,6 +167,8 @@ public class SvDetalleRestaurante extends HttpServlet {
 //            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al procesar la solicitud");
 //        }
 //    }
+// Refactorización del método doGet para mejorar la legibilidad y manejo de errores (extract method)
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Long idRestaurante = obtenerIdRestaurante(req, resp);
