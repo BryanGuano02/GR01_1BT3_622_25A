@@ -69,7 +69,7 @@ public class CalificacionServiceTest {
 
 
         verify(calificacionDAO).crear(any(Calificacion.class));
-        verify(restauranteDAO, times(2)).save(any(Restaurante.class));
+        verify(restauranteDAO).save(any(Restaurante.class));
 
     }
 
