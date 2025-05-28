@@ -101,7 +101,7 @@ public class CalificacionServiceTest {
     CalificacionDAO CalificacionDAOFalso = new CalificacionDAO() {
         @Override
         public boolean crear(Calificacion calificacion) {
-            return true; // Simula que se creó con éxito
+            return true;
         }
 
     };
