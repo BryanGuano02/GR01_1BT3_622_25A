@@ -154,6 +154,7 @@
                     </div>
 
                     <!-- Pestaña de Restaurantes -->
+                    <!-- Hola mundo -->
                     <div class="tab-pane fade p-3" id="restaurantes" role="tabpanel" aria-labelledby="restaurantes-tab">                        <!-- Mostrar todos los restaurantes de la planificación -->
                         <h4 class="mt-3 mb-3">Restaurantes considerados</h4>
                         
