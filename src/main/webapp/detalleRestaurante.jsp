@@ -298,6 +298,45 @@
             color: #64748b;
             margin-left: 0.5rem;
         }
+        /* Estilos para el botón de ordenar */
+        .sort-btn {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #4f46e5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .sort-btn:hover {
+            background-color: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .sort-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Ajustes responsive */
+        @media (max-width: 768px) {
+            .calificacion-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calificacion-fecha {
+                margin-top: 0.5rem;
+            }
+
+            .calificacion-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
     </style>
 </head>
 
@@ -422,42 +461,56 @@
     </div>
 
     <!-- Sección de calificaciones -->
-    <div class="card shadow mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Calificaciones</h5>
+    <div class="calificaciones-container">
+        <div class="calificaciones-header">
+            <h5 class="calificaciones-title"><i class="fas fa-comments"></i>Reseñas de clientes</h5>
             <form method="get" action="${pageContext.request.contextPath}/detalleRestaurante" class="m-0 p-0">
                 <input type="hidden" name="id" value="${restaurante.id}" />
                 <input type="hidden" name="orden" value="relevancia" />
-                <button type="submit" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-sort-amount-down-alt me-1"></i> Por relevancia
+                <button type="submit" class="sort-btn">
+                    <i class="fas fa-sort-amount-down-alt"></i> Ordenar por relevancia
                 </button>
             </form>
         </div>
-        <div class="card-body">
-            <c:choose>
-                <c:when test="${not empty calificaciones}">
-                    <c:forEach items="${calificaciones}" var="calificacion">
-                        <div class="calificacion-card">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="rating-stars">
-                                    <c:forEach begin="1" end="5" var="i">
-                                        <c:choose>
-                                            <c:when test="${i <= calificacion.puntaje}">
-                                                <i class="fas fa-star"></i>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <i class="far fa-star"></i>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:forEach>
-                                </div>
-                                <div class="calificacion-fecha">
-                                    <i class="far fa-calendar-alt me-1"></i>
-                                        ${calificacion.fechaFormateada}
-                                </div>
+
+        <c:choose>
+            <c:when test="${not empty calificaciones}">
+                <c:forEach items="${calificaciones}" var="calificacion">
+                    <div class="calificacion-card">
+                        <div class="calificacion-header">
+                            <div class="rating-stars">
+                                <c:forEach begin="1" end="5" var="i">
+                                    <c:choose>
+                                        <c:when test="${i <= calificacion.puntaje}">
+                                            <i class="fas fa-star"></i>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <i class="far fa-star"></i>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                            </div>
+                            <div class="calificacion-fecha">
+                                <i class="far fa-calendar-alt"></i>
+                                    ${calificacion.fechaFormateada}
+                            </div>
+                        </div>
+
+                        <div class="calificacion-usuario">
+                            <div class="user-avatar">
+                                    ${fn:substring(calificacion.comensal.nombreUsuario, 0, 1)}
+                            </div>
+                            <span class="user-name">${calificacion.comensal.nombreUsuario}</span>
+                        </div>
+
+                        <div class="calificacion-comentario">
+                                ${calificacion.comentario}
+                        </div>
+
+                        <div class="calificacion-actions">
+                            <div class="votos-container">
                                 <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                                    <form action="${pageContext.request.contextPath}/votarCalificacion" method="POST"
-                                          style="display:inline;">
+                                    <form action="${pageContext.request.contextPath}/votarCalificacion" method="POST" class="m-0 p-0">
                                         <input type="hidden" name="idCalificacion" value="${calificacion.id}"/>
                                         <input type="hidden" name="idComensal" value="${sessionScope.usuario.id}"/>
                                         <c:set var="yaVoto" value="false"/>
@@ -466,44 +519,31 @@
                                                 <c:set var="yaVoto" value="true"/>
                                             </c:if>
                                         </c:forEach>
-                                        <button type="submit"
-                                                class="btn btn-link ${yaVoto ? 'text-danger' : 'text-success'} d-flex align-items-center"
-                                                title="${yaVoto ? 'Quitar mi voto' : 'Votar esta calificación'}">
-                                            <i class="fas ${yaVoto ? 'fa-thumbs-down' : 'fa-thumbs-up'} fa-lg me-1"></i>
-                                            <span style="font-size:0.95em;">
-                                                    ${yaVoto ? 'Quitar voto útil' : 'Agregar voto útil'}
-                                            </span>
-                                            <span class="badge bg-secondary ms-2" title="Total de votos">
-                                                    <c:out value="${fn:length(calificacion.votos)}"/>
-                                                </span>
+                                        <button type="submit" class="voto-btn ${yaVoto ? 'active' : ''}">
+                                            <i class="fas ${yaVoto ? 'fa-thumbs-down' : 'fa-thumbs-up'}"></i>
+                                            <span>${yaVoto ? 'Quitar voto útil' : 'Agregar voto útil'}</span>
                                         </button>
+                                        <span class="votos-count">${fn:length(calificacion.votos)} votos</span>
                                     </form>
                                 </c:if>
                             </div>
-                            <div class="calificacion-usuario d-flex align-items-center">
-                                <i class="fas fa-user me-2 text-primary"></i>
-                                <span class="fw-bold">${calificacion.comensal.nombreUsuario}</span>
-                            </div>
-                            <div class="calificacion-comentario">
-                                    ${calificacion.comentario}
-                            </div>
                         </div>
-                    </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <div class="no-calificaciones">
-                        <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">Este restaurante no tiene calificaciones todavía.</p>
-                        <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
-                            <a href="${pageContext.request.contextPath}/calificar?idRestaurante=${restaurante.id}"
-                               class="btn btn-outline-primary">
-                                <i class="fas fa-star me-2"></i>Sé el primero en calificar
-                            </a>
-                        </c:if>
                     </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <div class="no-calificaciones">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>Este restaurante no tiene reseñas todavía.</p>
+                    <c:if test="${not empty sessionScope.usuario && sessionScope.usuario.tipoUsuario == 'COMENSAL'}">
+                        <a href="${pageContext.request.contextPath}/calificar?idRestaurante=${restaurante.id}"
+                           class="btn btn-primary">
+                            <i class="fas fa-star me-2"></i>Sé el primero en opinar
+                        </a>
+                    </c:if>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
 
