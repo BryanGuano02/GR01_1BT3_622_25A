@@ -70,7 +70,8 @@ public class SvDetalleRestaurante extends HttpServlet {
                     em.close();
                 }
             }
-// Hola Mundo :)
+
+
             @Override
             public Double calcularPromedioCalificaciones(Long idRestaurante) {
                 jakarta.persistence.EntityManager em = emf.createEntityManager();
