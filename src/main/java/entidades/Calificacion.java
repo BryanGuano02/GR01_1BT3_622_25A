@@ -200,6 +200,22 @@ public class Calificacion {
         return votos;
     }
 
+
+    //Nuevo Metodo
+    public int[] obtenerPuntajes() {
+        return new int[] {
+                this.calidadComida,
+                this.calidadServicio,
+                this.limpieza,
+                this.ambiente,
+                this.tiempoEspera,
+                this.relacionPrecioCalidad,
+                this.variedadMenu,
+                this.accesibilidad,
+                this.volveria
+        };
+    }
+
     @Override
     public String toString() {
         return "Calificacion{" + "id=" + id + ", puntaje=" + puntaje + ", comentario='" + comentario + '\''

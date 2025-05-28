@@ -74,7 +74,7 @@ public class CalificacionDAO {
             query.setParameter("idRestaurante", idRestaurante);
             return query.getResultList();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al obtener calificaciones para el restaurante ID: " + idRestaurante, e);
+            LOGGER.log(Level.SEVERE, "Errr al obtener calificaciones para el restaurante ID: " + idRestaurante, e);
             return new ArrayList<>();
         } finally {
             if (em != null && em.isOpen()) {
