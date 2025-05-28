@@ -130,7 +130,7 @@ public class AuthService {
         return usuarioDAO.findByNombreUsuario(nombreUsuario) != null;
     }
 
-    // Busca un usuario por nombre de usuario
+
     public Usuario findByNombreUsuario(String nombreUsuario) {
         return usuarioDAO.findByNombreUsuario(nombreUsuario);
     }

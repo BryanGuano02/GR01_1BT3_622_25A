@@ -123,11 +123,6 @@ public class PlanificacionService {
     }
 
     public void cancelarPlanificacion(Planificacion planificacion) {
-        // List<Comensal> comensales = planificacion.getComensales();
-
-        // for (Comensal comensal : comensales) {
-        // notificar(comensal, "La planificación ha sido cancelada");
-        // }
 
         if (planificacion == null) {
             throw new IllegalArgumentException("La planificación no puede ser nula");
