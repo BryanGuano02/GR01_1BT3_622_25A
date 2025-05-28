@@ -139,7 +139,6 @@ public class CalificacionServiceTest {
 
         @Test
         public void givenHashMapValido_whenExtraerParametrosCalificacion_thenParametrosExtraidosCorrectamente() {
-            // Arrange
             CalificacionService service = new CalificacionService(null, null, null);
             HashMap<String, Object> parametros = crearParametros(10L, 1L, "Buen servicio y comida rica");
 
