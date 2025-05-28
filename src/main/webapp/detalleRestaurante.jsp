@@ -217,6 +217,41 @@
         .calificacion-fecha i {
             margin-right: 0.5rem;
         }
+        /* Estilos para la información del usuario y comentario */
+        .calificacion-usuario {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .calificacion-comentario {
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            border-left: 3px solid #e2e8f0;
+        }
     </style>
 </head>
 
