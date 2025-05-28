@@ -66,7 +66,6 @@ public class CalificacionService {
 
             Calificacion calificacion = extraerParametrosCalificacion(parametrosCalificacion);
 
-            // Obtener comensal y restaurante reales desde la base de datos
             Comensal comensal = usuarioDAO.obtenerComensalPorId(calificacion.getComensal().getId());
             Restaurante restaurante = restauranteDAO.obtenerRestaurantePorId(calificacion.getRestaurante().getId());
 
@@ -74,11 +73,9 @@ public class CalificacionService {
                 throw new ServiceException("Comensal o restaurante no encontrado");
             }
 
-            // Actualizar las referencias por las reales
             calificacion.setComensal(comensal);
             calificacion.setRestaurante(restaurante);
 
-            // Buscar si ya existe una calificación previa
              Calificacion calificacionExistente = calificacionDAO.obtenerCalificacionPorComensalYRestaurante(
                      comensal.getId(), restaurante.getId());
 
