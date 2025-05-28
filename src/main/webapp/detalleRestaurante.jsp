@@ -298,6 +298,45 @@
             color: #64748b;
             margin-left: 0.5rem;
         }
+        /* Estilos para el botón de ordenar */
+        .sort-btn {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #4f46e5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .sort-btn:hover {
+            background-color: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .sort-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Ajustes responsive */
+        @media (max-width: 768px) {
+            .calificacion-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calificacion-fecha {
+                margin-top: 0.5rem;
+            }
+
+            .calificacion-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
     </style>
 </head>
 
