@@ -46,14 +46,6 @@ public class Calificacion {
         this.fechaCreacion = LocalDateTime.now();
     }
 
-    // public Calificacion(Double puntaje, String comentario, Comensal comensal,
-    // Restaurante restaurante) {
-    // this.puntaje = puntaje;
-    // this.comentario = comentario;
-    // this.comensal = comensal;
-    // this.restaurante = restaurante;
-    // }
-
     public Calificacion(String comentario, Comensal comensal, Restaurante restaurante, int calidadComida,
             int calidadServicio, int limpieza, int ambiente, int tiempoEspera, int relacionPrecioCalidad,
             int variedadMenu, int accesibilidad, int volveria) {
