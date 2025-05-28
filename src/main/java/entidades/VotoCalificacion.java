@@ -18,6 +18,9 @@ public class VotoCalificacion {
     @JoinColumn(name = "comensal_id")
     private Comensal comensal;
 
+    public VotoCalificacion() {
+    }
+
     public Long getId() {
         return id;
     }
