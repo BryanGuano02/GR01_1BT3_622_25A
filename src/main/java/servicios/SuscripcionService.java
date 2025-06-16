@@ -1,6 +1,6 @@
 package servicios;
 
-import DAO.DueñoRestauranteDAO;
+import DAO.DuenioRestauranteDAO;
 import DAO.RestauranteDAO;
 import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;

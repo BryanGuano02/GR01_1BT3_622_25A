@@ -5,16 +5,16 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "duenos_restaurante")
 @PrimaryKeyJoinColumn(name = "usuario_id")
-public class DueñoRestaurante extends Usuario {
+public class DuenioRestaurante extends Usuario {
 
-    @OneToOne(mappedBy = "dueño", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "duenio", cascade = CascadeType.ALL)
     private Restaurante restaurante;
 
-    public DueñoRestaurante() {
+    public DuenioRestaurante() {
         this.setTipoUsuario("DUENO_RESTAURANTE");
     }
 
-    public DueñoRestaurante(String nombreUsuario, String contrasena, String email) {
+    public DuenioRestaurante(String nombreUsuario, String contrasena, String email) {
         this.setNombreUsuario(nombreUsuario);
         this.setContrasena(contrasena);
         this.setEmail(email);
@@ -29,7 +29,7 @@ public class DueñoRestaurante extends Usuario {
     public void setRestaurante(Restaurante restaurante) {
         this.restaurante = restaurante;
         if (restaurante != null) {
-            restaurante.setDueño(this);
+            restaurante.setDuenio(this);
         }
     }
 }

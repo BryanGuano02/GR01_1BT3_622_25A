@@ -14,7 +14,7 @@ public class Restaurante {
 
     @OneToOne
     @JoinColumn(name = "dueno_id")
-    private DueñoRestaurante dueño;
+    private DuenioRestaurante duenio;
 
     // Atributos específicos del restaurante
     private String nombre;
@@ -59,12 +59,12 @@ public class Restaurante {
         this.id = id;
     }
 
-    public DueñoRestaurante getDueño() {
-        return dueño;
+    public DuenioRestaurante getDuenio() {
+        return duenio;
     }
 
-    public void setDueño(DueñoRestaurante dueño) {
-        this.dueño = dueño;
+    public void setDuenio(DuenioRestaurante duenio) {
+        this.duenio = duenio;
     }
 
     public String getNombre() {

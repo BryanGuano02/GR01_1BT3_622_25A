@@ -1,21 +1,21 @@
 package DAO;
 
-import entidades.DueñoRestaurante;
+import entidades.DuenioRestaurante;
 import jakarta.persistence.*;
 
-public class DueñoRestauranteDAO {
+public class DuenioRestauranteDAO {
     private final EntityManagerFactory emf;
 
-    public DueñoRestauranteDAO(EntityManagerFactory emf) {
+    public DuenioRestauranteDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-    public DueñoRestaurante findByNombreUsuario(String nombreUsuario) {
+    public DuenioRestaurante findByNombreUsuario(String nombreUsuario) {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery(
-                            "SELECT d FROM DueñoRestaurante d LEFT JOIN FETCH d.restaurante WHERE d.nombreUsuario = :nombreUsuario",
-                            DueñoRestaurante.class)
+                            "SELECT d FROM DuenioRestaurante d LEFT JOIN FETCH d.restaurante WHERE d.nombreUsuario = :nombreUsuario",
+                            DuenioRestaurante.class)
                     .setParameter("nombreUsuario", nombreUsuario)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -25,20 +25,20 @@ public class DueñoRestauranteDAO {
         }
     }
 
-    public void save(DueñoRestaurante dueño) {
+    public void save(DuenioRestaurante duenio) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            if (dueño.getId() == null) {
-                em.persist(dueño);
-                if (dueño.getRestaurante() != null) {
-                    em.persist(dueño.getRestaurante());
+            if (duenio.getId() == null) {
+                em.persist(duenio);
+                if (duenio.getRestaurante() != null) {
+                    em.persist(duenio.getRestaurante());
                 }
             } else {
-                em.merge(dueño);
-                if (dueño.getRestaurante() != null) {
-                    em.merge(dueño.getRestaurante());
+                em.merge(duenio);
+                if (duenio.getRestaurante() != null) {
+                    em.merge(duenio.getRestaurante());
                 }
             }
             tx.commit();

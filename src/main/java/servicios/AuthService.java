@@ -1,9 +1,9 @@
 package servicios;
 
-import DAO.DueñoRestauranteDAO;
+import DAO.DuenioRestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
-import entidades.DueñoRestaurante;
+import entidades.DuenioRestaurante;
 import entidades.Restaurante;
 import entidades.Usuario;
 import exceptions.ServiceException;
@@ -15,12 +15,12 @@ import java.util.List;
 
 public class AuthService {
     private final UsuarioDAO usuarioDAO;
-    private final DueñoRestauranteDAO dueñoRestauranteDAO;
+    private final DuenioRestauranteDAO duenioRestauranteDAO;
     private static final int SALT_LENGTH = 16; // 16 bytes
 
-    public AuthService(UsuarioDAO usuarioDAO, DueñoRestauranteDAO dueñoDAO) {
+    public AuthService(UsuarioDAO usuarioDAO, DuenioRestauranteDAO duenioDAO) {
         this.usuarioDAO = usuarioDAO;
-        this.dueñoRestauranteDAO = dueñoDAO;
+        this.duenioRestauranteDAO = duenioDAO;
     }
 
     // Método para obtener todos los restaurantes
@@ -91,17 +91,17 @@ public class AuthService {
     }
 
     // Registro de dueño de restaurante
-    public void registrarDueñoRestaurante(DueñoRestaurante dueño) throws ServiceException {
-        if (usuarioDAO.findByNombreUsuario(dueño.getNombreUsuario()) != null) {
+    public void registrarDuenioRestaurante(DuenioRestaurante duenio) throws ServiceException {
+        if (usuarioDAO.findByNombreUsuario(duenio.getNombreUsuario()) != null) {
             throw new ServiceException("El nombre de usuario ya existe");
         }
 
         // Hashear la contraseña antes de guardar
         String salt = generateSalt();
-        String hashedPassword = hashPassword(dueño.getContrasena(), salt);
-        dueño.setContrasena(salt + ":" + hashedPassword);
+        String hashedPassword = hashPassword(duenio.getContrasena(), salt);
+        duenio.setContrasena(salt + ":" + hashedPassword);
 
-        dueñoRestauranteDAO.save(dueño);
+        duenioRestauranteDAO.save(duenio);
     }
 
     // Registro de comensal

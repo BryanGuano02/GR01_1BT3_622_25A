@@ -5,13 +5,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     // Verificar autenticación y tipo de usuario
-    if (session.getAttribute("usuario") == null || !(session.getAttribute("usuario") instanceof DueñoRestaurante)) {
+    if (session.getAttribute("usuario") == null || !(session.getAttribute("usuario") instanceof DuenioRestaurante)) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
 
-    DueñoRestaurante dueño = (DueñoRestaurante) session.getAttribute("usuario");
-    Restaurante restauranteUsuario = dueño.getRestaurante();
+    DuenioRestaurante duenio = (DuenioRestaurante) session.getAttribute("usuario");
+    Restaurante restauranteUsuario = duenio.getRestaurante();
     boolean tieneDatos = restauranteUsuario != null && restauranteUsuario.getNombre() != null && !restauranteUsuario.getNombre().isEmpty();
     request.setAttribute("titulo", tieneDatos ? "Administrar Restaurante" : "Registrar Restaurante");
     request.setAttribute("botonAtras", false);

@@ -5,7 +5,7 @@ import DAO.SuscripcionDAO;
 import DAO.UsuarioDAO;
 import DTO.RestauranteDTO;
 import entidades.Comensal;
-import entidades.DueñoRestaurante;
+import entidades.DuenioRestaurante;
 import entidades.Historia;
 import entidades.Restaurante;
 import entidades.Usuario;
@@ -47,8 +47,8 @@ public class SvRestaurante extends HttpServlet {
 
         // Redirigir según tipo de usuario
         if ("DUENO_RESTAURANTE".equals(usuario.getTipoUsuario())) {
-            DueñoRestaurante dueño = (DueñoRestaurante) usuario;
-            mostrarPanelRestaurante(req, resp, dueño.getRestaurante());
+            DuenioRestaurante duenio = (DuenioRestaurante) usuario;
+            mostrarPanelRestaurante(req, resp, duenio.getRestaurante());
         } else {
             resp.sendRedirect(req.getContextPath() + "/inicio");
         }
@@ -65,8 +65,8 @@ public class SvRestaurante extends HttpServlet {
             return;
         }
 
-        DueñoRestaurante dueño = (DueñoRestaurante) session.getAttribute("usuario");
-        Restaurante restauranteUsuario = dueño.getRestaurante();
+        DuenioRestaurante duenio = (DuenioRestaurante) session.getAttribute("usuario");
+        Restaurante restauranteUsuario = duenio.getRestaurante();
         String accion = req.getParameter("accion");
 
         if ("guardar".equals(accion)) {
@@ -91,9 +91,9 @@ public class SvRestaurante extends HttpServlet {
                 MenuDelDiaService menuDelDiaService = new MenuDelDiaService();
                 Restaurante restaurante = menuDelDiaService.guardarMenuDelDia(descripcionMenu,
                         restauranteUsuario.getId());
-                dueño.setRestaurante(restaurante);
-                usuarioDAO.save(dueño);
-                session.setAttribute("usuario", dueño);
+                duenio.setRestaurante(restaurante);
+                usuarioDAO.save(duenio);
+                session.setAttribute("usuario", duenio);
             }
         }
     }
@@ -173,9 +173,9 @@ public class SvRestaurante extends HttpServlet {
             restauranteDAO.save(restauranteUsuario);
 
             HttpSession session = req.getSession();
-            DueñoRestaurante dueño = (DueñoRestaurante) session.getAttribute("usuario");
-            dueño.setRestaurante(restauranteUsuario);
-            session.setAttribute("usuario", dueño);
+            DuenioRestaurante duenio = (DuenioRestaurante) session.getAttribute("usuario");
+            duenio.setRestaurante(restauranteUsuario);
+            session.setAttribute("usuario", duenio);
 
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+exitosamente");
         } catch (Exception e) {
@@ -196,7 +196,7 @@ public class SvRestaurante extends HttpServlet {
             restaurante.agregarHistoria(historia);
 
             restauranteDAO.save(restaurante);
-            req.getSession().setAttribute("usuario", ((DueñoRestaurante) req.getSession().getAttribute("usuario")));
+            req.getSession().setAttribute("usuario", ((DuenioRestaurante) req.getSession().getAttribute("usuario")));
 
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Menú+agregado");
         } catch (Exception e) {
@@ -234,9 +234,9 @@ public class SvRestaurante extends HttpServlet {
             restauranteDAO.save(restauranteUsuario);
 
             HttpSession session = req.getSession();
-            DueñoRestaurante dueño = (DueñoRestaurante) session.getAttribute("usuario");
-            dueño.setRestaurante(restauranteUsuario);
-            session.setAttribute("usuario", dueño);
+            DuenioRestaurante duenio = (DuenioRestaurante) session.getAttribute("usuario");
+            duenio.setRestaurante(restauranteUsuario);
+            session.setAttribute("usuario", duenio);
 
             resp.sendRedirect(req.getContextPath() + "/restaurante?success=Restaurante+actualizado+correctamente");
         } catch (Exception e) {

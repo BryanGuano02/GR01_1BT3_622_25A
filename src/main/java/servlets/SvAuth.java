@@ -1,9 +1,9 @@
 package servlets;
 
-import DAO.DueñoRestauranteDAO;
+import DAO.DuenioRestauranteDAO;
 import DAO.UsuarioDAO;
 import entidades.Comensal;
-import entidades.DueñoRestaurante;
+import entidades.DuenioRestaurante;
 import entidades.Restaurante;
 import entidades.Usuario;
 import exceptions.ServiceException;
@@ -24,7 +24,7 @@ public class SvAuth extends HttpServlet {
     private AuthService authService;
     private static EntityManagerFactory emf;
     private UsuarioDAO usuarioDAO;
-    private DueñoRestauranteDAO dueñoRestauranteDAO;
+    private DuenioRestauranteDAO duenioRestauranteDAO;
 
     @Override
     public void init() throws ServletException {
@@ -33,8 +33,8 @@ public class SvAuth extends HttpServlet {
                 emf = Persistence.createEntityManagerFactory("UFood_PU");
             }
             this.usuarioDAO = new UsuarioDAO(emf);
-            this.dueñoRestauranteDAO = new DueñoRestauranteDAO(emf);
-            this.authService = new AuthService(usuarioDAO, dueñoRestauranteDAO);
+            this.duenioRestauranteDAO = new DuenioRestauranteDAO(emf);
+            this.authService = new AuthService(usuarioDAO, duenioRestauranteDAO);
         } catch (Exception e) {
             throw new ServletException("Error al inicializar JPA", e);
         }
@@ -82,13 +82,13 @@ public class SvAuth extends HttpServlet {
                 Comensal comensal = (Comensal) usuario;
                 session.setAttribute("notificaciones", comensal.getNotificaciones());
                 response.sendRedirect("inicio");
-            } else if (usuario instanceof DueñoRestaurante) {
-                DueñoRestaurante dueño = (DueñoRestaurante) usuario;
+            } else if (usuario instanceof DuenioRestaurante) {
+                DuenioRestaurante duenio = (DuenioRestaurante) usuario;
                 // Asegurarnos de cargar el restaurante asociado
-                if(dueño.getRestaurante() == null) {
-                    dueño.setRestaurante(new Restaurante());
+                if(duenio.getRestaurante() == null) {
+                    duenio.setRestaurante(new Restaurante());
                 }
-                session.setAttribute("restaurante", dueño.getRestaurante());
+                session.setAttribute("restaurante", duenio.getRestaurante());
                 response.sendRedirect("crearRestaurante.jsp");
             }
         } catch (ServiceException e) {
@@ -100,7 +100,7 @@ public class SvAuth extends HttpServlet {
     private void handleRestauranteRegistration(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            DueñoRestaurante dueño = new DueñoRestaurante(
+            DuenioRestaurante duenio = new DuenioRestaurante(
                     request.getParameter("nombreUsuario"),
                     request.getParameter("contrasena"),
                     request.getParameter("email")
@@ -112,9 +112,9 @@ public class SvAuth extends HttpServlet {
             Restaurante restaurante = new Restaurante(nombreRestaurante, tipoComida);
 
             // Establecer la relación bidireccional
-            dueño.setRestaurante(restaurante);
+            duenio.setRestaurante(restaurante);
 
-            authService.registrarDueñoRestaurante(dueño);
+            authService.registrarDuenioRestaurante(duenio);
             response.sendRedirect("login.jsp?registroExitoso=true");
         } catch (ServiceException e) {
             request.setAttribute("error", e.getMessage());
@@ -151,13 +151,13 @@ public class SvAuth extends HttpServlet {
             int numeroRestaurantes = 6;
 
             crearComensales(numeroComensales);
-            crearDueñosRestaurantes(numeroRestaurantes);
+            crearDueniosRestaurantes(numeroRestaurantes);
         } catch (ServiceException e) {
             System.out.println("Error al crear usuarios: " + e.getMessage());
         }
     }
 
-    private void crearDueñosRestaurantes(int numeroRestaurantes) throws ServiceException {
+    private void crearDueniosRestaurantes(int numeroRestaurantes) throws ServiceException {
         List<String> nombresRestaurantes = Arrays.asList(
                 "Burger Place", "Comida Casera Doña Marta", "Pescados y Mariscos del Pacífico",
                 "Restaurante Gourmet La Mesa", "Pizza Rápida", "El Buen Sabor");
@@ -175,16 +175,16 @@ public class SvAuth extends HttpServlet {
                 continue;
             }
 
-            DueñoRestaurante dueño = new DueñoRestaurante(nombreUsuario, contrasena, email);
+            DuenioRestaurante duenio = new DuenioRestaurante(nombreUsuario, contrasena, email);
 
             // Crear el restaurante asociado al dueño
             Restaurante restaurante = new Restaurante(nombresRestaurantes.get(i-1), tiposComida.get(i-1));
 
             // Establecer la relación bidireccional
-            dueño.setRestaurante(restaurante);
+            duenio.setRestaurante(restaurante);
 
-            authService.registrarDueñoRestaurante(dueño);
-            registrarRestaurantesQuemados(dueño);
+            authService.registrarDuenioRestaurante(duenio);
+            registrarRestaurantesQuemados(duenio);
         }
     }
 
@@ -209,7 +209,7 @@ public class SvAuth extends HttpServlet {
         }
     }
 
-    private void registrarRestaurantesQuemados(DueñoRestaurante dueño) {
+    private void registrarRestaurantesQuemados(DuenioRestaurante duenio) {
         List<String> descripciones = Arrays.asList(
                 "Las mejores hamburguesas de la ciudad", "Comida casera como la de mamá",
                 "Los mejores mariscos frescos", "Ambiente elegante y platos selectos",
@@ -234,13 +234,13 @@ public class SvAuth extends HttpServlet {
                 3, 4, 4, 5, 3, 4);
 
         try {
-            Restaurante restaurante = dueño.getRestaurante();
+            Restaurante restaurante = duenio.getRestaurante();
             if (restaurante == null) {
-                System.out.println("Error: Dueño sin restaurante asociado: " + dueño.getNombreUsuario());
+                System.out.println("Error: Dueño sin restaurante asociado: " + duenio.getNombreUsuario());
                 return;
             }
 
-            int index = Integer.parseInt(dueño.getNombreUsuario().substring(1)) - 1;
+            int index = Integer.parseInt(duenio.getNombreUsuario().substring(1)) - 1;
 
             restaurante.setDescripcion(descripciones.get(index));
             restaurante.setHoraApertura(LocalTime.parse(horasApertura.get(index)));
@@ -250,8 +250,8 @@ public class SvAuth extends HttpServlet {
             restaurante.setTiempoEspera(tiemposEspera.get(index));
             restaurante.setCalidad(calidades.get(index));
 
-            dueñoRestauranteDAO.save(dueño);
-            System.out.println("Restaurante actualizado: " + dueño.getNombreUsuario() + " - " + restaurante.getNombre());
+            duenioRestauranteDAO.save(duenio);
+            System.out.println("Restaurante actualizado: " + duenio.getNombreUsuario() + " - " + restaurante.getNombre());
 
         } catch (Exception e) {
             System.out.println("Error al actualizar restaurante: " + e.getMessage());
